@@ -44,6 +44,8 @@ $ go build
 $ ./andesite
 ```
 
+`go build` is used here instead of `go run main.go` because `go run` creates a new binary every time which, since this program is a server, will request a firewall exception on every run. Using `go build` overwrites the same binary `./andesite` over and over again as changes are made.
+
 ### Options
 - -root **Required**
     - A relative or absolute path to which you wish for Andesite to serve
