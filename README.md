@@ -48,7 +48,7 @@ $ ./andesite
 
 ### Options
 - -root **Required**
-    - A relative or absolute path to which you wish for Andesite to serve
+    - A relative or absolute path to the directory you wish for Andesite to serve
 - -port
     - The port Andesite will broadcast on. (Default `8000`)
 - -admin
