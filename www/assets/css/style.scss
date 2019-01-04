@@ -1,0 +1,117 @@
+//
+$dark: #212121;
+$light: #EFEFEF;
+$accent1: #00B0FF;
+$accent2: #FF9100;
+//
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: $dark;
+    color: $light;
+
+    h1 {
+        margin-bottom: 0;
+    }
+    p {
+        margin-top: 0;
+    }
+    a {
+        color: $accent2;
+
+        &.btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: .5em;
+            border: 2px solid $accent1;
+            border-radius: .25em;
+            color: $light;
+
+            &:hover {
+                background-color: $accent1;
+                color: $dark;
+            }
+            &:active {
+                background-color: $accent2;
+                border-color: $accent2;
+            }
+        }
+    }
+    table {
+        thead {
+            font-weight: bold;
+        }
+        td {
+            padding: 0 .5em;
+            white-space: nowrap;
+
+            &:nth-child(1) {
+                text-align: right;
+            }
+            &:nth-child(4) {
+                text-align: right;
+            }
+            a {
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+    ul {
+        list-style-type: none;
+        display: block;
+        padding: 0;
+
+        &.datalist {
+            display: block;
+
+            form {
+                display: flex;
+                flex-direction: row;
+                max-width: 60em;
+
+                > * {
+                    display: block;
+                    margin: .5em;
+                    padding: .5em;
+                }
+                input {
+                    &[type=text] {
+                        flex-grow: 1;
+                        background-color: transparent;
+                        border: 2px solid $accent1;
+                        border-radius: .25em;
+                        color: $light;
+
+                        &:focus {
+                            border-color: $accent2;
+                        }
+                        &[name=snowflake] {
+                            max-width: 12em;
+                        }
+                    }
+                }
+                button {
+                    &.btn {
+                        background-color: transparent;
+                        color: $light;
+                        border: 2px solid $accent1;
+                        border-radius: .25em;
+                        cursor: pointer;
+
+                        &:hover {
+                            background-color: $accent1;
+                            color: $dark;
+                        }
+                        &:active {
+                            background-color: $accent2;
+                            border-color: $accent2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
