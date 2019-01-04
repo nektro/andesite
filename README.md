@@ -11,7 +11,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 - A directory you wish to proxy through Andesite
-- *For Development* The Go Language (https://golang.org/dl/)
+- *For Development* The Go Language 1.7+ (https://golang.org/dl/)
 - *For Development* GCC on your PATH (for the https://github.com/mattn/go-sqlite3 installation)
 
 ### Installing
