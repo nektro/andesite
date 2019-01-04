@@ -11,8 +11,8 @@ Share folders in an Open Directory without making your entire server public. Man
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
-- The Go Language (https://golang.org/dl/)
 - A directory you wish to proxy through Andesite
+- *For Development* The Go Language (https://golang.org/dl/)
 
 ### Installing
 Go to (https://discordapp.com/developers/applications/) and create an application on your Discord Developers dashboard. Fill out the name and picture as you see fit. This will be the information shown when Andesite authenticates users through Discord.
