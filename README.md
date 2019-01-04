@@ -80,6 +80,3 @@ When making a pull request, please have it be associated with an issue and make 
 
 ## License
 MIT
-
-## Inspiration
-Gib Romz
