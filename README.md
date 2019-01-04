@@ -13,6 +13,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 - A directory you wish to proxy through Andesite
 - *For Development* The Go Language (https://golang.org/dl/)
+- *For Development* GCC on your PATH (for the https://github.com/mattn/go-sqlite3 installation)
 
 ### Installing
 Go to (https://discordapp.com/developers/applications/) and create an application on your Discord Developers dashboard. Fill out the name and picture as you see fit. This will be the information shown when Andesite authenticates users through Discord.
