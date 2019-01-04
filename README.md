@@ -1,7 +1,6 @@
 # Andesite
 ![loc](https://tokei.rs/b1/github/nektro/andesite)
 [![license](https://img.shields.io/github/license/nektro/andesite.svg)](https://github.com/nektro/andesite/blob/master/LICENSE)
-[![issues](https://img.shields.io/github/issues/nektro/andesite.svg)](https://github.com/nektro/andesite/issues)
 [![paypal](https://img.shields.io/badge/donate-paypal-blue.svg?logo=paypal)](https://www.paypal.me/nektro)
 [![patreon](https://img.shields.io/badge/donate-patreon-orange.svg?logo=patreon)](https://www.patreon.com/nektro)
 
@@ -70,7 +69,11 @@ Works standalone or proxied through Nginx, etc to add additional headers.
 ## Contributing
 We take issues all the time right here on GitHub. We use labels extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it's been answered!
 
+[![issues](https://img.shields.io/github/issues/nektro/andesite.svg)](https://github.com/nektro/andesite/issues)
+
 When making a pull request, please have it be associated with an issue and make a comment on the issue saying that you're working on it so everyone else knows what's going on :D
+
+[![pulls](https://img.shields.io/github/issues-pr/nektro/andesite.svg)](https://github.com/nektro/andesite/pulls)
 
 ## Contact
 - hello@nektro.net
