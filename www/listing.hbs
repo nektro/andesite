@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Index of {{path}}</title>
+        <link rel="stylesheet" href="/assets/css/style.min.css">
+    </head>
+    <body>
+        <h1>Index of {{path}}</h1>
+        <p>Welcome, {{user}}</p>
+        <p>
+            <a class="btn" href="/files/">Root Directory</a>
+            <a class="btn" href="../">Parent Directory</a>
+            {{#if admin}}
+            <a class="btn" href="/admin">Admin Panel</a>
+            {{/if}}
+        </p>
+        <hr>
+        <table>
+            <thead>
+                <tr>
+                    <td></td>
+                    <td>Name</td>
+                    <td>Last Modified</td>
+                    <td>Size</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each files}}
+                <tr>
+                    <td>{{@index}}</td>
+                    <td><a href="{{name}}">{{name}}</a></td>
+                    <td>{{mod}}</td>
+                    <td>{{size}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <br>
+        <hr>
+        <p>Powered by <a href="https://github.com/nektro/andesite">Andesite</a></p>
+    </body>
+</html>

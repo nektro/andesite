@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title></title>
+        <link rel="stylesheet" href="/assets/css/style.min.css">
+    </head>
+    <body>
+        {{#if good}}
+        <h1>Update Successful</h1>
+        {{/if}}
+        {{#if bad}}
+        <h1>Update Failed</h1>
+        {{/if}}
+        <p>{{message}}</p>
+        <p>Return to <a href="/admin">the dashboard</a>.</p>
+    </body>
+</html>

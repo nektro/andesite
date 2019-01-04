@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Andesite Admin Panel</title>
+        <link rel="stylesheet" href="/assets/css/style.min.css">
+    </head>
+    <body>
+        <h1>Andesite Admin Panel</h1>
+        <p>Welcome, {{user}}</p>
+        <p><a class="btn" href="/files/">Back to Files</a></p>
+        <hr>
+        <ul class="datalist">
+        {{#each accesses}}
+            <li>
+                <form method="POST">
+                    <input type="hidden" name="id" value="{{id}}">
+                    <input type="text" name="snowflake" placeholder="User Snowflake" value="{{snowflake}}">
+                    <input type="text" name="path" placeholder="Path" value="{{path}}">
+                    <button class="btn" formaction="/api/access/update">Update</button>
+                    <button class="btn" formaction="/api/access/delete">Delete</button>
+                </form>
+            </li>
+        {{/each}}
+            <hr>
+            <li>
+                <form method="POST">
+                    <input type="text" name="snowflake" placeholder="User Snowflake">
+                    <input type="text" name="path" placeholder="Path">
+                    <button class="btn" formaction="/api/access/create">Add User Access</button>
+                </form>
+            </li>
+        </ul>
+        <br>
+        <hr>
+        <p>Powered by <a href="https://github.com/nektro/andesite">Andesite</a></p>
+    </body>
+</html>
