@@ -66,7 +66,6 @@ Works standalone or proxied through Nginx, etc to add additional headers.
 - https://handlebarsjs.com/ - HTML templating
 - https://github.com/aymerick/raymond - Handlebars template rendering
 - https://sass-lang.com/ - Cascading CSS styles
-- No JavaScript!
 
 ## Contributing
 We take issues all the time right here on GitHub. We use labels extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it's been answered!
