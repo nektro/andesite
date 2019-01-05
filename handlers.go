@@ -14,6 +14,7 @@ import (
 	"github.com/aymerick/raymond"
 )
 
+// handler for http://andesite/login
 func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
 	session := getSession(r)
 	_, ok := session.Values["user"]
@@ -34,6 +35,7 @@ func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(301)
 }
 
+// handler for http://andesite/callback
 func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 	if len(code) == 0 {
@@ -63,6 +65,7 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(301)
 }
 
+// handler for http://andesite/token
 func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	session := getSession(r)
 	val, _ := session.Values[accessToken]
@@ -83,6 +86,7 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(301)
 }
 
+// handler for http://andesite/test
 func handleTest(w http.ResponseWriter, r *http.Request) {
 	// sessions test
 	// increment number every refresh
@@ -98,6 +102,7 @@ func handleTest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, strconv.Itoa(j))
 }
 
+// handler for http://andesite/files/*
 func handleFileListing(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(r.RequestURI, "..") {
 		return
@@ -200,6 +205,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handler for http://andesite/admin
 func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	// get discord snowflake from session cookie
 	session := getSession(r)
@@ -229,6 +235,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// handler for http://andesite/api/access/delete
 func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeAPIResponse(w, false, "This action requires using HTTP POST")
@@ -270,6 +277,7 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	writeAPIResponse(w, true, fmt.Sprintf("Removed access from %s.", r.PostForm.Get("snowflake")))
 }
 
+// handler for http://andesite/api/access/update
 func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeAPIResponse(w, false, "This action requires using HTTP POST")
@@ -311,6 +319,7 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	writeAPIResponse(w, true, fmt.Sprintf("Updated access for %s.", r.PostForm.Get("snowflake")))
 }
 
+// handler for http://andesite/api/access/create
 func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeAPIResponse(w, false, "This action requires using HTTP POST")
