@@ -177,7 +177,7 @@ func readFile(path string) []byte {
 	return bytes
 }
 
-// from https://yourbasic.org/golang/formatting-byte-size-to-human-readable-format/
+// @from https://yourbasic.org/golang/formatting-byte-size-to-human-readable-format/
 func byteCountIEC(b int64) string {
 	const unit = 1024
 	if b < unit {
