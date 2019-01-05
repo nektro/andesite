@@ -55,9 +55,6 @@ $ ./andesite
 - -admin
     - The Discord Snowflake of a user to add as an admin. Only required once. Admin priviledge allows this user to change the path access of other users.
 
-## Deployment
-Works standalone or proxied through Nginx, etc to add additional headers.
-
 ## Built With
 - The Go Programming Lanuage - https://golang.org/
 - https://github.com/gorilla/sessions - Session management
