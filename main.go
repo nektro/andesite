@@ -121,18 +121,20 @@ func main() {
 
 	//
 
+	mw := chainMiddleware()
+
 	p := strconv.Itoa(*port)
 	log("Initialization complete. Starting server on port " + p)
-	http.Handle("/", http.FileServer(http.Dir("www")))
-	http.HandleFunc("/login", handleOAuthLogin)
-	http.HandleFunc("/callback", handleOAuthCallback)
-	http.HandleFunc("/token", handleOAuthToken)
-	http.HandleFunc("/test", handleTest)
-	http.HandleFunc("/files/", handleFileListing)
-	http.HandleFunc("/admin", handleAdmin)
-	http.HandleFunc("/api/access/delete", handleAccessDelete)
-	http.HandleFunc("/api/access/update", handleAccessUpdate)
-	http.HandleFunc("/api/access/create", handleAccessCreate)
+	http.HandleFunc("/", mw(http.FileServer(http.Dir("www")).ServeHTTP))
+	http.HandleFunc("/login", mw(handleOAuthLogin))
+	http.HandleFunc("/callback", mw(handleOAuthCallback))
+	http.HandleFunc("/token", mw(handleOAuthToken))
+	http.HandleFunc("/test", mw(handleTest))
+	http.HandleFunc("/files/", mw(handleFileListing))
+	http.HandleFunc("/admin", mw(handleAdmin))
+	http.HandleFunc("/api/access/delete", mw(handleAccessDelete))
+	http.HandleFunc("/api/access/update", mw(handleAccessUpdate))
+	http.HandleFunc("/api/access/create", mw(handleAccessCreate))
 	http.ListenAndServe(":"+p, nil)
 	defer database.Close()
 }
@@ -252,4 +254,17 @@ func writeAPIResponse(w http.ResponseWriter, good bool, message string) {
 		"bad":     !good,
 		"message": message,
 	})
+}
+
+// @from https://gist.github.com/gbbr/fa652db0bab132976620bcb7809fd89a
+func chainMiddleware(mw ...Middleware) Middleware {
+	return func(final http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			last := final
+			for i := len(mw) - 1; i >= 0; i-- {
+				last = mw[i](last)
+			}
+			last(w, r)
+		}
+	}
 }

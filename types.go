@@ -1,5 +1,7 @@
 package main
 
+import "net/http"
+
 type Config struct {
 	Discord struct {
 		ID     string `json:"id"`
@@ -46,3 +48,10 @@ type UserRow struct {
 	snowflake string
 	admin     bool
 }
+
+// Middleware provides a convenient mechanism for augmenting HTTP requests
+// entering the application. It returns a new handler which may perform various
+// operations and should finish by calling the next HTTP handler.
+//
+// @from https://gist.github.com/gbbr/dc731df098276f1a135b343bf5f2534a
+type Middleware func(next http.HandlerFunc) http.HandlerFunc
