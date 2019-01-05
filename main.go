@@ -121,7 +121,7 @@ func main() {
 
 	//
 
-	mw := chainMiddleware()
+	mw := chainMiddleware(withAttribution)
 
 	p := strconv.Itoa(*port)
 	log("Initialization complete. Starting server on port " + p)
@@ -266,5 +266,12 @@ func chainMiddleware(mw ...Middleware) Middleware {
 			}
 			last(w, r)
 		}
+	}
+}
+
+func withAttribution(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Server", "nektro/andesite")
+		next.ServeHTTP(w, r)
 	}
 }
