@@ -31,6 +31,8 @@ In the `.andesite` folder make a `config.json` file and put the following data i
 ```
 and replace `CLIENT_ID` and `CLIENT_SECRET` with their respective values. Do not worry, this folder will remain entirely private, even to users with full access.
 
+Additionally, if your server is going to be hosted at `https://domain.com/` then you must add `https://domain.com/callback` as a trusted OAuth2 callback URL in your app's settings.
+
 Run
 ```
 $ go get github.com/nektro/andesite
