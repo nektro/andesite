@@ -68,7 +68,10 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 // handler for http://andesite/token
 func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	session := getSession(r)
-	val, _ := session.Values[accessToken]
+	val, ok := session.Values[accessToken]
+	if !ok {
+		return
+	}
 	urlR, _ := url.Parse(discordAPI)
 	urlR.Path += "/users/@me"
 	req, _ := http.NewRequest("GET", urlR.String(), strings.NewReader(""))
