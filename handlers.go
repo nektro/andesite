@@ -120,10 +120,10 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 
 	// get path
 	uqu, _ := url.QueryUnescape(r.RequestURI[6:])
-	path := path.Join(dataRootPath, uqu)
+	dpath := path.Join(dataRootPath, uqu)
 
 	// valid path check
-	stat, err := os.Stat(path)
+	stat, err := os.Stat(dpath)
 	if os.IsNotExist(err) {
 		// 404
 		w.WriteHeader(404)
@@ -136,7 +136,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/html")
 
 		// get list of all files
-		files, _ := ioutil.ReadDir(path)
+		files, _ := ioutil.ReadDir(dpath)
 
 		// hide dot files
 		files = filter(files, func(x os.FileInfo) bool {
@@ -204,7 +204,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.ServeFile(w, r, path)
+		http.ServeFile(w, r, dpath)
 	}
 }
 
