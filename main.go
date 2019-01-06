@@ -139,9 +139,12 @@ func main() {
 	http.ListenAndServe(":"+p, nil)
 }
 
-func dieOnError(e error) {
-	if e != nil {
-		logError(e.Error())
+func dieOnError(err error, args ...string) {
+	if err != nil {
+		logError(fmt.Sprintf("%q", err))
+		for _, item := range args {
+			logError(item)
+		}
 		os.Exit(1)
 	}
 }
