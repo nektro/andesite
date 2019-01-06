@@ -28,6 +28,7 @@ const (
 	version     = 1
 	discordAPI  = "https://discordapp.com/api"
 	accessToken = "access_token"
+	pthAnd      = "/.andesite/"
 )
 
 var (
@@ -54,7 +55,7 @@ func main() {
 	dieOnError(assert(fileExists(dataRootPath), "Path specified does not exist!"))
 
 	log("Starting Andesite in " + dataRootPath)
-	dieOnError(assert(fileExists(dataRootPath+"/.andesite/"), ".andesite folder does not exist!"))
+	dieOnError(assert(fileExists(dataRootPath+pthAnd), ".andesite folder does not exist!"))
 
 	configPath := dataRootPath + "/.andesite/config.json"
 	dieOnError(assert(fileExists(configPath), "config.json does not exist!"))
@@ -67,7 +68,7 @@ func main() {
 	//
 	// database initialization
 
-	db, err := sql.Open("sqlite3", "file:"+dataRootPath+"/.andesite/"+"access.db?mode=rwc&cache=shared")
+	db, err := sql.Open("sqlite3", "file:"+dataRootPath+pthAnd+"access.db?mode=rwc&cache=shared")
 	checkErr(err)
 	database = db
 
