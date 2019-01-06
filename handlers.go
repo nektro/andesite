@@ -10,8 +10,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-
-	"github.com/aymerick/raymond"
 )
 
 // handler for http://andesite/login
@@ -182,15 +180,12 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			admin = useruser.admin
 		}
 
-		template := string(readFile("./www/listing.hbs"))
-		context := map[string]interface{}{
+		writeHandlebarsFile(w, "./www/listing.hbs", map[string]interface{}{
 			"user":  userID,
 			"path":  uqu,
 			"files": data,
 			"admin": admin,
-		}
-		result, _ := raymond.Render(template, context)
-		fmt.Fprintln(w, result)
+		})
 	} else {
 		// access check
 		can := false
