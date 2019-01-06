@@ -122,10 +122,9 @@ func main() {
 	//
 
 	mw := chainMiddleware(withAttribution)
-
 	p := strconv.Itoa(*port)
-	log("Initialization complete. Starting server on port " + p)
-	http.HandleFunc("/", mw(http.FileServer(http.Dir("www")).ServeHTTP))
+
+	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
 	http.HandleFunc("/login", mw(handleOAuthLogin))
 	http.HandleFunc("/callback", mw(handleOAuthCallback))
 	http.HandleFunc("/token", mw(handleOAuthToken))
@@ -135,6 +134,8 @@ func main() {
 	http.HandleFunc("/api/access/delete", mw(handleAccessDelete))
 	http.HandleFunc("/api/access/update", mw(handleAccessUpdate))
 	http.HandleFunc("/api/access/create", mw(handleAccessCreate))
+
+	log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
 }
 
