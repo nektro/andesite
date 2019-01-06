@@ -38,12 +38,14 @@ var (
 	randomKey        = securecookie.GenerateRandomKey(32)
 	store            = sessions.NewCookieStore(randomKey)
 	database         *sql.DB
+	wwFFS            FusingFileSystem
 )
 
 func main() {
 	pathRaw := flag.String("root", "", "Path of root directory for files")
 	port := flag.Int("port", 8000, "Port to open server on")
 	admin := flag.String("admin", "", "Discord User ID of the user that is distinguished as the site owner")
+	theme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
 	flag.Parse()
 
 	dieOnError(assert(len(*pathRaw) > 1, "Please pass a directory as a -root parameter!"))
@@ -103,6 +105,20 @@ func main() {
 	}
 
 	//
+	// theme check from (optional) CLI argument
+
+	themeRootPath := ""
+	themeDirName := ""
+	if *theme != "" {
+		stheme := *theme
+		themeDirName = "theme-" + stheme
+		themeRootPath = dataRootPath + pthAnd + themeDirName + "/"
+		fi, err := os.Stat(themeRootPath)
+		dieOnError(err, "Theme directory must exist if the -theme option is present")
+		dieOnError(assert(fi.IsDir(), "Theme directory must be a directory!"))
+	}
+
+	//
 	// graceful stop
 
 	gracefulStop := make(chan os.Signal)
@@ -124,6 +140,14 @@ func main() {
 
 	mw := chainMiddleware(withAttribution)
 	p := strconv.Itoa(*port)
+	dirs := []http.FileSystem{}
+
+	if themeRootPath != "" {
+		dirs = append(dirs, http.Dir(themeRootPath))
+	}
+
+	dirs = append(dirs, http.Dir("www"))
+	wwFFS = FusingFileSystem{dirs}
 
 	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
 	http.HandleFunc("/login", mw(handleOAuthLogin))
@@ -177,6 +201,12 @@ func getIsoDateTime() string {
 
 func readFile(path string) []byte {
 	reader, _ := os.Open(path)
+	bytes, _ := ioutil.ReadAll(reader)
+	return bytes
+}
+
+func readServerFile(path string) []byte {
+	reader, _ := wwFFS.Open(path)
 	bytes, _ := ioutil.ReadAll(reader)
 	return bytes
 }
@@ -237,11 +267,11 @@ func checkErr(err error, args ...string) {
 
 func writeUserDenied(w http.ResponseWriter, message string, showLogin bool) {
 	w.WriteHeader(http.StatusForbidden)
-	writeHandlebarsFile(w, "./www/denied.hbs", map[string]interface{}{
 	linkmsg := ""
 	if showLogin {
 		linkmsg = "Please <a href='/login'>Log In</a>."
 	}
+	writeHandlebarsFile(w, "/response.hbs", map[string]interface{}{
 		"title":   "407 Forbidden",
 		"message": message,
 		"link":    linkmsg,
@@ -249,7 +279,7 @@ func writeUserDenied(w http.ResponseWriter, message string, showLogin bool) {
 }
 
 func writeHandlebarsFile(w http.ResponseWriter, file string, context map[string]interface{}) {
-	template := string(readFile(file))
+	template := string(readServerFile(file))
 	result, _ := raymond.Render(template, context)
 	fmt.Fprintln(w, result)
 }
@@ -258,13 +288,13 @@ func writeAPIResponse(w http.ResponseWriter, good bool, message string) {
 	if !good {
 		w.WriteHeader(http.StatusForbidden)
 	}
-	writeHandlebarsFile(w, "./www/response.hbs", map[string]interface{}{
 	titlemsg := ""
 	if good {
 		titlemsg = "Update Successful"
 	} else {
 		titlemsg = "Update Failed"
 	}
+	writeHandlebarsFile(w, "/response.hbs", map[string]interface{}{
 		"title":   titlemsg,
 		"message": message,
 		"link":    "Return to <a href='/admin'>the dashboard</a>.",

@@ -180,7 +180,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			admin = useruser.admin
 		}
 
-		writeHandlebarsFile(w, "./www/listing.hbs", map[string]interface{}{
+		writeHandlebarsFile(w, "/listing.hbs", map[string]interface{}{
 			"user":  userID,
 			"path":  uqu,
 			"files": data,
@@ -227,7 +227,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 
 	//
 	accesses := queryAllAccess()
-	writeHandlebarsFile(w, "./www/admin.hbs", map[string]interface{}{
+	writeHandlebarsFile(w, "/admin.hbs", map[string]interface{}{
 		"user":     useruser.snowflake,
 		"accesses": accesses,
 	})
