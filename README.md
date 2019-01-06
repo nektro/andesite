@@ -54,6 +54,22 @@ $ ./andesite
     - The port Andesite will broadcast on. (Default `8000`)
 - -admin
     - The Discord Snowflake of a user to add as an admin. Only required once. Admin priviledge allows this user to change the path access of other users.
+- -theme
+    - The name of the theme you want andesite to use for custom HTML and Handlebars templates.
+
+## Themes
+Andesite supports making custom themes for the splash page and the various HTML templates throughout the program. Those are:
+- `index.html` - [Default Source](./www/index.html)
+    - The main page shown to all users at the root of the server.
+- `response.hbs` - [Default Source](./www/response.hbs)
+    - A generic page used to show errors and message to the user.
+- `listing.hbs` - [Default Source](./www/listing.hbs)
+    - The main directory listing page.
+- `admin.hbs` - [Default Source](./www/admin.hbs)
+    - The admin dashboard that allows editing the access of users
+
+### Using A Theme
+All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `-theme` was `example`. Doing this will tell Andesite to serve files from `./.andesite/theme-example/`. This is so that multiple themes can be saved even though only one can be used at a time while keeping your `config.json` and any other private files private.
 
 ## Built With
 - The Go Programming Lanuage - https://golang.org/
