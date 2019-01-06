@@ -234,11 +234,16 @@ func checkErr(err error, args ...string) {
 	}
 }
 
-func writeUserDenied(w http.ResponseWriter, message string, show_login bool) {
+func writeUserDenied(w http.ResponseWriter, message string, showLogin bool) {
 	w.WriteHeader(http.StatusForbidden)
 	writeHandlebarsFile(w, "./www/denied.hbs", map[string]interface{}{
-		"denial_message": message,
-		"need_login":     show_login,
+	linkmsg := ""
+	if showLogin {
+		linkmsg = "Please <a href='/login'>Log In</a>."
+	}
+		"title":   "407 Forbidden",
+		"message": message,
+		"link":    linkmsg,
 	})
 }
 
@@ -253,9 +258,15 @@ func writeAPIResponse(w http.ResponseWriter, good bool, message string) {
 		w.WriteHeader(http.StatusForbidden)
 	}
 	writeHandlebarsFile(w, "./www/response.hbs", map[string]interface{}{
-		"good":    good,
-		"bad":     !good,
+	titlemsg := ""
+	if good {
+		titlemsg = "Update Successful"
+	} else {
+		titlemsg = "Update Failed"
+	}
+		"title":   titlemsg,
 		"message": message,
+		"link":    "Return to <a href='/admin'>the dashboard</a>.",
 	})
 }
 

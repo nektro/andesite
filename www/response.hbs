@@ -8,13 +8,8 @@
         <link rel="stylesheet" href="/assets/css/style.min.css">
     </head>
     <body>
-        {{#if good}}
-        <h1>Update Successful</h1>
-        {{/if}}
-        {{#if bad}}
-        <h1>Update Failed</h1>
-        {{/if}}
+        <h1>{{title}}</h1>
         <p>{{message}}</p>
-        <p>Return to <a href="/admin">the dashboard</a>.</p>
+        <p>{{{link}}}</p>
     </body>
 </html>
