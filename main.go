@@ -136,7 +136,6 @@ func main() {
 	http.HandleFunc("/api/access/update", mw(handleAccessUpdate))
 	http.HandleFunc("/api/access/create", mw(handleAccessCreate))
 	http.ListenAndServe(":"+p, nil)
-	defer database.Close()
 }
 
 func dieOnError(e error) {
