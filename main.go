@@ -49,8 +49,8 @@ func main() {
 	if !strings.HasSuffix(*pathRaw, "/") && !strings.HasSuffix(*pathRaw, "\\") {
 		*pathRaw += string(os.PathSeparator)
 	}
-	path, _ := filepath.Abs(*pathRaw)
-	dataRootPath = path
+	drp, _ := filepath.Abs(*pathRaw)
+	dataRootPath = drp
 	dieOnError(assert(fileExists(dataRootPath), "Path specified does not exist!"))
 
 	log("Starting Andesite in " + dataRootPath)
