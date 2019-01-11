@@ -140,6 +140,9 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			return !strings.HasPrefix(x.Name(), ".")
 		})
 
+		// amount of files in the directory
+		l1 := len(files)
+
 		// access check
 		acc := queryAccess(userID)
 		files = filter(files, func(x os.FileInfo) bool {
@@ -152,6 +155,14 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			}
 			return ok
 		})
+
+		// amount of files given access to
+		l2 := len(files)
+
+		if l1 > 0 && l2 == 0 {
+			writeUserDenied(w, true, false)
+			return
+		}
 
 		data := make([]map[string]string, len(files))
 		gi := 0
