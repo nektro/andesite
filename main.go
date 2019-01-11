@@ -265,8 +265,15 @@ func checkErr(err error, args ...string) {
 	}
 }
 
-func writeUserDenied(w http.ResponseWriter, message string, showLogin bool) {
+func writeUserDenied(w http.ResponseWriter, fileOrAdmin, showLogin bool) {
 	w.WriteHeader(http.StatusForbidden)
+
+	message := ""
+	if fileOrAdmin {
+		message = "You do not have access to this file/folder."
+	} else {
+		message = "Admin priviledge required. Access denied."
+	}
 
 	linkmsg := ""
 	if showLogin {

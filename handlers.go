@@ -111,7 +111,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 	session := getSession(r)
 	sessID, ok := session.Values["user"]
 	if !ok {
-		writeUserDenied(w, "You do not have access to this file/folder.", true)
+		writeUserDenied(w, true, true)
 		return
 	}
 	userID := sessID.(string)
@@ -124,8 +124,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 	stat, err := os.Stat(dpath)
 	if os.IsNotExist(err) {
 		// 404
-		w.WriteHeader(404)
-		fmt.Fprintln(w, "Directory doesn't exist")
+		writeUserDenied(w, true, false)
 		return
 	}
 
@@ -195,7 +194,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if can == false {
-			writeUserDenied(w, "File access denied.", false)
+			writeUserDenied(w, true, false)
 			return
 		}
 
@@ -209,7 +208,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	session := getSession(r)
 	sessID, ok := session.Values["user"]
 	if !ok {
-		writeUserDenied(w, "Admin priviledge required. Access denied.", true)
+		writeUserDenied(w, false, true)
 		return
 	}
 	userID := sessID.(string)
@@ -221,7 +220,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		admin = useruser.admin
 	}
 	if !admin {
-		writeUserDenied(w, "Admin priviledge required. Access denied.", false)
+		writeUserDenied(w, false, false)
 		return
 	}
 
