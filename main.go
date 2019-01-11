@@ -267,10 +267,12 @@ func checkErr(err error, args ...string) {
 
 func writeUserDenied(w http.ResponseWriter, message string, showLogin bool) {
 	w.WriteHeader(http.StatusForbidden)
+
 	linkmsg := ""
 	if showLogin {
 		linkmsg = "Please <a href='/login'>Log In</a>."
 	}
+
 	writeHandlebarsFile(w, "/response.hbs", map[string]interface{}{
 		"title":   "Forbidden",
 		"message": message,
