@@ -272,7 +272,7 @@ func writeUserDenied(w http.ResponseWriter, message string, showLogin bool) {
 		linkmsg = "Please <a href='/login'>Log In</a>."
 	}
 	writeHandlebarsFile(w, "/response.hbs", map[string]interface{}{
-		"title":   "407 Forbidden",
+		"title":   "Forbidden",
 		"message": message,
 		"link":    linkmsg,
 	})
