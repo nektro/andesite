@@ -32,9 +32,9 @@ const (
 )
 
 var (
-	dataRootPath     = ""
-	discordAppID     = ""
-	discordAppSecret = ""
+	dataRootPath     string
+	discordAppID     string
+	discordAppSecret string
 	randomKey        = securecookie.GenerateRandomKey(32)
 	store            = sessions.NewCookieStore(randomKey)
 	database         *sql.DB
