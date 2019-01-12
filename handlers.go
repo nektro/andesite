@@ -23,7 +23,7 @@ func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
 		urlR.Path += "/oauth2/authorize"
 		parameters := url.Values{}
 		parameters.Add("client_id", discordAppID)
-		parameters.Add("redirect_uri", fullHost(r)+"/callback")
+		parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 		parameters.Add("response_type", "code")
 		parameters.Add("scope", "identify")
 		urlR.RawQuery = parameters.Encode()
@@ -44,7 +44,7 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	parameters.Add("client_secret", discordAppSecret)
 	parameters.Add("grant_type", "authorization_code")
 	parameters.Add("code", code)
-	parameters.Add("redirect_uri", fullHost(r)+"/callback")
+	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 	urlR, _ := url.Parse(discordAPI)
 	urlR.Path += "/oauth2/token"
 	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
@@ -195,6 +195,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			"path":  uqu,
 			"files": data,
 			"admin": admin,
+			"base":  httpBase,
 		})
 	} else {
 		// access check
@@ -240,6 +241,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	writeHandlebarsFile(w, "/admin.hbs", map[string]interface{}{
 		"user":     useruser.snowflake,
 		"accesses": accesses,
+		"base":     httpBase,
 	})
 }
 

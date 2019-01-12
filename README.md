@@ -56,6 +56,8 @@ $ ./andesite
     - The Discord Snowflake of a user to add as an admin. Only required once. Admin priviledge allows this user to change the path access of other users.
 - -theme
     - The name of the theme you want andesite to use for custom HTML and Handlebars templates.
+- -base
+    - Used when serving andesite from an HTTP root that is not `/`. See [`deployment.md`](docs/deployment.md) for more info. (Default: `/`)
 
 ## Themes
 Andesite supports making custom themes for the splash page and the various HTML templates throughout the program. Those are:

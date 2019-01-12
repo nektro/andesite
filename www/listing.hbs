@@ -5,16 +5,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Index of {{path}}</title>
-        <link rel="stylesheet" href="/assets/css/style.min.css">
+        <link rel="stylesheet" href="{{base}}assets/css/style.min.css">
     </head>
     <body>
         <h1>Index of {{path}}</h1>
         <p>Welcome, {{user}}</p>
         <p>
-            <a class="btn" href="/files/">Root Directory</a>
+            <a class="btn" href="{{base}}files/">Root Directory</a>
             <a class="btn" href="../">Parent Directory</a>
             {{#if admin}}
-            <a class="btn" href="/admin">Admin Panel</a>
+            <a class="btn" href="{{base}}admin">Admin Panel</a>
             {{/if}}
         </p>
         <hr>

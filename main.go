@@ -39,6 +39,7 @@ var (
 	store            = sessions.NewCookieStore(randomKey)
 	database         *sql.DB
 	wwFFS            FusingFileSystem
+	httpBase         string
 )
 
 func main() {
@@ -46,6 +47,7 @@ func main() {
 	port := flag.Int("port", 8000, "Port to open server on")
 	admin := flag.String("admin", "", "Discord User ID of the user that is distinguished as the site owner")
 	theme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
+	flagBase := flag.String("base", "/", "")
 	flag.Parse()
 
 	dieOnError(assert(len(*pathRaw) > 1, "Please pass a directory as a -root parameter!"))
@@ -117,6 +119,10 @@ func main() {
 		dieOnError(err, "Theme directory must exist if the -theme option is present")
 		dieOnError(assert(fi.IsDir(), "Theme directory must be a directory!"))
 	}
+
+	//
+	// set HTTP base dir
+	httpBase = *flagBase
 
 	//
 	// graceful stop
@@ -277,13 +283,14 @@ func writeUserDenied(w http.ResponseWriter, fileOrAdmin, showLogin bool) {
 
 	linkmsg := ""
 	if showLogin {
-		linkmsg = "Please <a href='/login'>Log In</a>."
+		linkmsg = "Please <a href='" + httpBase + "login'>Log In</a>."
 	}
 
 	writeHandlebarsFile(w, "/response.hbs", map[string]interface{}{
 		"title":   "Forbidden",
 		"message": message,
 		"link":    linkmsg,
+		"base":    httpBase,
 	})
 }
 
@@ -307,6 +314,7 @@ func writeAPIResponse(w http.ResponseWriter, good bool, message string) {
 		"title":   titlemsg,
 		"message": message,
 		"link":    "Return to <a href='/admin'>the dashboard</a>.",
+		"base":    httpBase,
 	})
 }
 
