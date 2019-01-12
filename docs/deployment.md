@@ -10,7 +10,7 @@ location / {
     proxy_pass http://localhost:8000/;
 }
 ```
-### Serving from an HTTP base is not `/`
+### Serving from an HTTP base that is not `/`
 ```
 location /andesite/ {
     proxy_pass http://localhost:8000/;
