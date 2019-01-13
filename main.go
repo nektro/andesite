@@ -240,7 +240,7 @@ func fullHost(r *http.Request) string {
 }
 
 func getSession(r *http.Request) *sessions.Session {
-	session, _ := store.Get(r, "session")
+	session, _ := store.Get(r, "andesite_session")
 	return session
 }
 
