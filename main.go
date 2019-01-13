@@ -13,7 +13,6 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strconv"
-	"strings"
 	"syscall"
 	"time"
 
@@ -32,7 +31,6 @@ const (
 )
 
 var (
-	dataRootPath     string
 	discordAppID     string
 	discordAppSecret string
 	randomKey        = securecookie.GenerateRandomKey(32)
@@ -40,28 +38,41 @@ var (
 	database         *sql.DB
 	wwFFS            FusingFileSystem
 	httpBase         string
+	rootDir          RootDir
+	metaDir          string
 )
 
 func main() {
-	pathRaw := flag.String("root", "", "Path of root directory for files")
+	flagRoot := flag.String("root", "", "Path of root directory for files")
 	port := flag.Int("port", 8000, "Port to open server on")
 	admin := flag.String("admin", "", "Discord User ID of the user that is distinguished as the site owner")
 	theme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
 	flagBase := flag.String("base", "/", "")
+	flagRType := flag.String("root-type", "dir", "Type of path -root points to. One of 'dir', 'http'")
 	flag.Parse()
 
-	dieOnError(assert(len(*pathRaw) > 1, "Please pass a directory as a -root parameter!"))
-	if !strings.HasSuffix(*pathRaw, "/") && !strings.HasSuffix(*pathRaw, "\\") {
-		*pathRaw += string(os.PathSeparator)
+	//
+	// configure root dir
+
+	switch RootDirType(*flagRType) {
+	case RootTypeDir:
+		rootDir = FsRoot{*flagRoot}
+		s, _ := filepath.Abs(*flagRoot)
+		dieOnError(assert(fileExists(s), "Please pass a valid directory as a -root parameter!"))
+		metaDir = s + pthAnd
+	default:
+		dieOnError(errors.New("Invalid root type"))
 	}
-	drp, _ := filepath.Abs(*pathRaw)
-	dataRootPath = drp
-	dieOnError(assert(fileExists(dataRootPath), "Path specified does not exist!"))
+	dieOnError(assert(fileExists(metaDir), ".andesite folder does not exist!"))
 
-	log("Starting Andesite in " + dataRootPath)
-	dieOnError(assert(fileExists(dataRootPath+pthAnd), ".andesite folder does not exist!"))
+	//
 
-	configPath := dataRootPath + "/.andesite/config.json"
+	log("Starting Andesite in " + rootDir.Base())
+
+	//
+	// discover OAuth2 config info
+
+	configPath := metaDir + "/config.json"
 	dieOnError(assert(fileExists(configPath), "config.json does not exist!"))
 	configBytes := readFile(configPath)
 	var config Config
@@ -72,7 +83,7 @@ func main() {
 	//
 	// database initialization
 
-	db, err := sql.Open("sqlite3", "file:"+dataRootPath+pthAnd+"access.db?mode=rwc&cache=shared")
+	db, err := sql.Open("sqlite3", "file:"+metaDir+"/access.db?mode=rwc&cache=shared")
 	checkErr(err)
 	database = db
 
@@ -114,7 +125,7 @@ func main() {
 	if *theme != "" {
 		stheme := *theme
 		themeDirName = "theme-" + stheme
-		themeRootPath = dataRootPath + pthAnd + themeDirName + "/"
+		themeRootPath = metaDir + themeDirName + "/"
 		fi, err := os.Stat(themeRootPath)
 		dieOnError(err, "Theme directory must exist if the -theme option is present")
 		dieOnError(assert(fi.IsDir(), "Theme directory must be a directory!"))

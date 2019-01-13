@@ -3,11 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
-	"path"
 	"strconv"
 	"strings"
 )
@@ -117,11 +117,10 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 	userID := sessID.(string)
 
 	// get path
-	uqu, _ := url.QueryUnescape(r.RequestURI[6:])
-	dpath := path.Join(dataRootPath, uqu)
+	qpath, _ := url.QueryUnescape(r.RequestURI[6:])
 
 	// valid path check
-	stat, err := os.Stat(dpath)
+	stat, err := rootDir.Stat(qpath)
 	if os.IsNotExist(err) {
 		// 404
 		writeUserDenied(w, true, false)
@@ -133,7 +132,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/html")
 
 		// get list of all files
-		files, _ := ioutil.ReadDir(dpath)
+		files, _ := rootDir.ReadDir(qpath)
 
 		// hide dot files
 		files = filter(files, func(x os.FileInfo) bool {
@@ -147,9 +146,9 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 		acc := queryAccess(userID)
 		files = filter(files, func(x os.FileInfo) bool {
 			ok := false
-			fpath := uqu + x.Name()
+			fpath := qpath + x.Name()
 			for _, item := range acc {
-				if strings.HasPrefix(item, fpath) || strings.HasPrefix(uqu, item) {
+				if strings.HasPrefix(item, fpath) || strings.HasPrefix(qpath, item) {
 					ok = true
 				}
 			}
@@ -192,7 +191,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 
 		writeHandlebarsFile(w, "/listing.hbs", map[string]interface{}{
 			"user":  userID,
-			"path":  uqu,
+			"path":  qpath,
 			"files": data,
 			"admin": admin,
 			"base":  httpBase,
@@ -201,7 +200,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 		// access check
 		can := false
 		for _, item := range queryAccess(userID) {
-			if strings.HasPrefix(uqu, item) {
+			if strings.HasPrefix(qpath, item) {
 				can = true
 			}
 		}
@@ -210,7 +209,8 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.ServeFile(w, r, dpath)
+		reader, _ := rootDir.ReadFile(qpath)
+		io.Copy(w, reader)
 	}
 }
 
