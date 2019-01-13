@@ -64,4 +64,5 @@ type RootDirType string
 //
 const (
 	RootTypeDir  RootDirType = "dir"
+	RootTypeHttp             = "http"
 )
