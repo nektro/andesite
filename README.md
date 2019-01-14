@@ -3,7 +3,7 @@
 [![license](https://img.shields.io/github/license/nektro/andesite.svg)](https://github.com/nektro/andesite/blob/master/LICENSE)
 [![paypal](https://img.shields.io/badge/donate-paypal-blue.svg?logo=paypal)](https://www.paypal.me/nektro)
 
-Share folders in an Open Directory without making your entire server public. Manages users with [Discord](https://discordapp.com/).
+Share folders in an Open Directory without making your entire server public. Manages users with OAuth2.
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
@@ -14,24 +14,28 @@ These instructions will get you a copy of the project up and running on your loc
 - GCC on your PATH (for the https://github.com/mattn/go-sqlite3 installation)
 
 ### Installing
-Go to (https://discordapp.com/developers/applications/) and create an application on your Discord Developers dashboard. Fill out the name and picture as you see fit. This will be the information shown when Andesite authenticates users through Discord.
+Go to the developers dashboard of your choosing for the authentication platform you wish to use from the list below.
 
-Obtain your newly created application's Client ID and Secret from the dashboard.
+- Discord - https://discordapp.com/developers/applications/
+- Reddit - https://old.reddit.com/prefs/apps
 
-Create a folder in the root of the directory you will be serving with the name `.andesite`. If your file manager does not allow you to do this at first, you can open a command prompt/terminal and run `mkdir .andesite`.
+Once there, create an application and obtain the Client ID and Client Secret. Here you can also fill out a picture and description that will be displayed during the authorization of users on your chosen Identity Provider. When prompted for the "Redirect URI" during the app setup process, the URL to use will be `http://andesite/callback`, replacing `andesite` with any origins you wish Andesite to be usable from, such as `example.com` or `localhost`.
 
-In the `.andesite` folder make a `config.json` file and put the following data inside.
-```
+Once you have finished the app creation process and obtained the Client ID and Client Secret, create a folder in the root of the directory you will be serving with the name `.andesite`. If your file manager does not allow you to do this at first, you can open a command prompt/terminal and run `mkdir .andesite`.
+
+In the `.andesite` folder make a `config.json` file and put the following data inside, replacing `AUTH` with whichever Identity Provider you chose, one of (`discord`, `reddit`). And `CLIENT_ID` and `CLIENT_SECRET` with their respective values. Do not worry, this folder will remain entirely private, even to users with full access.
+
+```json
 {
-    "discord": {
+    "auth": "AUTH",
+    "AUTH": {
         "id": "CLIENT_ID",
         "secret": "CLIENT_SECRET"
     }
 }
 ```
-and replace `CLIENT_ID` and `CLIENT_SECRET` with their respective values. Do not worry, this folder will remain entirely private, even to users with full access.
 
-Additionally, if your server is going to be hosted at `https://domain.com/` then you must add `https://domain.com/callback` as a trusted OAuth2 callback URL in your app's settings.
+> Note: You may only use one Identity Provider at a time!
 
 Run
 ```
