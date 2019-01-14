@@ -7,6 +7,8 @@ type Oauth2Provider struct {
 	tokenURL     string
 	meURL        string
 	dbPrefix     string
+	nameProp     string
+	namePrefix   string
 }
 
 var (
@@ -18,6 +20,8 @@ var (
 			"/oauth2/token",
 			"/users/@me",
 			"",
+			"username",
+			"@",
 		},
 	}
 )

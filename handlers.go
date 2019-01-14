@@ -78,6 +78,7 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	var respMe map[string]interface{}
 	json.Unmarshal(body, &respMe)
 	session.Values["user"] = respMe["id"].(string)
+	session.Values["name"] = respMe[oauth2Provider.nameProp].(string)
 	session.Save(r, w)
 	w.Header().Add("Location", "./files/")
 	w.Header().Add("cache-control", "no-store")
@@ -108,7 +109,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 	session := getSession(r)
 	sessID, ok := session.Values["user"]
 	if !ok {
-		writeUserDenied(w, true, true)
+		writeUserDenied(w, r, true, true)
 		return
 	}
 	userID := sessID.(string)
@@ -120,7 +121,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 	stat, err := rootDir.Stat(qpath)
 	if os.IsNotExist(err) {
 		// 404
-		writeUserDenied(w, true, false)
+		writeUserDenied(w, r, true, false)
 		return
 	}
 
@@ -156,7 +157,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 		l2 := len(files)
 
 		if l1 > 0 && l2 == 0 {
-			writeUserDenied(w, true, false)
+			writeUserDenied(w, r, true, false)
 			return
 		}
 
@@ -186,12 +187,14 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			admin = useruser.admin
 		}
 
+		sessName, _ := session.Values["name"]
 		writeHandlebarsFile(w, "/listing.hbs", map[string]interface{}{
 			"user":  userID,
 			"path":  qpath,
 			"files": data,
 			"admin": admin,
 			"base":  httpBase,
+			"name":  oauth2Provider.namePrefix + sessName.(string),
 		})
 	} else {
 		// access check
@@ -202,7 +205,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if can == false {
-			writeUserDenied(w, true, false)
+			writeUserDenied(w, r, true, false)
 			return
 		}
 
@@ -217,7 +220,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	session := getSession(r)
 	sessID, ok := session.Values["user"]
 	if !ok {
-		writeUserDenied(w, false, true)
+		writeUserDenied(w, r, false, true)
 		return
 	}
 	userID := sessID.(string)
@@ -229,16 +232,18 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		admin = useruser.admin
 	}
 	if !admin {
-		writeUserDenied(w, false, false)
+		writeUserDenied(w, r, false, false)
 		return
 	}
 
 	//
 	accesses := queryAllAccess()
+	sessName, _ := session.Values["name"]
 	writeHandlebarsFile(w, "/admin.hbs", map[string]interface{}{
 		"user":     useruser.snowflake,
 		"accesses": accesses,
 		"base":     httpBase,
+		"name":     oauth2Provider.namePrefix + sessName.(string),
 	})
 }
 

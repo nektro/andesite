@@ -298,12 +298,20 @@ func checkErr(err error, args ...string) {
 	}
 }
 
-func writeUserDenied(w http.ResponseWriter, fileOrAdmin, showLogin bool) {
+func writeUserDenied(w http.ResponseWriter, r *http.Request, fileOrAdmin, showLogin bool) {
 	w.WriteHeader(http.StatusForbidden)
+
+	me := ""
+	session := getSession(r)
+	sessName, ok := session.Values["name"]
+	if ok {
+		sessID, _ := session.Values["user"]
+		me += fmt.Sprintf(" (%s%s - %s)", oauth2Provider.namePrefix, sessName.(string), sessID.(string))
+	}
 
 	message := ""
 	if fileOrAdmin {
-		message = "You do not have access to this file/folder."
+		message = "You" + me + " do not have access to this file/folder."
 	} else {
 		message = "Admin priviledge required. Access denied."
 	}
