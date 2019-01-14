@@ -31,15 +31,15 @@ const (
 )
 
 var (
-	discordAppID     string
-	discordAppSecret string
-	randomKey        = securecookie.GenerateRandomKey(32)
-	store            = sessions.NewCookieStore(randomKey)
-	database         *sql.DB
-	wwFFS            FusingFileSystem
-	httpBase         string
-	rootDir          RootDir
-	metaDir          string
+	oauth2AppID     string
+	oauth2AppSecret string
+	randomKey       = securecookie.GenerateRandomKey(32)
+	store           = sessions.NewCookieStore(randomKey)
+	database        *sql.DB
+	wwFFS           FusingFileSystem
+	httpBase        string
+	rootDir         RootDir
+	metaDir         string
 )
 
 func main() {
@@ -82,8 +82,8 @@ func main() {
 	configBytes := readFile(configPath)
 	var config Config
 	json.Unmarshal(configBytes, &config)
-	discordAppID = config.Discord.ID
-	discordAppSecret = config.Discord.Secret
+	oauth2AppID = config.Discord.ID
+	oauth2AppSecret = config.Discord.Secret
 
 	//
 	// database initialization

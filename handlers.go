@@ -22,7 +22,7 @@ func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
 		urlR, _ := url.Parse(discordAPI)
 		urlR.Path += "/oauth2/authorize"
 		parameters := url.Values{}
-		parameters.Add("client_id", discordAppID)
+		parameters.Add("client_id", oauth2AppID)
 		parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 		parameters.Add("response_type", "code")
 		parameters.Add("scope", "identify")
@@ -40,8 +40,8 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	parameters := url.Values{}
-	parameters.Add("client_id", discordAppID)
-	parameters.Add("client_secret", discordAppSecret)
+	parameters.Add("client_id", oauth2AppID)
+	parameters.Add("client_secret", oauth2AppSecret)
 	parameters.Add("grant_type", "authorization_code")
 	parameters.Add("code", code)
 	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
