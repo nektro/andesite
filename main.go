@@ -329,7 +329,7 @@ func writeAPIResponse(w http.ResponseWriter, good bool, message string) {
 	writeHandlebarsFile(w, "/response.hbs", map[string]interface{}{
 		"title":   titlemsg,
 		"message": message,
-		"link":    "Return to <a href='/admin'>the dashboard</a>.",
+		"link":    "Return to <a href='" + httpBase + "/admin'>the dashboard</a>.",
 		"base":    httpBase,
 	})
 }
