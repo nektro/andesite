@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+//
 type Config struct {
 	Discord struct {
 		ID     string `json:"id"`
@@ -11,6 +12,7 @@ type Config struct {
 	} `json:"discord"`
 }
 
+//
 type OAuth2CallBackResponse struct {
 	AccessToken  string `json:"access_token"`
 	TokenType    string `json:"token_type"`
@@ -19,6 +21,7 @@ type OAuth2CallBackResponse struct {
 	Scope        string `json:"scope"`
 }
 
+//
 type DiscordAPIMeResponse struct {
 	Username      string `json:"username"`
 	Locale        string `json:"locale"`
@@ -30,6 +33,7 @@ type DiscordAPIMeResponse struct {
 	ID            string `json:"id"`
 }
 
+//
 type PragmaTableInfoRow struct {
 	cid          int
 	name         string
@@ -39,12 +43,14 @@ type PragmaTableInfoRow struct {
 	pk           int
 }
 
+//
 type UserAccessRow struct {
 	id   int
 	user int
 	path string
 }
 
+//
 type UserRow struct {
 	id        int
 	snowflake string
