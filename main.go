@@ -25,7 +25,6 @@ import (
 
 const (
 	version     = 1
-	discordAPI  = "https://discordapp.com/api"
 	accessToken = "access_token"
 	pthAnd      = "/.andesite/"
 )
@@ -33,6 +32,7 @@ const (
 var (
 	oauth2AppID     string
 	oauth2AppSecret string
+	oauth2Provider  Oauth2Provider
 	randomKey       = securecookie.GenerateRandomKey(32)
 	store           = sessions.NewCookieStore(randomKey)
 	database        *sql.DB
@@ -94,6 +94,8 @@ func main() {
 		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", config.Auth)))
 	}
 
+	oauth2Provider = Oauth2Providers[config.Auth]
+
 	//
 	// database initialization
 
@@ -120,7 +122,7 @@ func main() {
 		if !ok {
 			uid := queryLastID("users") + 1
 			aid := queryLastID("access") + 1
-			query(fmt.Sprintf("insert into users values ('%d', '%s', '1')", uid, *admin), true)
+			query(fmt.Sprintf("insert into users values ('%d', '%s', '1')", uid, oauth2Provider.dbPrefix+*admin), true)
 			query(fmt.Sprintf("insert into access values ('%d', '%d', '/')", aid, uid), true)
 			log(fmt.Sprintf("Added user %s as an admin", *admin))
 		} else {

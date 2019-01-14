@@ -77,7 +77,7 @@ func queryAccess(snowflake string) []string {
 
 func queryUserBySnowflake(snowflake string) (UserRow, bool) {
 	var ur UserRow
-	rows := query(fmt.Sprintf("select * from users where snowflake = '%s'", snowflake), false)
+	rows := query(fmt.Sprintf("select * from users where snowflake = '%s'", oauth2Provider.dbPrefix+snowflake), false)
 	if !rows.Next() {
 		return ur, false
 	}
@@ -111,7 +111,7 @@ func queryAllAccess() []map[string]string {
 		result = append(result, map[string]string{
 			"id":        strconv.Itoa(uar.id),
 			"user":      strconv.Itoa(uar.user),
-			"snowflake": ids[uar.user],
+			"snowflake": ids[uar.user][len(oauth2Provider.dbPrefix):],
 			"path":      uar.path,
 		})
 	}
@@ -131,6 +131,7 @@ func queryLastID(table string) int {
 
 func queryPrepared(q string, modify bool, args ...interface{}) *sql.Rows {
 	stmt, err := database.Prepare(q)
+	checkErr(err)
 	if modify {
 		_, err := stmt.Exec(args...)
 		checkErr(err)

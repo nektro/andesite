@@ -19,13 +19,12 @@ func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		w.Header().Add("Location", "./files/")
 	} else {
-		urlR, _ := url.Parse(discordAPI)
-		urlR.Path += "/oauth2/authorize"
+		urlR, _ := url.Parse(oauth2Provider.oa2baseURL + oauth2Provider.authorizeURL)
 		parameters := url.Values{}
 		parameters.Add("client_id", oauth2AppID)
 		parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 		parameters.Add("response_type", "code")
-		parameters.Add("scope", "identify")
+		parameters.Add("scope", oauth2Provider.scope)
 		urlR.RawQuery = parameters.Encode()
 		w.Header().Add("Location", urlR.String())
 	}
@@ -45,8 +44,7 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	parameters.Add("grant_type", "authorization_code")
 	parameters.Add("code", code)
 	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
-	urlR, _ := url.Parse(discordAPI)
-	urlR.Path += "/oauth2/token"
+	urlR, _ := url.Parse(oauth2Provider.oa2baseURL + oauth2Provider.tokenURL)
 	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	client := &http.Client{}
@@ -70,8 +68,7 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	urlR, _ := url.Parse(discordAPI)
-	urlR.Path += "/users/@me"
+	urlR, _ := url.Parse(oauth2Provider.oa2baseURL + oauth2Provider.meURL)
 	req, _ := http.NewRequest("GET", urlR.String(), strings.NewReader(""))
 	req.Header.Set("Authorization", "Bearer "+val.(string))
 	client := &http.Client{}
@@ -370,7 +367,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		aud = u.id
 	} else {
 		aud = queryLastID("users") + 1
-		queryPrepared("insert into users values (?, ?, ?)", true, aud, asn, 0)
+		queryPrepared("insert into users values (?, ?, ?)", true, aud, oauth2Provider.dbPrefix+asn, 0)
 	}
 	//
 	queryPrepared("insert into access values (?, ?, ?)", true, aid, aud, apt)
