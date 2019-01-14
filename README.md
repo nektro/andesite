@@ -57,7 +57,7 @@ $ ./andesite
 - -port
     - The port Andesite will broadcast on. (Default `8000`)
 - -admin
-    - The Discord Snowflake of a user to add as an admin. Only required once. Admin priviledge allows this user to change the path access of other users.
+    - The ID of a user to add as an admin. Only required once. Admin priviledge allows this user to change the path access of other users. The User ID can be obtained from `/files/` once logged in.
 - -theme
     - The name of the theme you want andesite to use for custom HTML and Handlebars templates.
 - -base
