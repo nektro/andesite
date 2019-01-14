@@ -23,5 +23,15 @@ var (
 			"username",
 			"@",
 		},
+		"reddit": Oauth2Provider{
+			"",
+			"https://old.reddit.com/api/v1/authorize",
+			"identity",
+			"https://old.reddit.com/api/v1/access_token",
+			"https://oauth.reddit.com/api/v1/me",
+			"1:",
+			"name",
+			"u/",
+		},
 	}
 )

@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Auth    string       `json:"auth"`
 	Discord oauth2Client `json:"discord"`
+	Reddit  oauth2Client `json:"reddit"`
 }
 
 //

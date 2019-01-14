@@ -90,6 +90,9 @@ func main() {
 	case "discord":
 		oauth2AppID = config.Discord.ID
 		oauth2AppSecret = config.Discord.Secret
+	case "reddit":
+		oauth2AppID = config.Reddit.ID
+		oauth2AppSecret = config.Reddit.Secret
 	default:
 		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", config.Auth)))
 	}

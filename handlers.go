@@ -1,6 +1,7 @@
 package main
 
 import (
+	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -25,6 +26,8 @@ func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
 		parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 		parameters.Add("response_type", "code")
 		parameters.Add("scope", oauth2Provider.scope)
+		parameters.Add("duration", "temporary")
+		parameters.Add("state", "none")
 		urlR.RawQuery = parameters.Encode()
 		w.Header().Add("Location", urlR.String())
 	}
@@ -46,7 +49,9 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 	urlR, _ := url.Parse(oauth2Provider.oa2baseURL + oauth2Provider.tokenURL)
 	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
+	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", "Basic "+b64.StdEncoding.EncodeToString([]byte(oauth2AppID+":"+oauth2AppSecret)))
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 	defer resp.Body.Close()
@@ -70,6 +75,7 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	}
 	urlR, _ := url.Parse(oauth2Provider.oa2baseURL + oauth2Provider.meURL)
 	req, _ := http.NewRequest("GET", urlR.String(), strings.NewReader(""))
+	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Authorization", "Bearer "+val.(string))
 	client := &http.Client{}
 	resp, _ := client.Do(req)
