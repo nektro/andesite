@@ -75,9 +75,9 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	resp, _ := client.Do(req)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	var respMe DiscordAPIMeResponse
+	var respMe map[string]interface{}
 	json.Unmarshal(body, &respMe)
-	session.Values["user"] = respMe.ID
+	session.Values["user"] = respMe["id"].(string)
 	session.Save(r, w)
 	w.Header().Add("Location", "./files/")
 	w.Header().Add("cache-control", "no-store")

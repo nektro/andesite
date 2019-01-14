@@ -26,18 +26,6 @@ type OAuth2CallBackResponse struct {
 }
 
 //
-type DiscordAPIMeResponse struct {
-	Username      string `json:"username"`
-	Locale        string `json:"locale"`
-	PremiumType   int    `json:"premium_type"`
-	Multifactor   bool   `json:"mfa_enabled"`
-	Flags         int    `json:"flags"`
-	Avatar        string `json:"avatar"`
-	Discriminator string `json:"discriminator"`
-	ID            string `json:"id"`
-}
-
-//
 type PragmaTableInfoRow struct {
 	cid          int
 	name         string
