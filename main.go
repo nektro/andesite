@@ -82,8 +82,17 @@ func main() {
 	configBytes := readFile(configPath)
 	var config Config
 	json.Unmarshal(configBytes, &config)
-	oauth2AppID = config.Discord.ID
-	oauth2AppSecret = config.Discord.Secret
+
+	if len(config.Auth) == 0 {
+		config.Auth = "discord"
+	}
+	switch config.Auth {
+	case "discord":
+		oauth2AppID = config.Discord.ID
+		oauth2AppSecret = config.Discord.Secret
+	default:
+		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", config.Auth)))
+	}
 
 	//
 	// database initialization

@@ -6,10 +6,14 @@ import (
 
 //
 type Config struct {
-	Discord struct {
-		ID     string `json:"id"`
-		Secret string `json:"secret"`
-	} `json:"discord"`
+	Auth    string       `json:"auth"`
+	Discord oauth2Client `json:"discord"`
+}
+
+//
+type oauth2Client struct {
+	ID     string `json:"id"`
+	Secret string `json:"secret"`
 }
 
 //
