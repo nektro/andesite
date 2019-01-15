@@ -80,24 +80,23 @@ func main() {
 	configPath := metaDir + "/config.json"
 	dieOnError(assert(fileExists(configPath), "config.json does not exist!"))
 	configBytes := readFile(configPath)
-	var config Config
+	var config map[string]interface{}
 	json.Unmarshal(configBytes, &config)
 
-	if len(config.Auth) == 0 {
-		config.Auth = "discord"
+	ca := config["auth"].(string)
+	if len(ca) == 0 {
+		ca = "discord"
 	}
-	switch config.Auth {
-	case "discord":
-		oauth2AppID = config.Discord.ID
-		oauth2AppSecret = config.Discord.Secret
-	case "reddit":
-		oauth2AppID = config.Reddit.ID
-		oauth2AppSecret = config.Reddit.Secret
+	switch ca {
+	case "discord", "reddit":
+		acm := config[ca].(map[string]interface{})
+		oauth2AppID = acm["id"].(string)
+		oauth2AppSecret = acm["secret"].(string)
 	default:
-		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", config.Auth)))
+		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", ca)))
 	}
 
-	oauth2Provider = Oauth2Providers[config.Auth]
+	oauth2Provider = Oauth2Providers[ca]
 
 	//
 	// database initialization

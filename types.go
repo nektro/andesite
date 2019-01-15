@@ -5,25 +5,8 @@ import (
 )
 
 //
-type Config struct {
-	Auth    string       `json:"auth"`
-	Discord oauth2Client `json:"discord"`
-	Reddit  oauth2Client `json:"reddit"`
-}
-
-//
-type oauth2Client struct {
-	ID     string `json:"id"`
-	Secret string `json:"secret"`
-}
-
-//
 type OAuth2CallBackResponse struct {
-	AccessToken  string `json:"access_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
-	RefreshToken string `json:"refresh_token"`
-	Scope        string `json:"scope"`
+	AccessToken string `json:"access_token"`
 }
 
 //
