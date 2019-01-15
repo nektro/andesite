@@ -88,7 +88,7 @@ func main() {
 		ca = "discord"
 	}
 	switch ca {
-	case "discord", "reddit":
+	case "discord", "reddit", "github":
 		acm := config[ca].(map[string]interface{})
 		oauth2AppID = acm["id"].(string)
 		oauth2AppSecret = acm["secret"].(string)
@@ -373,4 +373,14 @@ func withAttribution(next http.HandlerFunc) http.HandlerFunc {
 		w.Header().Add("Server", "nektro/andesite")
 		next.ServeHTTP(w, r)
 	}
+}
+
+func fixID(id interface{}) string {
+	switch id.(type) {
+	case string:
+		return id.(string)
+	case float64:
+		return strconv.Itoa(int(id.(float64)))
+	}
+	return id.(string)
 }

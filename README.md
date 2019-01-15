@@ -18,6 +18,7 @@ Go to the developers dashboard of your choosing for the authentication platform 
 
 - Discord - https://discordapp.com/developers/applications/
 - Reddit - https://old.reddit.com/prefs/apps
+- GitHub - https://github.com/settings/developers
 
 Once there, create an application and obtain the Client ID and Client Secret. Here you can also fill out a picture and description that will be displayed during the authorization of users on your chosen Identity Provider. When prompted for the "Redirect URI" during the app setup process, the URL to use will be `http://andesite/callback`, replacing `andesite` with any origins you wish Andesite to be usable from, such as `example.com` or `localhost`.
 

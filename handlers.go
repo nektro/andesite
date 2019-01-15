@@ -47,11 +47,13 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	parameters.Add("grant_type", "authorization_code")
 	parameters.Add("code", code)
 	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
+	parameters.Add("state", "none")
 	urlR, _ := url.Parse(oauth2Provider.oa2baseURL + oauth2Provider.tokenURL)
 	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Basic "+b64.StdEncoding.EncodeToString([]byte(oauth2AppID+":"+oauth2AppSecret)))
+	req.Header.Set("Accept", "application/json")
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 	defer resp.Body.Close()
@@ -83,7 +85,7 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	var respMe map[string]interface{}
 	json.Unmarshal(body, &respMe)
-	session.Values["user"] = respMe["id"].(string)
+	session.Values["user"] = fixID(respMe["id"])
 	session.Values["name"] = respMe[oauth2Provider.nameProp].(string)
 	session.Save(r, w)
 	w.Header().Add("Location", "./files/")

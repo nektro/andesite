@@ -33,5 +33,15 @@ var (
 			"name",
 			"u/",
 		},
+		"github": Oauth2Provider{
+			"",
+			"https://github.com/login/oauth/authorize",
+			"read:user",
+			"https://github.com/login/oauth/access_token",
+			"https://api.github.com/user",
+			"2:",
+			"login",
+			"@",
+		},
 	}
 )
