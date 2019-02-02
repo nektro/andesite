@@ -24,7 +24,7 @@ Once there, create an application and obtain the Client ID and Client Secret. He
 
 Once you have finished the app creation process and obtained the Client ID and Client Secret, create a folder in the root of the directory you will be serving with the name `.andesite`. If your file manager does not allow you to do this at first, you can open a command prompt/terminal and run `mkdir .andesite`.
 
-In the `.andesite` folder make a `config.json` file and put the following data inside, replacing `AUTH` with whichever Identity Provider you chose, one of (`discord`, `reddit`). And `CLIENT_ID` and `CLIENT_SECRET` with their respective values. Do not worry, this folder will remain entirely private, even to users with full access.
+In the `.andesite` folder make a `config.json` file and put the following data inside, replacing `AUTH` with whichever Identity Provider you chose, such as `discord`, `reddit`, etc. And `CLIENT_ID` and `CLIENT_SECRET` with their respective values. Do not worry, this folder will remain entirely private, even to users with full access.
 
 ```json
 {
