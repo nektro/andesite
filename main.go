@@ -89,6 +89,9 @@ func main() {
 	}
 	switch ca {
 	case "discord", "reddit", "github":
+		if config[ca] == nil {
+			dieOnError(errors.New(fmt.Sprintf("config.json[%s] is missing", ca)))
+		}
 		acm := config[ca].(map[string]interface{})
 		oauth2AppID = acm["id"].(string)
 		oauth2AppSecret = acm["secret"].(string)
