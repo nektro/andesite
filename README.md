@@ -28,10 +28,10 @@ In the `.andesite` folder make a `config.json` file and put the following data i
 
 ```json
 {
-    "auth": "AUTH",
-    "AUTH": {
-        "id": "CLIENT_ID",
-        "secret": "CLIENT_SECRET"
+    "auth": "{AUTH}",
+    "{AUTH}": {
+        "id": "{CLIENT_ID}",
+        "secret": "{CLIENT_SECRET}"
     }
 }
 ```
