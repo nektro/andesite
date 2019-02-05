@@ -20,7 +20,7 @@ func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		w.Header().Add("Location", "./files/")
 	} else {
-		urlR, _ := url.Parse(oauth2Provider.oa2baseURL + oauth2Provider.authorizeURL)
+		urlR, _ := url.Parse(oauth2Provider.authorizeURL)
 		parameters := url.Values{}
 		parameters.Add("client_id", oauth2AppID)
 		parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
@@ -48,7 +48,7 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	parameters.Add("code", code)
 	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 	parameters.Add("state", "none")
-	urlR, _ := url.Parse(oauth2Provider.oa2baseURL + oauth2Provider.tokenURL)
+	urlR, _ := url.Parse(oauth2Provider.tokenURL)
 	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -75,7 +75,7 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	urlR, _ := url.Parse(oauth2Provider.oa2baseURL + oauth2Provider.meURL)
+	urlR, _ := url.Parse(oauth2Provider.meURL)
 	req, _ := http.NewRequest("GET", urlR.String(), strings.NewReader(""))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Authorization", "Bearer "+val.(string))
