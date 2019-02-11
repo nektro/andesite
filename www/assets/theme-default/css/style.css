@@ -161,3 +161,35 @@ body.dark ul.datalist form input[type=text] {
 body.dark ul.datalist form button.btn {
   color: #E0E0E0;
 }
+
+body.grid table {
+  display: flex;
+}
+
+body.grid table thead {
+  display: none;
+}
+
+body.grid table tbody {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+body.grid table tbody tr {
+  display: flex;
+  flex-direction: column;
+  border: 5px solid #E0E0E0;
+  margin: .5em;
+  max-width: 13em;
+}
+
+body.grid table tbody tr td {
+  text-align: left;
+}
+
+body.grid table tbody tr td a {
+  max-width: 12em;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+}

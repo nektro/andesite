@@ -163,4 +163,37 @@ body {
             }
         }
     }
+
+    &.grid {
+        table {
+            display: flex;
+
+            thead {
+                display: none;
+            }
+            tbody {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+
+                tr {
+                    display: flex;
+                    flex-direction: column;
+                    border: 5px solid #E0E0E0;
+                    margin: .5em;
+                    max-width: 13em;
+
+                    td {
+                        text-align: left;
+
+                        a {
+                            max-width: 12em;
+                            text-overflow: ellipsis;
+                            overflow-x: hidden;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
