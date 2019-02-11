@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/aymerick/raymond"
+	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 
@@ -193,6 +194,7 @@ func main() {
 	}
 
 	dirs = append(dirs, http.Dir("www"))
+	dirs = append(dirs, packr.New("", "./www/"))
 	wwFFS = FusingFileSystem{dirs}
 
 	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
