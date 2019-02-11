@@ -43,6 +43,8 @@ var (
 )
 
 func main() {
+	log("Initializing Andesite...")
+
 	flagRoot := flag.String("root", "", "Path of root directory for files")
 	port := flag.Int("port", 8000, "Port to open server on")
 	admin := flag.String("admin", "", "Discord User ID of the user that is distinguished as the site owner")
@@ -69,10 +71,9 @@ func main() {
 		dieOnError(errors.New("Invalid root type"))
 	}
 	dieOnError(assert(fileExists(metaDir), ".andesite folder does not exist!"))
+	log("Starting in " + rootDir.Base())
 
 	//
-
-	log("Starting Andesite in " + rootDir.Base())
 
 	//
 	// discover OAuth2 config info
