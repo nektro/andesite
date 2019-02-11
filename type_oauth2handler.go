@@ -48,5 +48,14 @@ var (
 			"name",
 			"",
 		},
+		"twitter": Oauth2Provider{
+			"https://api.twitter.com/oauth/authorize",
+			"https://api.twitter.com/oauth/access_token",
+			"https://api.twitter.com/1.1/account/verify_credentials.json?skip_status=true&include_email=false",
+			"",
+			"4:",
+			"screen_name",
+			"",
+		},
 	}
 )
