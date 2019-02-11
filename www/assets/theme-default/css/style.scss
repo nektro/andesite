@@ -126,4 +126,41 @@ body {
             }
         }
     }
+
+    &.dark {
+        background-color: #212121;
+        color: #9E9E9E;
+
+        a.btn {
+            background-color: #616161;
+            color: #9E9E9E;
+        }
+        .toggle {
+            background-color: #616161;
+
+            > span {
+                color: #9E9E9E;
+            }
+            x-switch label span{
+                background-color: #9E9E9E;
+
+                &::before {
+                    background-color: #616161;
+                }
+            }
+        }
+        table td a {
+            color: #E0E0E0;
+        }
+        ul.datalist {
+            form {
+                input[type=text] {
+                    color: #E0E0E0;
+                }
+                button.btn {
+                    color: #E0E0E0;
+                }
+            }
+        }
+    }
 }

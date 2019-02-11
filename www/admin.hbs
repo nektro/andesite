@@ -5,7 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Andesite Admin Panel</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
         <link rel="stylesheet" href="{{base}}assets/theme-default/css/style.min.css">
+        <script type="module" src="{{base}}assets/theme-default/js/x-switch.js"></script>
     </head>
     <body>
         <h1>Andesite Admin Panel</h1>
@@ -15,6 +17,13 @@
                 <a class="btn" href="{{base}}files/">Back to Files</a>
             </div>
             <div class="grow"></div>
+            <div class="flex row">
+                <div class="toggle">
+                    <span class="fa fa-fw fa-sun-o"></span>
+                    <x-switch data-mode="dark"></x-switch>
+                    <span class="fa fa-fw fa-moon-o"></span>
+                </div>
+            </div>
         </div>
         <hr>
         <ul class="datalist">

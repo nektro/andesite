@@ -123,3 +123,41 @@ body ul.datalist form button.btn {
   border-radius: .25em;
   cursor: pointer;
 }
+
+body.dark {
+  background-color: #212121;
+  color: #9E9E9E;
+}
+
+body.dark a.btn {
+  background-color: #616161;
+  color: #9E9E9E;
+}
+
+body.dark .toggle {
+  background-color: #616161;
+}
+
+body.dark .toggle > span {
+  color: #9E9E9E;
+}
+
+body.dark .toggle x-switch label span {
+  background-color: #9E9E9E;
+}
+
+body.dark .toggle x-switch label span::before {
+  background-color: #616161;
+}
+
+body.dark table td a {
+  color: #E0E0E0;
+}
+
+body.dark ul.datalist form input[type=text] {
+  color: #E0E0E0;
+}
+
+body.dark ul.datalist form button.btn {
+  color: #E0E0E0;
+}
