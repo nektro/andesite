@@ -40,7 +40,7 @@ In the `.andesite` folder make a `config.json` file and put the following data i
 
 Run
 ```
-$ go get github.com/nektro/andesite
+$ go get -u github.com/nektro/andesite
 ```
 and then make your way to `$GOPATH/src/github.com/nektro/andesite/`.
 
