@@ -1,7 +1,10 @@
+* {
+  transition: .25s;
+}
+
 body {
-  font-family: 'Courier New', 'Courier', monospace;
-  background-color: #212121;
-  color: #EFEFEF;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #FAFAFA;
 }
 
 body h1 {
@@ -12,27 +15,50 @@ body p {
   margin-top: 0;
 }
 
-body a {
-  color: #FF9100;
+body .flex {
+  display: flex;
+}
+
+body .flex.row {
+  flex-direction: row;
+  justify-content: center;
+}
+
+body .flex .grow {
+  flex-grow: 1;
+}
+
+body .hidden {
+  opacity: 0;
 }
 
 body a.btn {
   display: inline-block;
   text-decoration: none;
-  padding: .5em;
-  border: 2px solid #00B0FF;
+  background-color: #E0E0E0;
+  color: #616161;
+  padding: .25em;
   border-radius: .25em;
-  color: #EFEFEF;
+  font-size: .8em;
+  margin: 0 .25em;
 }
 
-body a.btn:hover {
-  background-color: #00B0FF;
-  color: #212121;
+body .toggle {
+  background-color: #E0E0E0;
+  padding: .25em;
+  border-radius: .25em;
+  margin: 0 .25em;
+  display: flex;
+  flex-direction: row;
 }
 
-body a.btn:active {
-  background-color: #FF9100;
-  border-color: #FF9100;
+body .toggle > span {
+  margin: 0 .25em;
+  color: #616161;
+}
+
+body table {
+  font-family: 'Courier New', Courier, monospace;
 }
 
 body table thead {
@@ -53,6 +79,7 @@ body table td:nth-child(4) {
 }
 
 body table td a {
+  display: block;
   text-decoration: none;
 }
 
@@ -78,20 +105,13 @@ body ul.datalist form {
 
 body ul.datalist form > * {
   display: block;
-  margin: .5em;
   padding: .5em;
 }
 
 body ul.datalist form input[type=text] {
   flex-grow: 1;
   background-color: transparent;
-  border: 2px solid #00B0FF;
   border-radius: .25em;
-  color: #EFEFEF;
-}
-
-body ul.datalist form input[type=text]:focus {
-  border-color: #FF9100;
 }
 
 body ul.datalist form input[type=text][name=snowflake] {
@@ -100,18 +120,6 @@ body ul.datalist form input[type=text][name=snowflake] {
 
 body ul.datalist form button.btn {
   background-color: transparent;
-  color: #EFEFEF;
-  border: 2px solid #00B0FF;
   border-radius: .25em;
   cursor: pointer;
-}
-
-body ul.datalist form button.btn:hover {
-  background-color: #00B0FF;
-  color: #212121;
-}
-
-body ul.datalist form button.btn:active {
-  background-color: #FF9100;
-  border-color: #FF9100;
 }
