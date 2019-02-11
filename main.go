@@ -83,23 +83,27 @@ func main() {
 	var config map[string]interface{}
 	json.Unmarshal(configBytes, &config)
 
-	ca := config["auth"].(string)
-	if len(ca) == 0 {
-		ca = "discord"
+	ca := config["auth"]
+	if ca == nil {
+		dieOnError(errors.New("config.json[auth] is missing"))
 	}
-	switch ca {
+	cas := ca.(string)
+	if len(cas) == 0 {
+		cas = "discord"
+	}
+	switch cas {
 	case "discord", "reddit", "github":
-		if config[ca] == nil {
-			dieOnError(errors.New(fmt.Sprintf("config.json[%s] is missing", ca)))
+		if config[cas] == nil {
+			dieOnError(errors.New(fmt.Sprintf("config.json[%s] is missing", cas)))
 		}
-		acm := config[ca].(map[string]interface{})
+		acm := config[cas].(map[string]interface{})
 		oauth2AppID = acm["id"].(string)
 		oauth2AppSecret = acm["secret"].(string)
 	default:
-		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", ca)))
+		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", cas)))
 	}
 
-	oauth2Provider = Oauth2Providers[ca]
+	oauth2Provider = Oauth2Providers[cas]
 
 	//
 	// database initialization
