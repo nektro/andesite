@@ -39,5 +39,14 @@ var (
 			"login",
 			"@",
 		},
+		"twitch": Oauth2Provider{
+			"https://id.twitch.tv/oauth2/authorize",
+			"https://id.twitch.tv/oauth2/token",
+			"https://api.twitch.tv/kraken/user",
+			"user_read",
+			"3:",
+			"name",
+			"",
+		},
 	}
 )
