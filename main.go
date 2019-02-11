@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"os"
 	"os/signal"
@@ -74,6 +75,8 @@ func main() {
 	log("Starting in " + rootDir.Base())
 
 	//
+	// https://github.com/labstack/echo/issues/1038#issuecomment-410294904
+	mime.AddExtensionType(".js", "application/javascript")
 
 	//
 	// discover OAuth2 config info
