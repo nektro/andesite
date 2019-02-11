@@ -324,7 +324,7 @@ func writeUserDenied(w http.ResponseWriter, r *http.Request, fileOrAdmin, showLo
 
 	message := ""
 	if fileOrAdmin {
-		message = "You" + me + " do not have access to this file/folder."
+		message = "You" + me + " do not have access to this resource."
 	} else {
 		message = "Admin priviledge required. Access denied."
 	}
