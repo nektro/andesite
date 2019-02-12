@@ -79,7 +79,7 @@ body table td:nth-child(4) {
 }
 
 body table td a {
-  display: block;
+  display: inline-block;
   text-decoration: none;
 }
 
