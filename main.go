@@ -96,15 +96,14 @@ func main() {
 	if len(cas) == 0 {
 		cas = "discord"
 	}
-	switch cas {
-	case "discord", "reddit", "github":
+	if _, ok := Oauth2Providers[cas]; ok {
 		if config[cas] == nil {
 			dieOnError(errors.New(fmt.Sprintf("config.json[%s] is missing", cas)))
 		}
 		acm := config[cas].(map[string]interface{})
 		oauth2AppID = acm["id"].(string)
 		oauth2AppSecret = acm["secret"].(string)
-	default:
+	} else {
 		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", cas)))
 	}
 
