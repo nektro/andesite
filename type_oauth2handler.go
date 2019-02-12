@@ -39,5 +39,14 @@ var (
 			"2:",
 			"@",
 		},
+		"google": Oauth2Provider{
+			"https://accounts.google.com/o/oauth2/v2/auth",
+			"https://www.googleapis.com/oauth2/v4/token",
+			"https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
+			"profile",
+			"name",
+			"3:",
+			"",
+		},
 	}
 )
