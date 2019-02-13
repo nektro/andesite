@@ -248,7 +248,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	accesses := queryAllAccess()
 	sessName, _ := session.Values["name"]
 	writeHandlebarsFile(w, "/admin.hbs", map[string]interface{}{
-		"user":     useruser.snowflake,
+		"user":     userID,
 		"accesses": accesses,
 		"base":     httpBase,
 		"name":     oauth2Provider.namePrefix + sessName.(string),
@@ -380,7 +380,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		aud = u.id
 	} else {
 		aud = queryLastID("users") + 1
-		queryPrepared("insert into users values (?, ?, ?)", true, aud, oauth2Provider.dbPrefix+asn, 0)
+		queryPrepared("insert into users values (?, ?, ?, ?)", true, aud, oauth2Provider.dbPrefix+asn, 0, "")
 	}
 	//
 	queryPrepared("insert into access values (?, ?, ?)", true, aid, aud, apt)
