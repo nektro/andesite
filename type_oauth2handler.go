@@ -48,5 +48,14 @@ var (
 			"3:",
 			"",
 		},
+		"facebook": Oauth2Provider{
+			"https://graph.facebook.com/oauth/authorize",
+			"https://graph.facebook.com/oauth/access_token",
+			"https://graph.facebook.com/me",
+			"",
+			"name",
+			"4:",
+			"",
+		},
 	}
 )
