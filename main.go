@@ -389,8 +389,6 @@ func withAttribution(next http.HandlerFunc) http.HandlerFunc {
 
 func fixID(id interface{}) string {
 	switch id.(type) {
-	case string:
-		return id.(string)
 	case float64:
 		return strconv.Itoa(int(id.(float64)))
 	}
