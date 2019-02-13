@@ -100,18 +100,18 @@ func queryUserByID(id int) (UserRow, bool) {
 func queryAllAccess() []map[string]string {
 	var result []map[string]string
 	rows := query("select * from access", false)
-	ids := map[int]string{}
+	ids := map[int][]string{}
 	for rows.Next() {
 		var uar UserAccessRow
 		rows.Scan(&uar.id, &uar.user, &uar.path)
 		if _, ok := ids[uar.user]; !ok {
 			uu, _ := queryUserByID(uar.user)
-			ids[uar.user] = uu.snowflake
+			ids[uar.user] = []string{uu.snowflake}
 		}
 		result = append(result, map[string]string{
 			"id":        strconv.Itoa(uar.id),
 			"user":      strconv.Itoa(uar.user),
-			"snowflake": ids[uar.user][len(oauth2Provider.dbPrefix):],
+			"snowflake": ids[uar.user][0][len(oauth2Provider.dbPrefix):],
 			"path":      uar.path,
 		})
 	}
