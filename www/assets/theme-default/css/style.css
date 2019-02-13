@@ -112,6 +112,7 @@ body ul.datalist form input[type=text] {
   flex-grow: 1;
   background-color: transparent;
   border-radius: .25em;
+  max-height: .8em;
 }
 
 body ul.datalist form input[type=text][name=snowflake] {
