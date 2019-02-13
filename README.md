@@ -40,7 +40,7 @@ In the `.andesite` folder make a `config.json` file and put the following data i
 }
 ```
 
-> Note: You may only use one Identity Provider at a time!
+> Note: You may currently only use one Identity Provider at a time!
 
 Run
 ```
