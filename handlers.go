@@ -122,6 +122,12 @@ func handleFileListing(ctx *fasthttp.RequestCtx) {
 	// remove /files
 	qpath := string(ctx.URI().Path()[6:])
 
+	// disallow exploring dotfile folders
+	if strings.Contains(qpath, "/.") {
+		writeUserDenied(ctx, true, false)
+		return
+	}
+
 	// valid path check
 	stat, err := rootDir.Stat(qpath)
 	if os.IsNotExist(err) {
