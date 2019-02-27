@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/nektro/go-util/types"
+	"github.com/nektro/go-util/util"
 
 	"github.com/aymerick/raymond"
 	"github.com/gobuffalo/packr/v2"
@@ -232,16 +233,11 @@ func fileExists(file string) bool {
 }
 
 func log(message string) {
-	fmt.Println("[" + getIsoDateTime() + "][info]  " + message)
+	fmt.Println("[" + util.GetIsoDateTime() + "][info]  " + message)
 }
 
 func logError(message string) {
-	fmt.Println("[" + getIsoDateTime() + "][error] " + message)
-}
-
-func getIsoDateTime() string {
-	vil := time.Now().UTC().String()
-	return vil[0:19]
+	fmt.Println("[" + util.GetIsoDateTime() + "][error] " + message)
 }
 
 func readFile(path string) []byte {
