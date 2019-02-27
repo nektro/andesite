@@ -1,7 +1,7 @@
 package main
 
 import (
-	b64 "encoding/base64"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -52,7 +52,7 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Basic "+b64.StdEncoding.EncodeToString([]byte(oauth2AppID+":"+oauth2AppSecret)))
+	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(oauth2AppID+":"+oauth2AppSecret)))
 	req.Header.Set("Accept", "application/json")
 	client := &http.Client{}
 	resp, _ := client.Do(req)
