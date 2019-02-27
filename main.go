@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strconv"
+	"strings"
 	"syscall"
 
 	"github.com/nektro/go-util/types"
@@ -282,11 +283,6 @@ func fullHost(ctx *fasthttp.RequestCtx) string {
 	if ctx.IsTLS() {
 		urL += "s"
 	}
-}
-
-func getSession(r *http.Request) *sessions.Session {
-	session, _ := store.Get(r, "andesite_session")
-	return session
 	return urL + "://" + string(ctx.URI().Host())
 }
 
@@ -375,7 +371,6 @@ func writeAPIResponse(ctx *fasthttp.RequestCtx, good bool, message string) {
 	} else {
 		titlemsg = "Update Failed"
 	}
-	writeHandlebarsFile(w, "/response.hbs", map[string]interface{}{
 	writeHandlebarsFile(ctx, "/response.hbs", map[string]interface{}{
 		"title":   titlemsg,
 		"message": message,

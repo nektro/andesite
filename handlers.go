@@ -46,7 +46,7 @@ func handleOAuthCallback(ctx *fasthttp.RequestCtx) {
 	parameters.Add("client_id", oauth2AppID)
 	parameters.Add("client_secret", oauth2AppSecret)
 	parameters.Add("grant_type", "authorization_code")
-	parameters.Add("code", code)
+	parameters.Add("code", string(code))
 	parameters.Add("redirect_uri", fullHost(ctx)+httpBase+"callback")
 	parameters.Add("state", "none")
 	urlR, _ := url.Parse(oauth2Provider.tokenURL)
@@ -369,7 +369,6 @@ func handleAccessCreate(ctx *fasthttp.RequestCtx) {
 	}
 	//
 	aid := queryLastID("access") + 1
-	asn := r.PostForm.Get("snowflake")
 	asn := string(pa.Peek("snowflake"))
 	apt := string(pa.Peek("path"))
 	//
