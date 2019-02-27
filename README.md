@@ -55,7 +55,7 @@ $ packr2 build
 $ ./andesite
 ```
 
-> `packr2 build` is used here instead of `go run main.go` because `go run` creates a new binary every time which, since this program is a server, will request a firewall exception on every run. Using `packr2 build` overwrites the same binary `./andesite` over and over again as changes are made.
+> `packr2 build`, and by proxy `go build` is used here instead of `go run main.go` because `go run` creates a new binary every time which, since this program is a server, will request a firewall exception on every run. Using `go build` overwrites the same binary `./andesite` over and over again as changes are made.
 
 > `packr2 build` is used here over `go build` so that `packr2` can generate the resources necessary to embed the static resources into the resulting binary. This will allow the Andesite program to be run from anywhere.
 
