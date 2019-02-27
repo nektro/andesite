@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"mime"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,15 +14,14 @@ import (
 	"runtime/debug"
 	"strconv"
 	"syscall"
-	"time"
 
 	"github.com/nektro/go-util/types"
 	"github.com/nektro/go-util/util"
 
 	"github.com/aymerick/raymond"
 	"github.com/gobuffalo/packr/v2"
-	"github.com/gorilla/securecookie"
-	"github.com/gorilla/sessions"
+	sessions "github.com/kataras/go-sessions"
+	"github.com/valyala/fasthttp"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -38,8 +36,6 @@ var (
 	oauth2AppID     string
 	oauth2AppSecret string
 	oauth2Provider  Oauth2Provider
-	randomKey       = securecookie.GenerateRandomKey(32)
-	store           = sessions.NewCookieStore(randomKey)
 	database        *sql.DB
 	wwFFS           types.MultiplexFileSystem
 	httpBase        string
@@ -183,7 +179,6 @@ func main() {
 
 	//
 
-	mw := chainMiddleware(withAttribution)
 	p := strconv.Itoa(*port)
 	dirs := []http.FileSystem{}
 
@@ -193,21 +188,37 @@ func main() {
 
 	dirs = append(dirs, http.Dir("www"))
 	dirs = append(dirs, packr.New("", "./www/"))
-
-	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
-	http.HandleFunc("/login", mw(handleOAuthLogin))
-	http.HandleFunc("/callback", mw(handleOAuthCallback))
-	http.HandleFunc("/token", mw(handleOAuthToken))
-	http.HandleFunc("/test", mw(handleTest))
-	http.HandleFunc("/files/", mw(handleFileListing))
-	http.HandleFunc("/admin", mw(handleAdmin))
-	http.HandleFunc("/api/access/delete", mw(handleAccessDelete))
-	http.HandleFunc("/api/access/update", mw(handleAccessUpdate))
-	http.HandleFunc("/api/access/create", mw(handleAccessCreate))
 	wwFFS = types.MultiplexFileSystem{dirs}
 
+	listener := func(ctx *fasthttp.RequestCtx) {
+		ctx.Response.Header.Add("Server", "nektro/andesite")
+
+		upath := string(ctx.Path())
+		if upath == "/login" {
+			handleOAuthLogin(ctx)
+		} else if upath == "/callback" {
+			handleOAuthCallback(ctx)
+		} else if upath == "/token" {
+			handleOAuthToken(ctx)
+		} else if upath == "/test" {
+			handleTest(ctx)
+		} else if upath == "/admin" {
+			handleAdmin(ctx)
+		} else if strings.HasPrefix(upath, "/files/") {
+			handleFileListing(ctx)
+		} else if upath == "/api/access/delete" {
+			handleAccessDelete(ctx)
+		} else if upath == "/api/access/update" {
+			handleAccessUpdate(ctx)
+		} else if upath == "/api/access/create" {
+			handleAccessCreate(ctx)
+		} else {
+			wwFFS.HandleFastHTTP(ctx)
+		}
+	}
+
 	log("Initialization complete. Starting server on port " + p)
-	http.ListenAndServe(":"+p, nil)
+	fasthttp.ListenAndServe(":"+p, listener)
 }
 
 func dieOnError(err error, args ...string) {
@@ -266,17 +277,17 @@ func byteCountIEC(b int64) string {
 	return fmt.Sprintf("%.1f %ciB", float64(b)/float64(div), "KMGTPEZY"[exp])
 }
 
-func fullHost(r *http.Request) string {
+func fullHost(ctx *fasthttp.RequestCtx) string {
 	urL := "http"
-	if r.TLS != nil {
+	if ctx.IsTLS() {
 		urL += "s"
 	}
-	return urL + "://" + r.Host
 }
 
 func getSession(r *http.Request) *sessions.Session {
 	session, _ := store.Get(r, "andesite_session")
 	return session
+	return urL + "://" + string(ctx.URI().Host())
 }
 
 func contains(stack []string, needle string) bool {
@@ -306,20 +317,22 @@ func checkErr(err error, args ...string) {
 	}
 }
 
-func writeUserDenied(w http.ResponseWriter, r *http.Request, fileOrAdmin, showLogin bool) {
-	w.WriteHeader(http.StatusForbidden)
-
+func writeUserDenied(ctx *fasthttp.RequestCtx, fileOrAdmin bool, showLogin bool) {
 	me := ""
-	session := getSession(r)
-	sessName, ok := session.Values["name"]
-	if ok {
-		sessID, _ := session.Values["user"]
+	sess := sessions.StartFasthttp(ctx)
+	sessName := sess.Get("name")
+	if sessName != nil {
+		sessID := sess.Get("user")
 		me += fmt.Sprintf(" (%s%s - %s)", oauth2Provider.namePrefix, sessName.(string), sessID.(string))
 	}
 
 	message := ""
 	if fileOrAdmin {
-		message = "You" + me + " do not have access to this resource."
+		if showLogin {
+			message = "You" + me + " do not have access to this resource."
+		} else {
+			message = "Unable to find the requested resource for you (" + me + " )"
+		}
 	} else {
 		message = "Admin priviledge required. Access denied."
 	}
@@ -327,25 +340,34 @@ func writeUserDenied(w http.ResponseWriter, r *http.Request, fileOrAdmin, showLo
 	linkmsg := ""
 	if showLogin {
 		linkmsg = "Please <a href='" + httpBase + "login'>Log In</a>."
+		ctx.SetStatusCode(fasthttp.StatusForbidden)
+		writeHandlebarsFile(ctx, "/response.hbs", map[string]interface{}{
+			"title":   "Forbidden",
+			"message": message,
+			"link":    linkmsg,
+			"base":    httpBase,
+		})
+	} else {
+		ctx.SetStatusCode(fasthttp.StatusForbidden)
+		writeHandlebarsFile(ctx, "/response.hbs", map[string]interface{}{
+			"title":   "Not Found",
+			"message": message,
+			"link":    linkmsg,
+			"base":    httpBase,
+		})
 	}
-
-	writeHandlebarsFile(w, "/response.hbs", map[string]interface{}{
-		"title":   "Forbidden",
-		"message": message,
-		"link":    linkmsg,
-		"base":    httpBase,
-	})
 }
 
-func writeHandlebarsFile(w http.ResponseWriter, file string, context map[string]interface{}) {
+func writeHandlebarsFile(ctx *fasthttp.RequestCtx, file string, context map[string]interface{}) {
 	template := string(readServerFile(file))
 	result, _ := raymond.Render(template, context)
-	fmt.Fprintln(w, result)
+	ctx.SetContentType("text/html")
+	fmt.Fprintln(ctx, result)
 }
 
-func writeAPIResponse(w http.ResponseWriter, good bool, message string) {
+func writeAPIResponse(ctx *fasthttp.RequestCtx, good bool, message string) {
 	if !good {
-		w.WriteHeader(http.StatusForbidden)
+		ctx.SetStatusCode(fasthttp.StatusForbidden)
 	}
 	titlemsg := ""
 	if good {
@@ -354,31 +376,12 @@ func writeAPIResponse(w http.ResponseWriter, good bool, message string) {
 		titlemsg = "Update Failed"
 	}
 	writeHandlebarsFile(w, "/response.hbs", map[string]interface{}{
+	writeHandlebarsFile(ctx, "/response.hbs", map[string]interface{}{
 		"title":   titlemsg,
 		"message": message,
 		"link":    "Return to <a href='" + httpBase + "admin'>the dashboard</a>.",
 		"base":    httpBase,
 	})
-}
-
-// @from https://gist.github.com/gbbr/fa652db0bab132976620bcb7809fd89a
-func chainMiddleware(mw ...Middleware) Middleware {
-	return func(final http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			last := final
-			for i := len(mw) - 1; i >= 0; i-- {
-				last = mw[i](last)
-			}
-			last(w, r)
-		}
-	}
-}
-
-func withAttribution(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Server", "nektro/andesite")
-		next.ServeHTTP(w, r)
-	}
 }
 
 func fixID(id interface{}) string {

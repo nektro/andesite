@@ -4,40 +4,41 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/kataras/go-sessions"
+	"github.com/valyala/fasthttp"
 )
 
 // handler for http://andesite/login
-func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
-	session := getSession(r)
-	_, ok := session.Values["user"]
-	if ok {
-		w.Header().Add("Location", "./files/")
+func handleOAuthLogin(ctx *fasthttp.RequestCtx) {
+	sess := sessions.StartFasthttp(ctx)
+	u := sess.Get("user")
+	if u != nil {
+		ctx.Response.Header.Add("Location", "./files/")
 	} else {
 		urlR, _ := url.Parse(oauth2Provider.authorizeURL)
 		parameters := url.Values{}
 		parameters.Add("client_id", oauth2AppID)
-		parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
+		parameters.Add("redirect_uri", fullHost(ctx)+httpBase+"callback")
 		parameters.Add("response_type", "code")
 		parameters.Add("scope", oauth2Provider.scope)
 		parameters.Add("duration", "temporary")
 		parameters.Add("state", "none")
 		urlR.RawQuery = parameters.Encode()
-		w.Header().Add("Location", urlR.String())
+		ctx.Response.Header.Add("Location", urlR.String())
 	}
-	w.Header().Add("cache-control", "no-store")
-	w.WriteHeader(301)
+	ctx.SetStatusCode(301)
 }
 
 // handler for http://andesite/callback
-func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
-	code := r.URL.Query().Get("code")
+func handleOAuthCallback(ctx *fasthttp.RequestCtx) {
+	code := ctx.URI().QueryArgs().Peek("code") //.URL.Query().Get("code")
 	if len(code) == 0 {
 		return
 	}
@@ -46,7 +47,7 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	parameters.Add("client_secret", oauth2AppSecret)
 	parameters.Add("grant_type", "authorization_code")
 	parameters.Add("code", code)
-	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
+	parameters.Add("redirect_uri", fullHost(ctx)+httpBase+"callback")
 	parameters.Add("state", "none")
 	urlR, _ := url.Parse(oauth2Provider.tokenURL)
 	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
@@ -60,19 +61,17 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	var respJSON OAuth2CallBackResponse
 	json.Unmarshal(body, &respJSON)
-	session := getSession(r)
-	session.Values[accessToken] = respJSON.AccessToken
-	session.Save(r, w)
-	w.Header().Add("Location", "./token")
-	w.Header().Add("cache-control", "no-store")
-	w.WriteHeader(301)
+	sess := sessions.StartFasthttp(ctx)
+	sess.Set(accessToken, respJSON.AccessToken)
+	ctx.Response.Header.Add("Location", "./token")
+	ctx.SetStatusCode(301)
 }
 
 // handler for http://andesite/token
-func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
-	session := getSession(r)
-	val, ok := session.Values[accessToken]
-	if !ok {
+func handleOAuthToken(ctx *fasthttp.RequestCtx) {
+	sess := sessions.StartFasthttp(ctx)
+	val := sess.Get(accessToken)
+	if val == nil {
 		return
 	}
 	urlR, _ := url.Parse(oauth2Provider.meURL)
@@ -85,57 +84,55 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	var respMe map[string]interface{}
 	json.Unmarshal(body, &respMe)
-	session.Values["user"] = fixID(respMe["id"])
-	session.Values["name"] = respMe[oauth2Provider.nameProp].(string)
-	session.Save(r, w)
-	w.Header().Add("Location", "./files/")
-	w.Header().Add("cache-control", "no-store")
-	w.WriteHeader(301)
+	sess.Set("user", fixID(respMe["id"]))
+	sess.Set("name", respMe[oauth2Provider.nameProp].(string))
+	ctx.Response.Header.Add("Location", "./files/")
+	ctx.SetStatusCode(301)
 }
 
 // handler for http://andesite/test
-func handleTest(w http.ResponseWriter, r *http.Request) {
+func handleTest(ctx *fasthttp.RequestCtx) {
 	// sessions test
 	// increment number every refresh
-	session := getSession(r)
-	i, ok := session.Values["int"]
-	if !ok {
+	sess := sessions.StartFasthttp(ctx)
+	i := sess.Get("int")
+	if i == nil {
 		i = 0
 	}
 	j := i.(int)
-	session.Values["int"] = j + 1
-	session.Save(r, w)
-	w.Header().Add("cache-control", "no-store")
-	fmt.Fprintf(w, strconv.Itoa(j))
+	sess.Set("int", j+1)
+	fmt.Fprintf(ctx, strconv.Itoa(j))
 }
 
 // handler for http://andesite/files/*
-func handleFileListing(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(r.RequestURI, "..") {
+func handleFileListing(ctx *fasthttp.RequestCtx) {
+	if strings.Contains(string(ctx.Request.URI().Path()), "..") {
 		return
 	}
-	session := getSession(r)
-	sessID, ok := session.Values["user"]
-	if !ok {
-		writeUserDenied(w, r, true, true)
+
+	sess := sessions.StartFasthttp(ctx)
+	sessID := sess.Get("user")
+	if sessID == nil {
+		writeUserDenied(ctx, true, true)
 		return
 	}
 	userID := sessID.(string)
 
 	// get path
-	qpath, _ := url.QueryUnescape(r.RequestURI[6:])
+	// remove /files
+	qpath := string(ctx.URI().Path()[6:])
 
 	// valid path check
 	stat, err := rootDir.Stat(qpath)
 	if os.IsNotExist(err) {
 		// 404
-		writeUserDenied(w, r, true, false)
+		writeUserDenied(ctx, true, false)
 		return
 	}
 
 	// server file/folder
 	if stat.IsDir() {
-		w.Header().Add("Content-Type", "text/html")
+		ctx.Response.Header.Add("Content-Type", "text/html")
 
 		// get list of all files
 		files, _ := rootDir.ReadDir(qpath)
@@ -165,7 +162,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 		l2 := len(files)
 
 		if l1 > 0 && l2 == 0 {
-			writeUserDenied(w, r, true, false)
+			writeUserDenied(ctx, true, false)
 			return
 		}
 
@@ -195,8 +192,8 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			admin = useruser.admin
 		}
 
-		sessName, _ := session.Values["name"]
-		writeHandlebarsFile(w, "/listing.hbs", map[string]interface{}{
+		sessName := sess.Get("name")
+		writeHandlebarsFile(ctx, "/listing.hbs", map[string]interface{}{
 			"user":  userID,
 			"path":  qpath,
 			"files": data,
@@ -213,22 +210,23 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if can == false {
-			writeUserDenied(w, r, true, false)
+			writeUserDenied(ctx, true, false)
 			return
 		}
 
 		reader, _ := rootDir.ReadFile(qpath)
-		io.Copy(w, reader)
+		data, _ := ioutil.ReadAll(reader)
+		ctx.SetBody(data)
 	}
 }
 
 // handler for http://andesite/admin
-func handleAdmin(w http.ResponseWriter, r *http.Request) {
+func handleAdmin(ctx *fasthttp.RequestCtx) {
 	// get discord snowflake from session cookie
-	session := getSession(r)
-	sessID, ok := session.Values["user"]
-	if !ok {
-		writeUserDenied(w, r, false, true)
+	sess := sessions.StartFasthttp(ctx)
+	sessID := sess.Get("user")
+	if sessID == nil {
+		writeUserDenied(ctx, false, true)
 		return
 	}
 	userID := sessID.(string)
@@ -240,14 +238,14 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		admin = useruser.admin
 	}
 	if !admin {
-		writeUserDenied(w, r, false, false)
+		writeUserDenied(ctx, false, false)
 		return
 	}
 
 	//
 	accesses := queryAllAccess()
-	sessName, _ := session.Values["name"]
-	writeHandlebarsFile(w, "/admin.hbs", map[string]interface{}{
+	sessName := sess.Get("name")
+	writeHandlebarsFile(ctx, "/admin.hbs", map[string]interface{}{
 		"user":     userID,
 		"accesses": accesses,
 		"base":     httpBase,
@@ -256,123 +254,124 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 // handler for http://andesite/api/access/delete
-func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeAPIResponse(w, false, "This action requires using HTTP POST")
+func handleAccessDelete(ctx *fasthttp.RequestCtx) {
+	if string(ctx.Method()) != http.MethodPost {
+		writeAPIResponse(ctx, false, "This action requires using HTTP POST")
 		return
 	}
 	//
-	session := getSession(r)
-	sessID, ok := session.Values["user"]
-	if !ok {
-		writeAPIResponse(w, false, "This action requires being logged in")
+	sess := sessions.StartFasthttp(ctx)
+	sessID := sess.Get("user")
+	if sessID == nil {
+		writeAPIResponse(ctx, false, "This action requires being logged in")
 		return
 	}
 	userID := sessID.(string)
 	//
 	user, ok := queryUserBySnowflake(userID)
 	if !ok {
-		writeAPIResponse(w, false, "This action requires being a member of this server")
+		writeAPIResponse(ctx, false, "This action requires being a member of this server")
 		return
 	}
 	if !user.admin {
-		writeAPIResponse(w, false, "This action requires being a site administrator")
+		writeAPIResponse(ctx, false, "This action requires being a site administrator")
 		return
 	}
 	//
-	err := r.ParseForm()
-	if err != nil {
-		writeAPIResponse(w, false, "Error parsing form data")
+	pa := ctx.PostArgs()
+	if pa == nil {
+		writeAPIResponse(ctx, false, "Error parsing form data")
 		return
 	}
 	//
-	aid := r.PostForm.Get("id")
+	aid := string(pa.Peek("id"))
 	iid, err := strconv.ParseInt(aid, 10, 32)
 	if err != nil {
-		writeAPIResponse(w, false, "ID parameter must be an integer")
+		writeAPIResponse(ctx, false, "ID parameter must be an integer")
 		return
 	}
 	//
 	query(fmt.Sprintf("delete from access where id = '%d'", iid), true)
-	writeAPIResponse(w, true, fmt.Sprintf("Removed access from %s.", r.PostForm.Get("snowflake")))
+	writeAPIResponse(ctx, true, fmt.Sprintf("Removed access from %s.", string(pa.Peek("snowflake"))))
 }
 
 // handler for http://andesite/api/access/update
-func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeAPIResponse(w, false, "This action requires using HTTP POST")
+func handleAccessUpdate(ctx *fasthttp.RequestCtx) {
+	if string(ctx.Method()) != http.MethodPost {
+		writeAPIResponse(ctx, false, "This action requires using HTTP POST")
 		return
 	}
 	//
-	session := getSession(r)
-	sessID, ok := session.Values["user"]
-	if !ok {
-		writeAPIResponse(w, false, "This action requires being logged in")
+	sess := sessions.StartFasthttp(ctx)
+	sessID := sess.Get("user")
+	if sessID == nil {
+		writeAPIResponse(ctx, false, "This action requires being logged in")
 		return
 	}
 	userID := sessID.(string)
 	//
 	user, ok := queryUserBySnowflake(userID)
 	if !ok {
-		writeAPIResponse(w, false, "This action requires being a member of this server")
+		writeAPIResponse(ctx, false, "This action requires being a member of this server")
 		return
 	}
 	if !user.admin {
-		writeAPIResponse(w, false, "This action requires being a site administrator")
+		writeAPIResponse(ctx, false, "This action requires being a site administrator")
 		return
 	}
 	//
-	err := r.ParseForm()
+	pa := ctx.PostArgs()
+	if pa == nil {
+		writeAPIResponse(ctx, false, "Error parsing form data")
+		return
+	}
+	//
+	aid := pa.Peek("id")
+	iid, err := strconv.ParseInt(string(aid), 10, 32)
 	if err != nil {
-		writeAPIResponse(w, false, "Error parsing form data")
+		writeAPIResponse(ctx, false, "ID parameter must be an integer")
 		return
 	}
 	//
-	aid := r.PostForm.Get("id")
-	iid, err := strconv.ParseInt(aid, 10, 32)
-	if err != nil {
-		writeAPIResponse(w, false, "ID parameter must be an integer")
-		return
-	}
-	//
-	queryPrepared("update access set path = ? where id = ?", true, r.PostForm.Get("path"), iid)
-	writeAPIResponse(w, true, fmt.Sprintf("Updated access for %s.", r.PostForm.Get("snowflake")))
+	queryPrepared("update access set path = ? where id = ?", true, string(pa.Peek("path")), iid)
+	writeAPIResponse(ctx, true, fmt.Sprintf("Updated access for %s.", string(pa.Peek("snowflake"))))
 }
 
 // handler for http://andesite/api/access/create
-func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeAPIResponse(w, false, "This action requires using HTTP POST")
+func handleAccessCreate(ctx *fasthttp.RequestCtx) {
+	if string(ctx.Method()) != http.MethodPost {
+		writeAPIResponse(ctx, false, "This action requires using HTTP POST")
 		return
 	}
 	//
-	session := getSession(r)
-	sessID, ok := session.Values["user"]
-	if !ok {
-		writeAPIResponse(w, false, "This action requires being logged in")
+	sess := sessions.StartFasthttp(ctx)
+	sessID := sess.Get("user")
+	if sessID == nil {
+		writeAPIResponse(ctx, false, "This action requires being logged in")
 		return
 	}
 	userID := sessID.(string)
 	//
 	user, ok := queryUserBySnowflake(userID)
 	if !ok {
-		writeAPIResponse(w, false, "This action requires being a member of this server")
+		writeAPIResponse(ctx, false, "This action requires being a member of this server")
 		return
 	}
 	if !user.admin {
-		writeAPIResponse(w, false, "This action requires being a site administrator")
+		writeAPIResponse(ctx, false, "This action requires being a site administrator")
 		return
 	}
 	//
-	err := r.ParseForm()
-	if err != nil {
-		writeAPIResponse(w, false, "Error parsing form data")
+	pa := ctx.PostArgs()
+	if pa == nil {
+		writeAPIResponse(ctx, false, "Error parsing form data")
 		return
 	}
 	//
 	aid := queryLastID("access") + 1
 	asn := r.PostForm.Get("snowflake")
-	apt := r.PostForm.Get("path")
+	asn := string(pa.Peek("snowflake"))
+	apt := string(pa.Peek("path"))
 	//
 	u, ok := queryUserBySnowflake(asn)
 	aud := -1
@@ -384,5 +383,5 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	queryPrepared("insert into access values (?, ?, ?)", true, aid, aud, apt)
-	writeAPIResponse(w, true, fmt.Sprintf("Created access for %s.", asn))
+	writeAPIResponse(ctx, true, fmt.Sprintf("Created access for %s.", asn))
 }
