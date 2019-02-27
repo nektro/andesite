@@ -17,6 +17,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/nektro/go-util/types"
+
 	"github.com/aymerick/raymond"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/securecookie"
@@ -38,7 +40,7 @@ var (
 	randomKey       = securecookie.GenerateRandomKey(32)
 	store           = sessions.NewCookieStore(randomKey)
 	database        *sql.DB
-	wwFFS           FusingFileSystem
+	wwFFS           types.MultiplexFileSystem
 	httpBase        string
 	rootDir         RootDir
 	metaDir         string
@@ -74,10 +76,6 @@ func main() {
 	}
 	dieOnError(assert(fileExists(metaDir), ".andesite folder does not exist!"))
 	log("Starting in " + rootDir.Base())
-
-	//
-	// https://github.com/labstack/echo/issues/1038#issuecomment-410294904
-	mime.AddExtensionType(".js", "application/javascript")
 
 	//
 	// discover OAuth2 config info
@@ -194,7 +192,6 @@ func main() {
 
 	dirs = append(dirs, http.Dir("www"))
 	dirs = append(dirs, packr.New("", "./www/"))
-	wwFFS = FusingFileSystem{dirs}
 
 	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
 	http.HandleFunc("/login", mw(handleOAuthLogin))
@@ -206,6 +203,7 @@ func main() {
 	http.HandleFunc("/api/access/delete", mw(handleAccessDelete))
 	http.HandleFunc("/api/access/update", mw(handleAccessUpdate))
 	http.HandleFunc("/api/access/create", mw(handleAccessCreate))
+	wwFFS = types.MultiplexFileSystem{dirs}
 
 	log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
