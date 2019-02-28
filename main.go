@@ -264,18 +264,20 @@ func readServerFile(path string) []byte {
 	return bytes
 }
 
-// @from https://yourbasic.org/golang/formatting-byte-size-to-human-readable-format/
-func byteCountIEC(b int64) string {
-	const unit = 1024
-	if b < unit {
-		return fmt.Sprintf("%d B", b)
+func reduceNumber(input int64, unit int64, base string, prefixes string) string {
+	if input < unit {
+		return fmt.Sprintf("%d "+base, input)
 	}
 	div, exp := int64(unit), 0
-	for n := b / unit; n >= unit; n /= unit {
+	for n := input / unit; n >= unit; n /= unit {
 		div *= unit
 		exp++
 	}
-	return fmt.Sprintf("%.1f %ciB", float64(b)/float64(div), "KMGTPEZY"[exp])
+	return fmt.Sprintf("%.1f %ci", float64(input)/float64(div), prefixes[exp]) + base
+}
+
+func byteCountIEC(b int64) string {
+	return reduceNumber(b, 1024, "B", "KMGTPEZY")
 }
 
 func fullHost(ctx *fasthttp.RequestCtx) string {
