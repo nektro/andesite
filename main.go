@@ -195,24 +195,20 @@ func main() {
 		ctx.Response.Header.Add("Server", "nektro/andesite")
 
 		upath := string(ctx.Path())
-		if upath == "/login" {
-			handleOAuthLogin(ctx)
-		} else if upath == "/callback" {
-			handleOAuthCallback(ctx)
-		} else if upath == "/token" {
-			handleOAuthToken(ctx)
-		} else if upath == "/test" {
-			handleTest(ctx)
-		} else if upath == "/admin" {
-			handleAdmin(ctx)
+
+		util.FasthttpAddHandler("/login", handleOAuthLogin)
+		util.FasthttpAddHandler("/callback", handleOAuthCallback)
+		util.FasthttpAddHandler("/token", handleOAuthToken)
+		util.FasthttpAddHandler("/test", handleTest)
+		util.FasthttpAddHandler("/admin", handleAdmin)
+		util.FasthttpAddHandler("/api/access/delete", handleAccessDelete)
+		util.FasthttpAddHandler("/api/access/update", handleAccessUpdate)
+		util.FasthttpAddHandler("/api/access/create", handleAccessCreate)
+
+		if util.FasthttpHandle(upath, ctx) {
+			// do nothing, already served
 		} else if strings.HasPrefix(upath, "/files/") {
 			handleFileListing(ctx)
-		} else if upath == "/api/access/delete" {
-			handleAccessDelete(ctx)
-		} else if upath == "/api/access/update" {
-			handleAccessUpdate(ctx)
-		} else if upath == "/api/access/create" {
-			handleAccessCreate(ctx)
 		} else {
 			wwFFS.HandleFastHTTP(ctx)
 		}
