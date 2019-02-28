@@ -191,19 +191,19 @@ func main() {
 	dirs = append(dirs, packr.New("", "./www/"))
 	wwFFS = types.MultiplexFileSystem{dirs}
 
+	util.FasthttpAddHandler("/login", handleOAuthLogin)
+	util.FasthttpAddHandler("/callback", handleOAuthCallback)
+	util.FasthttpAddHandler("/token", handleOAuthToken)
+	util.FasthttpAddHandler("/test", handleTest)
+	util.FasthttpAddHandler("/admin", handleAdmin)
+	util.FasthttpAddHandler("/api/access/delete", handleAccessDelete)
+	util.FasthttpAddHandler("/api/access/update", handleAccessUpdate)
+	util.FasthttpAddHandler("/api/access/create", handleAccessCreate)
+
 	listener := func(ctx *fasthttp.RequestCtx) {
 		ctx.Response.Header.Add("Server", "nektro/andesite")
 
 		upath := string(ctx.Path())
-
-		util.FasthttpAddHandler("/login", handleOAuthLogin)
-		util.FasthttpAddHandler("/callback", handleOAuthCallback)
-		util.FasthttpAddHandler("/token", handleOAuthToken)
-		util.FasthttpAddHandler("/test", handleTest)
-		util.FasthttpAddHandler("/admin", handleAdmin)
-		util.FasthttpAddHandler("/api/access/delete", handleAccessDelete)
-		util.FasthttpAddHandler("/api/access/update", handleAccessUpdate)
-		util.FasthttpAddHandler("/api/access/create", handleAccessCreate)
 
 		if util.FasthttpHandle(upath, ctx) {
 			// do nothing, already served
