@@ -98,6 +98,11 @@ See [`deployment.md`](docs/deployment.md)
 - https://handlebarsjs.com/ - HTML templating
 - https://github.com/aymerick/raymond - Handlebars template rendering
 - https://sass-lang.com/ - Cascading CSS styles
+- https://github.com/gobuffalo/packr - Package static assets into single Go binary
+- https://github.com/valyala/fasthttp - Optimized HTTP server backend
+- https://github.com/kataras/go-sessions - HTTP Session manager for fasthttp
+- https://github.com/nektro/go-util - Go utilities for simplifying common complex tasks
+- https://github.com/spf13/pflag - Optimized flag handler that makes program flags POSIX compliant
 
 ## Contributing
 We take issues all the time right here on GitHub. We use labels extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it's been answered!
