@@ -19,6 +19,7 @@ import (
 func handleOAuthLogin(ctx *fasthttp.RequestCtx) {
 	sess := sessions.StartFasthttp(ctx)
 	u := sess.Get("user")
+	ctx.SetStatusCode(301)
 	if u != nil {
 		ctx.Response.Header.Add("Location", "./files/")
 	} else {
@@ -33,7 +34,6 @@ func handleOAuthLogin(ctx *fasthttp.RequestCtx) {
 		urlR.RawQuery = parameters.Encode()
 		ctx.Response.Header.Add("Location", urlR.String())
 	}
-	ctx.SetStatusCode(301)
 }
 
 // handler for http://andesite/callback
@@ -63,8 +63,8 @@ func handleOAuthCallback(ctx *fasthttp.RequestCtx) {
 	json.Unmarshal(body, &respJSON)
 	sess := sessions.StartFasthttp(ctx)
 	sess.Set(accessToken, respJSON.AccessToken)
-	ctx.Response.Header.Add("Location", "./token")
 	ctx.SetStatusCode(301)
+	ctx.Response.Header.Add("Location", "./token")
 }
 
 // handler for http://andesite/token
@@ -86,8 +86,8 @@ func handleOAuthToken(ctx *fasthttp.RequestCtx) {
 	json.Unmarshal(body, &respMe)
 	sess.Set("user", fixID(respMe["id"]))
 	sess.Set("name", respMe[oauth2Provider.nameProp].(string))
-	ctx.Response.Header.Add("Location", "./files/")
 	ctx.SetStatusCode(301)
+	ctx.Response.Header.Add("Location", "./files/")
 }
 
 // handler for http://andesite/test
