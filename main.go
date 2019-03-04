@@ -16,13 +16,13 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/nektro/go-util/types"
-	"github.com/nektro/go-util/util"
-
 	"github.com/aymerick/raymond"
 	"github.com/gobuffalo/packr/v2"
-	sessions "github.com/kataras/go-sessions"
+	"github.com/nektro/go-util/types"
+	"github.com/nektro/go-util/util"
 	"github.com/valyala/fasthttp"
+
+	sessions "github.com/kataras/go-sessions"
 
 	_ "github.com/mattn/go-sqlite3"
 )
