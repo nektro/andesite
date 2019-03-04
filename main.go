@@ -384,3 +384,10 @@ func fixID(id interface{}) string {
 	}
 	return id.(string)
 }
+
+func boolToString(x bool) string {
+	if x {
+		return "1"
+	}
+	return "0"
+}
