@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -23,6 +22,7 @@ import (
 	"github.com/valyala/fasthttp"
 
 	sessions "github.com/kataras/go-sessions"
+	flag "github.com/spf13/pflag"
 
 	_ "github.com/mattn/go-sqlite3"
 )

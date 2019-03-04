@@ -60,15 +60,15 @@ $ ./andesite
 > `packr2 build` is used here over `go build` so that `packr2` can generate the resources necessary to embed the static resources into the resulting binary. This will allow the Andesite program to be run from anywhere.
 
 ### Options
-- -root **Required**
+- --root **Required**
     - A relative or absolute path to the directory you wish for Andesite to serve
-- -port
+- --port
     - The port Andesite will broadcast on. (Default `8000`)
-- -admin
+- --admin
     - The ID of a user to add as an admin. Only required once. Admin priviledge allows this user to change the path access of other users. The User ID can be obtained from `/files/` once logged in.
-- -theme
+- --theme
     - The name of the theme you want andesite to use for custom HTML and Handlebars templates.
-- -base
+- --base
     - Used when serving andesite from an HTTP root that is not `/`. See [`deployment.md`](docs/deployment.md) for more info. (Default: `/`)
 
 ## Themes
@@ -83,7 +83,7 @@ Andesite supports making custom themes for the splash page and the various HTML 
     - The admin dashboard that allows editing the access of users
 
 ### Using A Theme
-All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `-theme` was `example`. Doing this will tell Andesite to serve files from `./.andesite/theme-example/`. This is so that multiple themes can be saved even though only one can be used at a time while keeping your `config.json` and any other private files private.
+All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `--theme` was `example`. Doing this will tell Andesite to serve files from `./.andesite/theme-example/`. This is so that multiple themes can be saved even though only one can be used at a time while keeping your `config.json` and any other private files private.
 
 ## Deployment
 See [`deployment.md`](docs/deployment.md)
