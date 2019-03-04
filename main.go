@@ -48,9 +48,9 @@ func main() {
 	log("Initializing Andesite...")
 
 	flagRoot := flag.String("root", "", "Path of root directory for files")
-	port := flag.Int("port", 8000, "Port to open server on")
-	admin := flag.String("admin", "", "Discord User ID of the user that is distinguished as the site owner")
-	theme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
+	flagPort := flag.Int("port", 8000, "Port to open server on")
+	flagAdmin := flag.String("admin", "", "Discord User ID of the user that is distinguished as the site owner")
+	flagTheme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
 	flagBase := flag.String("base", "/", "")
 	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
 	flagMeta := flag.String("meta", "", "")
@@ -126,14 +126,14 @@ func main() {
 	//
 	// admin creation from (optional) CLI argument
 
-	if *admin != "" {
-		uu, ok := queryUserBySnowflake(*admin)
+	if *flagAdmin != "" {
+		uu, ok := queryUserBySnowflake(*flagAdmin)
 		if !ok {
 			uid := queryLastID("users") + 1
 			aid := queryLastID("access") + 1
-			query(fmt.Sprintf("insert into users values ('%d', '%s', '1')", uid, oauth2Provider.dbPrefix+*admin), true)
+			query(fmt.Sprintf("insert into users values ('%d', '%s', '1')", uid, oauth2Provider.dbPrefix+*flagAdmin), true)
 			query(fmt.Sprintf("insert into access values ('%d', '%d', '/')", aid, uid), true)
-			log(fmt.Sprintf("Added user %s as an admin", *admin))
+			log(fmt.Sprintf("Added user %s as an admin", *flagAdmin))
 		} else {
 			if !uu.admin {
 				query(fmt.Sprintf("update users set admin = '1' where id = '%d'", uu.id), true)
@@ -147,8 +147,8 @@ func main() {
 
 	themeRootPath := ""
 	themeDirName := ""
-	if *theme != "" {
-		stheme := *theme
+	if *flagTheme != "" {
+		stheme := *flagTheme
 		themeDirName = "theme-" + stheme
 		themeRootPath = metaDir + themeDirName + "/"
 		fi, err := os.Stat(themeRootPath)
@@ -180,7 +180,7 @@ func main() {
 
 	//
 
-	p := strconv.Itoa(*port)
+	p := strconv.Itoa(*flagPort)
 	dirs := []http.FileSystem{}
 
 	if themeRootPath != "" {
