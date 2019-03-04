@@ -52,7 +52,7 @@ func main() {
 	admin := flag.String("admin", "", "Discord User ID of the user that is distinguished as the site owner")
 	theme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
 	flagBase := flag.String("base", "/", "")
-	flagRType := flag.String("root-type", "dir", "Type of path -root points to. One of 'dir', 'http'")
+	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
 	flagMeta := flag.String("meta", "", "")
 	flag.Parse()
 
@@ -63,7 +63,7 @@ func main() {
 	case RootTypeDir:
 		rootDir = FsRoot{*flagRoot}
 		s, _ := filepath.Abs(*flagRoot)
-		dieOnError(assert(fileExists(s), "Please pass a valid directory as a -root parameter!"))
+		dieOnError(assert(fileExists(s), "Please pass a valid directory as a --root parameter!"))
 		metaDir = s + pthAnd
 	case RootTypeHttp:
 		rootDir = HttpRoot{*flagRoot}
@@ -152,7 +152,7 @@ func main() {
 		themeDirName = "theme-" + stheme
 		themeRootPath = metaDir + themeDirName + "/"
 		fi, err := os.Stat(themeRootPath)
-		dieOnError(err, "Theme directory must exist if the -theme option is present")
+		dieOnError(err, "Theme directory must exist if the --theme option is present")
 		dieOnError(assert(fi.IsDir(), "Theme directory must be a directory!"))
 	}
 
