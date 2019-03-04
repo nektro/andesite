@@ -146,3 +146,7 @@ func queryDoAddUser(id int, snowflake string, admin bool, name string) {
 	adm := boolToString(admin)
 	queryPrepared(fmt.Sprintf("insert into users values ('%d', '%s', '%s', '?')", id, snowflake, adm), true, name)
 }
+
+func queryDoUpdate(table string, col string, value string, where string, search string) {
+	queryPrepared(fmt.Sprintf("update %s set %s = ? where %s = '%s'", table, col, where, search), true, value)
+}
