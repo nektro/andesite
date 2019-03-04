@@ -38,7 +38,7 @@ func handleOAuthLogin(ctx *fasthttp.RequestCtx) {
 
 // handler for http://andesite/callback
 func handleOAuthCallback(ctx *fasthttp.RequestCtx) {
-	code := ctx.URI().QueryArgs().Peek("code") //.URL.Query().Get("code")
+	code := ctx.URI().QueryArgs().Peek("code")
 	if len(code) == 0 {
 		return
 	}
