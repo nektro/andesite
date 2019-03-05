@@ -32,6 +32,7 @@
                 <form method="POST">
                     <input type="hidden" name="id" value="{{id}}">
                     <input type="text" name="snowflake" placeholder="User Snowflake" value="{{snowflake}}">
+                    <input type="text" name="name" placeholder="{User Name}" value="{{name}}" disabled>
                     <input type="text" name="path" placeholder="Path" value="{{path}}">
                     <button class="btn" formaction="{{base}}api/access/update">Update</button>
                     <button class="btn" formaction="{{base}}api/access/delete">Delete</button>

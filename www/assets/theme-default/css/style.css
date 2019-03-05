@@ -118,6 +118,10 @@ body ul.datalist form input[type=text][name=snowflake] {
   max-width: 12em;
 }
 
+body ul.datalist form input[type=text][name=name] {
+  max-width: 15em;
+}
+
 body ul.datalist form button.btn {
   background-color: transparent;
   border-radius: .25em;

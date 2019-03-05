@@ -117,6 +117,7 @@ func main() {
 	createTable("users", []string{"id", "int primary key"}, [][]string{
 		{"snowflake", "text"},
 		{"admin", "tinyint(1)"},
+		{"name", "text"},
 	})
 	createTable("access", []string{"id", "int primary key"}, [][]string{
 		{"user", "int"},
@@ -131,7 +132,7 @@ func main() {
 		if !ok {
 			uid := queryLastID("users") + 1
 			aid := queryLastID("access") + 1
-			query(fmt.Sprintf("insert into users values ('%d', '%s', '1')", uid, oauth2Provider.dbPrefix+*flagAdmin), true)
+			query(fmt.Sprintf("insert into users values ('%d', '%s', '1', '')", uid, oauth2Provider.dbPrefix+*flagAdmin), true)
 			query(fmt.Sprintf("insert into access values ('%d', '%d', '/')", aid, uid), true)
 			log(fmt.Sprintf("Added user %s as an admin", *flagAdmin))
 		} else {

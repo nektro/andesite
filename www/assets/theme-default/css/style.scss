@@ -109,6 +109,9 @@ body {
                         &[name=snowflake] {
                             max-width: 12em;
                         }
+                        &[name=name] {
+                            max-width: 15em;
+                        }
                     }
                 }
                 button {

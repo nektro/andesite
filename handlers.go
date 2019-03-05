@@ -84,8 +84,12 @@ func handleOAuthToken(ctx *fasthttp.RequestCtx) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	var respMe map[string]interface{}
 	json.Unmarshal(body, &respMe)
-	sess.Set("user", fixID(respMe["id"]))
-	sess.Set("name", respMe[oauth2Provider.nameProp].(string))
+	_id := fixID(respMe["id"])
+	_name := respMe[oauth2Provider.nameProp].(string)
+	sess.Set("user", _id)
+	sess.Set("name", _name)
+	queryAssertUserName(_id, _name)
+
 	ctx.SetStatusCode(301)
 	ctx.Response.Header.Add("Location", "./files/")
 }

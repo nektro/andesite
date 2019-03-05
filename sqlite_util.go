@@ -81,7 +81,7 @@ func queryUserBySnowflake(snowflake string) (UserRow, bool) {
 	if !rows.Next() {
 		return ur, false
 	}
-	rows.Scan(&ur.id, &ur.snowflake, &ur.admin)
+	rows.Scan(&ur.id, &ur.snowflake, &ur.admin, &ur.name)
 	rows.Close()
 	return ur, true
 }
@@ -92,7 +92,7 @@ func queryUserByID(id int) (UserRow, bool) {
 	if !rows.Next() {
 		return ur, false
 	}
-	rows.Scan(&ur.id, &ur.snowflake, &ur.admin)
+	rows.Scan(&ur.id, &ur.snowflake, &ur.admin, &ur.name)
 	rows.Close()
 	return ur, true
 }
@@ -106,12 +106,13 @@ func queryAllAccess() []map[string]string {
 		rows.Scan(&uar.id, &uar.user, &uar.path)
 		if _, ok := ids[uar.user]; !ok {
 			uu, _ := queryUserByID(uar.user)
-			ids[uar.user] = []string{uu.snowflake}
+			ids[uar.user] = []string{uu.snowflake, uu.name}
 		}
 		result = append(result, map[string]string{
 			"id":        strconv.Itoa(uar.id),
 			"user":      strconv.Itoa(uar.user),
 			"snowflake": ids[uar.user][0][len(oauth2Provider.dbPrefix):],
+			"name":      ids[uar.user][1],
 			"path":      uar.path,
 		})
 	}
@@ -144,9 +145,19 @@ func queryPrepared(q string, modify bool, args ...interface{}) *sql.Rows {
 
 func queryDoAddUser(id int, snowflake string, admin bool, name string) {
 	adm := boolToString(admin)
-	queryPrepared(fmt.Sprintf("insert into users values ('%d', '%s', '%s', '?')", id, snowflake, adm), true, name)
+	queryPrepared(fmt.Sprintf("insert into users values ('%d', '%s', '%s', ?)", id, snowflake, adm), true, name)
 }
 
 func queryDoUpdate(table string, col string, value string, where string, search string) {
 	queryPrepared(fmt.Sprintf("update %s set %s = ? where %s = '%s'", table, col, where, search), true, value)
+}
+
+func queryAssertUserName(snowflake string, name string) {
+	_, ok := queryUserBySnowflake(snowflake)
+	if ok {
+		queryDoUpdate("users", "name", name, "snowflake", oauth2Provider.dbPrefix+snowflake)
+	} else {
+		uid := queryLastID("users") + 1
+		queryDoAddUser(uid, snowflake, false, name)
+	}
 }
