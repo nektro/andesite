@@ -148,7 +148,7 @@ func queryDoAddUser(id int, snowflake string, admin bool, name string) {
 }
 
 func queryDoUpdate(table string, col string, value string, where string, search string) {
-	queryPrepared(fmt.Sprintf("update %s set %s = ? where %s = '%s'", table, col, where, search), true, value)
+	queryPrepared(fmt.Sprintf("update %s set %s = ? where %s = ?", table, col, where), true, value, search)
 }
 
 func queryAssertUserName(snowflake string, name string) {
