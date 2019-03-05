@@ -8,7 +8,6 @@ import (
 
 func createTable(name string, pk []string, columns [][]string) {
 	if !doesTableExist(name) {
-		// create table
 		query(fmt.Sprintf("create table %s(%s %s)", name, pk[0], pk[1]), true)
 		log(fmt.Sprintf("Created table '%s'", name))
 	}

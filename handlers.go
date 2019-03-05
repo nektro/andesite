@@ -343,7 +343,7 @@ func handleAccessUpdate(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	//
-	queryPrepared("update access set path = ? where id = ?", true, string(pa.Peek("path")), iid)
+	queryDoUpdate("access", "path", string(pa.Peek("path")), "id", strconv.FormatInt(iid, 10))
 	writeAPIResponse(ctx, true, fmt.Sprintf("Updated access for %s.", string(pa.Peek("snowflake"))))
 }
 
