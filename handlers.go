@@ -388,7 +388,7 @@ func handleAccessCreate(ctx *fasthttp.RequestCtx) {
 		aud = u.id
 	} else {
 		aud = queryLastID("users") + 1
-		queryPrepared("insert into users values (?, ?, ?, ?)", true, aud, oauth2Provider.dbPrefix+asn, 0, "")
+		queryDoAddUser(aud, oauth2Provider.dbPrefix+asn, false, "")
 	}
 	//
 	queryPrepared("insert into access values (?, ?, ?)", true, aid, aud, apt)

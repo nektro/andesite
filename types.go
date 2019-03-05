@@ -31,6 +31,7 @@ type UserRow struct {
 	id        int
 	snowflake string
 	admin     bool
+	name      string
 }
 
 // Middleware provides a convenient mechanism for augmenting HTTP requests

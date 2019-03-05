@@ -132,12 +132,12 @@ func main() {
 		if !ok {
 			uid := queryLastID("users") + 1
 			aid := queryLastID("access") + 1
-			query(fmt.Sprintf("insert into users values ('%d', '%s', '1', '')", uid, oauth2Provider.dbPrefix+*flagAdmin), true)
+			queryDoAddUser(uid, oauth2Provider.dbPrefix+*flagAdmin, true, "")
 			query(fmt.Sprintf("insert into access values ('%d', '%d', '/')", aid, uid), true)
 			log(fmt.Sprintf("Added user %s as an admin", *flagAdmin))
 		} else {
 			if !uu.admin {
-				query(fmt.Sprintf("update users set admin = '1' where id = '%d'", uu.id), true)
+				queryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.id), 10))
 				log(fmt.Sprintf("Set user '%s's status to admin", uu.snowflake))
 			}
 		}
