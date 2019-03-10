@@ -53,7 +53,7 @@ func main() {
 	flagTheme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
 	flagBase := flag.String("base", "/", "")
 	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
-	flagMeta := flag.String("meta", "", "")
+	// flagMeta := flag.String("meta", "", "")
 	flag.Parse()
 
 	//
@@ -65,10 +65,10 @@ func main() {
 		s, _ := filepath.Abs(*flagRoot)
 		dieOnError(assert(fileExists(s), "Please pass a valid directory as a --root parameter!"))
 		metaDir = s + pthAnd
-	case RootTypeHttp:
-		rootDir = HttpRoot{*flagRoot}
-		s, _ := filepath.Abs(*flagMeta)
-		metaDir = s
+	// case RootTypeHttp:
+	// 	rootDir = HttpRoot{*flagRoot}
+	// 	s, _ := filepath.Abs(*flagMeta)
+	// 	metaDir = s
 	default:
 		dieOnError(errors.New("Invalid root type"))
 	}
