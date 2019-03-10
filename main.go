@@ -12,16 +12,15 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strconv"
-	"strings"
 	"syscall"
 
 	"github.com/aymerick/raymond"
 	"github.com/gobuffalo/packr/v2"
+	"github.com/gorilla/securecookie"
+	"github.com/gorilla/sessions"
 	"github.com/nektro/go-util/types"
 	"github.com/nektro/go-util/util"
-	"github.com/valyala/fasthttp"
 
-	sessions "github.com/kataras/go-sessions"
 	flag "github.com/spf13/pflag"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -42,6 +41,8 @@ var (
 	httpBase        string
 	rootDir         RootDir
 	metaDir         string
+	randomKey       = securecookie.GenerateRandomKey(32)
+	store           = sessions.NewCookieStore(randomKey)
 )
 
 func main() {
@@ -192,31 +193,19 @@ func main() {
 	dirs = append(dirs, packr.New("", "./www/"))
 	wwFFS = types.MultiplexFileSystem{dirs}
 
-	util.FasthttpAddHandler("/login", handleOAuthLogin)
-	util.FasthttpAddHandler("/callback", handleOAuthCallback)
-	util.FasthttpAddHandler("/token", handleOAuthToken)
-	util.FasthttpAddHandler("/test", handleTest)
-	util.FasthttpAddHandler("/admin", handleAdmin)
-	util.FasthttpAddHandler("/api/access/delete", handleAccessDelete)
-	util.FasthttpAddHandler("/api/access/update", handleAccessUpdate)
-	util.FasthttpAddHandler("/api/access/create", handleAccessCreate)
-
-	listener := func(ctx *fasthttp.RequestCtx) {
-		ctx.Response.Header.Add("Server", "nektro/andesite")
-
-		upath := string(ctx.Path())
-
-		if util.FasthttpHandle(upath, ctx) {
-			// do nothing, already served
-		} else if strings.HasPrefix(upath, "/files/") {
-			handleFileListing(ctx)
-		} else {
-			wwFFS.HandleFastHTTP(ctx)
-		}
-	}
+	http.HandleFunc("/", http.FileServer(wwFFS).ServeHTTP)
+	http.HandleFunc("/login", handleOAuthLogin)
+	http.HandleFunc("/callback", handleOAuthCallback)
+	http.HandleFunc("/token", handleOAuthToken)
+	http.HandleFunc("/test", handleTest)
+	http.HandleFunc("/files/", handleFileListing)
+	http.HandleFunc("/admin", handleAdmin)
+	http.HandleFunc("/api/access/delete", handleAccessDelete)
+	http.HandleFunc("/api/access/update", handleAccessUpdate)
+	http.HandleFunc("/api/access/create", handleAccessCreate)
 
 	log("Initialization complete. Starting server on port " + p)
-	fasthttp.ListenAndServe(":"+p, listener)
+	http.ListenAndServe(":"+p, nil)
 }
 
 func dieOnError(err error, args ...string) {
@@ -277,12 +266,12 @@ func byteCountIEC(b int64) string {
 	return reduceNumber(b, 1024, "B", "KMGTPEZY")
 }
 
-func fullHost(ctx *fasthttp.RequestCtx) string {
+func fullHost(r *http.Request) string {
 	urL := "http"
-	if ctx.IsTLS() {
+	if r.TLS != nil {
 		urL += "s"
 	}
-	return urL + "://" + string(ctx.URI().Host())
+	return urL + "://" + r.Host
 }
 
 func contains(stack []string, needle string) bool {
@@ -312,12 +301,12 @@ func checkErr(err error, args ...string) {
 	}
 }
 
-func writeUserDenied(ctx *fasthttp.RequestCtx, fileOrAdmin bool, showLogin bool) {
+func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, showLogin bool) {
 	me := ""
-	sess := sessions.StartFasthttp(ctx)
-	sessName := sess.Get("name")
+	sess := getSession(r)
+	sessName := sess.Values["name"]
 	if sessName != nil {
-		sessID := sess.Get("user")
+		sessID := sess.Values["user"]
 		me += fmt.Sprintf(" (%s%s - %s)", oauth2Provider.namePrefix, sessName.(string), sessID.(string))
 	}
 
@@ -335,16 +324,16 @@ func writeUserDenied(ctx *fasthttp.RequestCtx, fileOrAdmin bool, showLogin bool)
 	linkmsg := ""
 	if showLogin {
 		linkmsg = "Please <a href='" + httpBase + "login'>Log In</a>."
-		ctx.SetStatusCode(fasthttp.StatusForbidden)
-		writeHandlebarsFile(ctx, "/response.hbs", map[string]interface{}{
+		w.WriteHeader(http.StatusForbidden)
+		writeHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
 			"title":   "Forbidden",
 			"message": message,
 			"link":    linkmsg,
 			"base":    httpBase,
 		})
 	} else {
-		ctx.SetStatusCode(fasthttp.StatusForbidden)
-		writeHandlebarsFile(ctx, "/response.hbs", map[string]interface{}{
+		w.WriteHeader(http.StatusForbidden)
+		writeHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
 			"title":   "Not Found",
 			"message": message,
 			"link":    linkmsg,
@@ -353,16 +342,16 @@ func writeUserDenied(ctx *fasthttp.RequestCtx, fileOrAdmin bool, showLogin bool)
 	}
 }
 
-func writeHandlebarsFile(ctx *fasthttp.RequestCtx, file string, context map[string]interface{}) {
+func writeHandlebarsFile(r *http.Request, w http.ResponseWriter, file string, context map[string]interface{}) {
 	template := string(readServerFile(file))
 	result, _ := raymond.Render(template, context)
-	ctx.SetContentType("text/html")
-	fmt.Fprintln(ctx, result)
+	w.Header().Add("Content-Type", "text/html")
+	fmt.Fprintln(w, result)
 }
 
-func writeAPIResponse(ctx *fasthttp.RequestCtx, good bool, message string) {
+func writeAPIResponse(r *http.Request, w http.ResponseWriter, good bool, message string) {
 	if !good {
-		ctx.SetStatusCode(fasthttp.StatusForbidden)
+		w.WriteHeader(http.StatusForbidden)
 	}
 	titlemsg := ""
 	if good {
@@ -370,7 +359,7 @@ func writeAPIResponse(ctx *fasthttp.RequestCtx, good bool, message string) {
 	} else {
 		titlemsg = "Update Failed"
 	}
-	writeHandlebarsFile(ctx, "/response.hbs", map[string]interface{}{
+	writeHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
 		"title":   titlemsg,
 		"message": message,
 		"link":    "Return to <a href='" + httpBase + "admin'>the dashboard</a>.",
@@ -391,4 +380,9 @@ func boolToString(x bool) string {
 		return "1"
 	}
 	return "0"
+}
+
+func getSession(r *http.Request) *sessions.Session {
+	sess, _ := store.Get(r, "session_andesite")
+	return sess
 }
