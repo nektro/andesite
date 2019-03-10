@@ -8,7 +8,7 @@ import (
 
 //
 type RootDir interface {
-	ReadFile(string) (io.Reader, error)
+	ReadFile(string) (io.ReadSeeker, error)
 	ReadDir(string) ([]os.FileInfo, error)
 	Stat(string) (os.FileInfo, error)
 	Base() string
@@ -20,7 +20,7 @@ type FsRoot struct {
 }
 
 //
-func (rd FsRoot) ReadFile(fpath string) (io.Reader, error) {
+func (rd FsRoot) ReadFile(fpath string) (io.ReadSeeker, error) {
 	return os.Open(rd.base + fpath)
 }
 
