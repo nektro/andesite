@@ -174,7 +174,7 @@ func main() {
 		log("Gracefully shutting down...")
 
 		database.Close()
-		log("Save database to disk")
+		log("Saved database to disk")
 
 		os.Exit(0)
 	}()
