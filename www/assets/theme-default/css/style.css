@@ -3,7 +3,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', sans-serif;
   background-color: #FAFAFA;
 }
 
@@ -59,7 +59,7 @@ body .toggle > span {
 }
 
 body table {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Courier New', 'Courier', monospace;
 }
 
 body table thead {
