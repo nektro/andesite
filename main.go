@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -379,4 +380,13 @@ func writeResponse(r *http.Request, w http.ResponseWriter, title string, message
 		"link":    link,
 		"base":    httpBase,
 	})
+}
+
+func containsAll(mp url.Values, keys ...string) bool {
+	for _, item := range keys {
+		if _, ok := mp[item]; !ok {
+			return false
+		}
+	}
+	return true
 }

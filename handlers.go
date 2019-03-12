@@ -297,6 +297,10 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
+	if !containsAll(r.PostForm, "id", "snowflake") {
+		writeAPIResponse(r, w, false, "Missing POST values")
+	}
+	//
 	aid := r.PostForm.Get("id")
 	iid, err := strconv.ParseInt(aid, 10, 32)
 	if err != nil {
@@ -346,6 +350,10 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
+	if !containsAll(r.PostForm, "snowflake", "path") {
+		writeAPIResponse(r, w, false, "Missing POST values")
+	}
+	//
 	queryDoUpdate("access", "path", r.PostForm.Get("path"), "id", strconv.FormatInt(iid, 10))
 	writeAPIResponse(r, w, true, fmt.Sprintf("Updated access for %s.", r.PostForm.Get("snowflake")))
 }
@@ -379,6 +387,10 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeAPIResponse(r, w, false, "Error parsing form data")
 		return
+	}
+	//
+	if !containsAll(r.PostForm, "snowflake", "path") {
+		writeAPIResponse(r, w, false, "Missing POST values")
 	}
 	//
 	aid := queryLastID("access") + 1
