@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"mime"
@@ -115,127 +116,138 @@ func handleTest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, strconv.Itoa(j))
 }
 
-// handler for http://andesite/files/*
-func handleFileListing(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(string(r.URL.Path), "..") {
-		return
-	}
+func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, []string, string, string, bool, error)) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		qpath, uAccess, uID, uName, isAdmin, err := getAccess(w, r)
 
+		// if getAccess errored, response has already been written
+		if err != nil {
+			return
+		}
+
+		// disallow path tricks
+		if strings.Contains(string(r.URL.Path), "..") {
+			return
+		}
+
+		// disallow exploring dotfile folders
+		if strings.Contains(qpath, "/.") {
+			writeUserDenied(r, w, true, false)
+			return
+		}
+
+		// valid path check
+		stat, err := rootDir.Stat(qpath)
+		if os.IsNotExist(err) {
+			// 404
+			writeUserDenied(r, w, true, false)
+			return
+		}
+
+		// server file/folder
+		if stat.IsDir() {
+			w.Header().Add("Content-Type", "text/html")
+
+			// get list of all files
+			files, _ := rootDir.ReadDir(qpath)
+
+			// hide dot files
+			files = filter(files, func(x os.FileInfo) bool {
+				return !strings.HasPrefix(x.Name(), ".")
+			})
+
+			// amount of files in the directory
+			l1 := len(files)
+
+			// access check
+			files = filter(files, func(x os.FileInfo) bool {
+				ok := false
+				fpath := qpath + x.Name()
+				for _, item := range uAccess {
+					if strings.HasPrefix(item, fpath) || strings.HasPrefix(qpath, item) {
+						ok = true
+					}
+				}
+				return ok
+			})
+
+			// amount of files given access to
+			l2 := len(files)
+
+			if l1 > 0 && l2 == 0 {
+				writeUserDenied(r, w, true, false)
+				return
+			}
+
+			data := make([]map[string]string, len(files))
+			gi := 0
+			for i := 0; i < len(files); i++ {
+				name := files[i].Name()
+				a := ""
+				if files[i].IsDir() || files[i].Mode()&os.ModeSymlink != 0 {
+					a = name + "/"
+				} else {
+					a = name
+				}
+				b := byteCountIEC(files[i].Size())
+				c := files[i].ModTime().UTC().String()[:19]
+				data[gi] = map[string]string{
+					"name": a,
+					"size": b,
+					"mod":  c,
+				}
+				gi++
+			}
+
+			writeHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
+				"user":  uID,
+				"path":  qpath,
+				"files": data,
+				"admin": isAdmin,
+				"base":  httpBase,
+				"name":  uName,
+			})
+		} else {
+			// access check
+			can := false
+			for _, item := range uAccess {
+				if strings.HasPrefix(qpath, item) {
+					can = true
+				}
+			}
+			if can == false {
+				writeUserDenied(r, w, true, false)
+				return
+			}
+
+			w.Header().Add("Content-Type", mime.TypeByExtension(path.Ext(qpath)))
+			file, _ := rootDir.ReadFile(qpath)
+			info, _ := rootDir.Stat(qpath)
+			http.ServeContent(w, r, info.Name(), info.ModTime(), file)
+		}
+	}
+}
+
+// handler for http://andesite/files/*
+func handleFileListing(w http.ResponseWriter, r *http.Request) (string, []string, string, string, bool, error) {
 	sess := getSession(r)
 	sessID := sess.Values["user"]
+	sessName := sess.Values["name"]
 	if sessID == nil {
 		writeUserDenied(r, w, true, true)
-		return
+		return "", []string{}, "", "", false, errors.New("")
 	}
 	userID := sessID.(string)
+	userName := sessName.(string)
 
 	// get path
 	// remove /files
 	qpath := string(r.URL.Path[6:])
 
-	// disallow exploring dotfile folders
-	if strings.Contains(qpath, "/.") {
-		writeUserDenied(r, w, true, false)
-		return
-	}
+	userUser, _ := queryUserBySnowflake(userID)
+	userAccess := queryAccess(userID)
 
-	// valid path check
-	stat, err := rootDir.Stat(qpath)
-	if os.IsNotExist(err) {
-		// 404
-		writeUserDenied(r, w, true, false)
-		return
-	}
-
-	// server file/folder
-	if stat.IsDir() {
-		w.Header().Add("Content-Type", "text/html")
-
-		// get list of all files
-		files, _ := rootDir.ReadDir(qpath)
-
-		// hide dot files
-		files = filter(files, func(x os.FileInfo) bool {
-			return !strings.HasPrefix(x.Name(), ".")
-		})
-
-		// amount of files in the directory
-		l1 := len(files)
-
-		// access check
-		acc := queryAccess(userID)
-		files = filter(files, func(x os.FileInfo) bool {
-			ok := false
-			fpath := qpath + x.Name()
-			for _, item := range acc {
-				if strings.HasPrefix(item, fpath) || strings.HasPrefix(qpath, item) {
-					ok = true
-				}
-			}
-			return ok
-		})
-
-		// amount of files given access to
-		l2 := len(files)
-
-		if l1 > 0 && l2 == 0 {
-			writeUserDenied(r, w, true, false)
-			return
-		}
-
-		data := make([]map[string]string, len(files))
-		gi := 0
-		for i := 0; i < len(files); i++ {
-			name := files[i].Name()
-			a := ""
-			if files[i].IsDir() || files[i].Mode()&os.ModeSymlink != 0 {
-				a = name + "/"
-			} else {
-				a = name
-			}
-			b := byteCountIEC(files[i].Size())
-			c := files[i].ModTime().UTC().String()[:19]
-			data[gi] = map[string]string{
-				"name": a,
-				"size": b,
-				"mod":  c,
-			}
-			gi++
-		}
-
-		useruser, ok := queryUserBySnowflake(userID)
-		admin := false
-		if ok {
-			admin = useruser.admin
-		}
-
-		sessName := sess.Values["name"]
-		writeHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
-			"user":  userID,
-			"path":  qpath,
-			"files": data,
-			"admin": admin,
-			"base":  httpBase,
-			"name":  oauth2Provider.namePrefix + sessName.(string),
-		})
-	} else {
-		// access check
-		can := false
-		for _, item := range queryAccess(userID) {
-			if strings.HasPrefix(qpath, item) {
-				can = true
-			}
-		}
-		if can == false {
-			writeUserDenied(r, w, true, false)
-			return
-		}
-
-		w.Header().Add("Content-Type", mime.TypeByExtension(path.Ext(qpath)))
-		file, _ := rootDir.ReadFile(qpath)
-		info, _ := rootDir.Stat(qpath)
-		http.ServeContent(w, r, info.Name(), info.ModTime(), file)
-	}
+	return qpath, userAccess, userID, userName, userUser.admin, nil
 }
 
 // handler for http://andesite/admin
@@ -460,7 +472,7 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	writeAPIResponse(r, w, true, fmt.Sprintf("Created share with code %s for folder %s.", ahs, fpath))
 }
 
-func handleShareListing(w http.ResponseWriter, r *http.Request) {
+func handleShareListing(w http.ResponseWriter, r *http.Request) (string, []string, string, string, bool, error) {
 	u := r.URL.Path[6:]
 	if len(u) == 0 {
 		w.Header().Add("Location", "../")
@@ -468,121 +480,17 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) {
 	}
 	if match, _ := regexp.MatchString("^[0-9a-f]{32}/.*", u); !match {
 		writeResponse(r, w, "Invalid Share Link", "Invalid format for share code.", "")
-		return
+		return "", []string{}, "", "", false, errors.New("")
 	}
 
 	h := u[:32]
-	s := queryAllSharesByCode(h)
+	s := queryAccessByShare(h)
 	if len(s) == 0 {
 		writeResponse(r, w, "Not Found", "Public share code not found.", "")
-		return
+		return "", []string{}, "", "", false, errors.New("")
 	}
 
-	if strings.Contains(string(r.URL.Path), "..") {
-		return
-	}
-
-	// get path
-	qpath := u[32:]
-
-	// disallow exploring dotfile folders
-	if strings.Contains(qpath, "/.") {
-		writeUserDenied(r, w, true, false)
-		return
-	}
-
-	// valid path check
-	stat, err := rootDir.Stat(qpath)
-	if os.IsNotExist(err) {
-		// 404
-		writeUserDenied(r, w, true, false)
-		return
-	}
-
-	// query access
-	acc := queryAccessByShare(h)
-
-	// server file/folder
-	if stat.IsDir() {
-		w.Header().Add("Content-Type", "text/html")
-
-		// get list of all files
-		files, _ := rootDir.ReadDir(qpath)
-
-		// hide dot files
-		files = filter(files, func(x os.FileInfo) bool {
-			return !strings.HasPrefix(x.Name(), ".")
-		})
-
-		// amount of files in the directory
-		l1 := len(files)
-
-		// access check
-		files = filter(files, func(x os.FileInfo) bool {
-			ok := false
-			fpath := qpath + x.Name()
-			for _, item := range acc {
-				if strings.HasPrefix(item, fpath) || strings.HasPrefix(qpath, item) {
-					ok = true
-				}
-			}
-			return ok
-		})
-
-		// amount of files given access to
-		l2 := len(files)
-
-		if l1 > 0 && l2 == 0 {
-			writeUserDenied(r, w, true, false)
-			return
-		}
-
-		data := make([]map[string]string, len(files))
-		gi := 0
-		for i := 0; i < len(files); i++ {
-			name := files[i].Name()
-			a := ""
-			if files[i].IsDir() || files[i].Mode()&os.ModeSymlink != 0 {
-				a = name + "/"
-			} else {
-				a = name
-			}
-			b := byteCountIEC(files[i].Size())
-			c := files[i].ModTime().UTC().String()[:19]
-			data[gi] = map[string]string{
-				"name": a,
-				"size": b,
-				"mod":  c,
-			}
-			gi++
-		}
-
-		writeHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
-			"user":  h,
-			"path":  qpath,
-			"files": data,
-			"admin": false,
-			"base":  httpBase,
-			"name":  "",
-		})
-	} else {
-		// access check
-		can := false
-		for _, item := range acc {
-			if strings.HasPrefix(qpath, item) {
-				can = true
-			}
-		}
-		if can == false {
-			writeUserDenied(r, w, true, false)
-			return
-		}
-
-		w.Header().Add("Content-Type", mime.TypeByExtension(path.Ext(qpath)))
-		file, _ := rootDir.ReadFile(qpath)
-		info, _ := rootDir.Stat(qpath)
-		http.ServeContent(w, r, info.Name(), info.ModTime(), file)
-	}
+	return u[32:], s, h, "", false, nil
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
