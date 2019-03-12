@@ -297,7 +297,7 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := string(r.PostForm.Get("id"))
+	aid := r.PostForm.Get("id")
 	iid, err := strconv.ParseInt(aid, 10, 32)
 	if err != nil {
 		writeAPIResponse(r, w, false, "ID parameter must be an integer")
@@ -305,7 +305,7 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	query(fmt.Sprintf("delete from access where id = '%d'", iid), true)
-	writeAPIResponse(r, w, true, fmt.Sprintf("Removed access from %s.", string(r.PostForm.Get("snowflake"))))
+	writeAPIResponse(r, w, true, fmt.Sprintf("Removed access from %s.", r.PostForm.Get("snowflake")))
 }
 
 // handler for http://andesite/api/access/update
@@ -346,8 +346,8 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	queryDoUpdate("access", "path", string(r.PostForm.Get("path")), "id", strconv.FormatInt(iid, 10))
-	writeAPIResponse(r, w, true, fmt.Sprintf("Updated access for %s.", string(r.PostForm.Get("snowflake"))))
+	queryDoUpdate("access", "path", r.PostForm.Get("path"), "id", strconv.FormatInt(iid, 10))
+	writeAPIResponse(r, w, true, fmt.Sprintf("Updated access for %s.", r.PostForm.Get("snowflake")))
 }
 
 // handler for http://andesite/api/access/create
@@ -382,8 +382,8 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	aid := queryLastID("access") + 1
-	asn := string(r.PostForm.Get("snowflake"))
-	apt := string(r.PostForm.Get("path"))
+	asn := r.PostForm.Get("snowflake")
+	apt := r.PostForm.Get("path")
 	//
 	u, ok := queryUserBySnowflake(asn)
 	aud := -1
