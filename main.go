@@ -325,20 +325,10 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	if showLogin {
 		linkmsg = "Please <a href='" + httpBase + "login'>Log In</a>."
 		w.WriteHeader(http.StatusForbidden)
-		writeHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
-			"title":   "Forbidden",
-			"message": message,
-			"link":    linkmsg,
-			"base":    httpBase,
-		})
+		writeResponse(r, w, "Forbidden", message, linkmsg)
 	} else {
 		w.WriteHeader(http.StatusForbidden)
-		writeHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
-			"title":   "Not Found",
-			"message": message,
-			"link":    linkmsg,
-			"base":    httpBase,
-		})
+		writeResponse(r, w, "Not Found", message, linkmsg)
 	}
 }
 
@@ -359,12 +349,7 @@ func writeAPIResponse(r *http.Request, w http.ResponseWriter, good bool, message
 	} else {
 		titlemsg = "Update Failed"
 	}
-	writeHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
-		"title":   titlemsg,
-		"message": message,
-		"link":    "Return to <a href='" + httpBase + "admin'>the dashboard</a>.",
-		"base":    httpBase,
-	})
+	writeResponse(r, w, titlemsg, message, "Return to <a href='"+httpBase+"admin'>the dashboard</a>.")
 }
 
 func fixID(id interface{}) string {
@@ -385,4 +370,13 @@ func boolToString(x bool) string {
 func getSession(r *http.Request) *sessions.Session {
 	sess, _ := store.Get(r, "session_andesite")
 	return sess
+}
+
+func writeResponse(r *http.Request, w http.ResponseWriter, title string, message string, link string) {
+	writeHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
+		"title":   title,
+		"message": message,
+		"link":    link,
+		"base":    httpBase,
+	})
 }
