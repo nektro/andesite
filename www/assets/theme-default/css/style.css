@@ -48,7 +48,7 @@ body .toggle {
   padding: .25em;
   border-radius: .25em;
   margin: 0 .25em;
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
   align-items: center;
 }
