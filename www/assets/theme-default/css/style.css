@@ -101,7 +101,6 @@ body ul.datalist {
 body ul.datalist form {
   display: flex;
   flex-direction: row;
-  max-width: 80em;
 }
 
 body ul.datalist form > * {
