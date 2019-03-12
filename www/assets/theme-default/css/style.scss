@@ -130,6 +130,38 @@ body {
         }
     }
 
+    &[data-page="/admin"] {
+        #tab_shares {
+            display: none;
+
+            .datalist {
+                li {
+                    form {
+                        input[type=text] {
+                            &:nth-child(2) {
+                                max-width: 17em;
+                            }
+                        }
+                        a {
+                            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+                            font-size: .8em;
+                            color: inherit;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.admin_tab {
+            #tab_users {
+                display: none;
+            }
+            #tab_shares {
+                display: block;
+            }
+        }
+    }
+
     &.dark {
         background-color: #212121;
         color: #9E9E9E;

@@ -159,3 +159,39 @@ func queryAssertUserName(snowflake string, name string) {
 		queryDoAddUser(uid, snowflake, false, name)
 	}
 }
+
+func queryAllShares() []map[string]string {
+	var result []map[string]string
+	rows := query("select * from shares", false)
+	for rows.Next() {
+		var sr ShareRow
+		rows.Scan(&sr.id, &sr.hash, &sr.path)
+		result = append(result, map[string]string{
+			"id":   strconv.Itoa(sr.id),
+			"hash": sr.hash,
+			"path": sr.path,
+		})
+	}
+	rows.Close()
+	return result
+}
+
+func queryAllSharesByCode(code string) []ShareRow {
+	shrs := []ShareRow{}
+	rows := queryPrepared("select * from shares where hash = ?", false, code)
+	for rows.Next() {
+		var sr ShareRow
+		rows.Scan(&sr.id, &sr.hash, &sr.path)
+		shrs = append(shrs, sr)
+	}
+	rows.Close()
+	return shrs
+}
+
+func queryAccessByShare(code string) []string {
+	result := []string{}
+	for _, item := range queryAllSharesByCode(code) {
+		result = append(result, item.path)
+	}
+	return result
+}

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/md5"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,8 +12,11 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/nektro/go-util/util"
 )
 
 // handler for http://andesite/login
@@ -258,11 +263,13 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	//
 	accesses := queryAllAccess()
 	sessName := sess.Values["name"]
+	shares := queryAllShares()
 	writeHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
 		"user":     userID,
 		"accesses": accesses,
 		"base":     httpBase,
 		"name":     oauth2Provider.namePrefix + sessName.(string),
+		"shares":   shares,
 	})
 }
 
@@ -408,4 +415,253 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	//
 	queryPrepared("insert into access values (?, ?, ?)", true, aid, aud, apt)
 	writeAPIResponse(r, w, true, fmt.Sprintf("Created access for %s.", asn))
+}
+
+func handleShareCreate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeAPIResponse(r, w, false, "This action requires using HTTP POST")
+		return
+	}
+	//
+	sess := getSession(r)
+	sessID := sess.Values["user"]
+	if sessID == nil {
+		writeAPIResponse(r, w, false, "This action requires being logged in")
+		return
+	}
+	userID := sessID.(string)
+	//
+	user, ok := queryUserBySnowflake(userID)
+	if !ok {
+		writeAPIResponse(r, w, false, "This action requires being a member of this server")
+		return
+	}
+	if !user.admin {
+		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+		return
+	}
+	//
+	err := r.ParseForm()
+	if err != nil {
+		writeAPIResponse(r, w, false, "Error parsing form data")
+		return
+	}
+	//
+	if !containsAll(r.PostForm, "path") {
+		writeAPIResponse(r, w, false, "Missing POST values")
+	}
+	//
+	aid := queryLastID("shares") + 1
+	ahs_ := md5.Sum([]byte(fmt.Sprintf("astheno.andesite.share.%s.%s", strconv.FormatInt(int64(aid), 10), util.GetIsoDateTime())))
+	ahs := hex.EncodeToString(ahs_[:])
+	fpath := r.PostForm.Get("path")
+	//
+	queryPrepared("insert into shares values (?, ?, ?)", true, aid, ahs, fpath)
+	writeAPIResponse(r, w, true, fmt.Sprintf("Created share with code %s for folder %s.", ahs, fpath))
+}
+
+func handleShareListing(w http.ResponseWriter, r *http.Request) {
+	u := r.URL.Path[6:]
+	if len(u) == 0 {
+		w.Header().Add("Location", "../")
+		w.WriteHeader(http.StatusMovedPermanently)
+	}
+	if match, _ := regexp.MatchString("^[0-9a-f]{32}/.*", u); !match {
+		writeResponse(r, w, "Invalid Share Link", "Invalid format for share code.", "")
+		return
+	}
+
+	h := u[:32]
+	s := queryAllSharesByCode(h)
+	if len(s) == 0 {
+		writeResponse(r, w, "Not Found", "Public share code not found.", "")
+		return
+	}
+
+	if strings.Contains(string(r.URL.Path), "..") {
+		return
+	}
+
+	// get path
+	qpath := u[32:]
+
+	// disallow exploring dotfile folders
+	if strings.Contains(qpath, "/.") {
+		writeUserDenied(r, w, true, false)
+		return
+	}
+
+	// valid path check
+	stat, err := rootDir.Stat(qpath)
+	if os.IsNotExist(err) {
+		// 404
+		writeUserDenied(r, w, true, false)
+		return
+	}
+
+	// query access
+	acc := queryAccessByShare(h)
+
+	// server file/folder
+	if stat.IsDir() {
+		w.Header().Add("Content-Type", "text/html")
+
+		// get list of all files
+		files, _ := rootDir.ReadDir(qpath)
+
+		// hide dot files
+		files = filter(files, func(x os.FileInfo) bool {
+			return !strings.HasPrefix(x.Name(), ".")
+		})
+
+		// amount of files in the directory
+		l1 := len(files)
+
+		// access check
+		files = filter(files, func(x os.FileInfo) bool {
+			ok := false
+			fpath := qpath + x.Name()
+			for _, item := range acc {
+				if strings.HasPrefix(item, fpath) || strings.HasPrefix(qpath, item) {
+					ok = true
+				}
+			}
+			return ok
+		})
+
+		// amount of files given access to
+		l2 := len(files)
+
+		if l1 > 0 && l2 == 0 {
+			writeUserDenied(r, w, true, false)
+			return
+		}
+
+		data := make([]map[string]string, len(files))
+		gi := 0
+		for i := 0; i < len(files); i++ {
+			name := files[i].Name()
+			a := ""
+			if files[i].IsDir() || files[i].Mode()&os.ModeSymlink != 0 {
+				a = name + "/"
+			} else {
+				a = name
+			}
+			b := byteCountIEC(files[i].Size())
+			c := files[i].ModTime().UTC().String()[:19]
+			data[gi] = map[string]string{
+				"name": a,
+				"size": b,
+				"mod":  c,
+			}
+			gi++
+		}
+
+		writeHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
+			"user":  h,
+			"path":  qpath,
+			"files": data,
+			"admin": false,
+			"base":  httpBase,
+			"name":  "",
+		})
+	} else {
+		// access check
+		can := false
+		for _, item := range acc {
+			if strings.HasPrefix(qpath, item) {
+				can = true
+			}
+		}
+		if can == false {
+			writeUserDenied(r, w, true, false)
+			return
+		}
+
+		w.Header().Add("Content-Type", mime.TypeByExtension(path.Ext(qpath)))
+		file, _ := rootDir.ReadFile(qpath)
+		info, _ := rootDir.Stat(qpath)
+		http.ServeContent(w, r, info.Name(), info.ModTime(), file)
+	}
+}
+
+func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeAPIResponse(r, w, false, "This action requires using HTTP POST")
+		return
+	}
+	//
+	sess := getSession(r)
+	sessID := sess.Values["user"]
+	if sessID == nil {
+		writeAPIResponse(r, w, false, "This action requires being logged in")
+		return
+	}
+	userID := sessID.(string)
+	//
+	user, ok := queryUserBySnowflake(userID)
+	if !ok {
+		writeAPIResponse(r, w, false, "This action requires being a member of this server")
+		return
+	}
+	if !user.admin {
+		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+		return
+	}
+	//
+	err := r.ParseForm()
+	if err != nil {
+		writeAPIResponse(r, w, false, "Error parsing form data")
+		return
+	}
+	//
+	if !containsAll(r.PostForm, "id", "hash", "path") {
+		writeAPIResponse(r, w, false, "Missing POST values")
+	}
+	//
+	ahs := r.PostForm.Get("hash")
+	aph := r.PostForm.Get("path")
+	// //
+	queryDoUpdate("shares", "path", aph, "hash", ahs)
+	writeAPIResponse(r, w, true, "Successfully updated share path.")
+}
+
+func handleShareDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeAPIResponse(r, w, false, "This action requires using HTTP POST")
+		return
+	}
+	//
+	sess := getSession(r)
+	sessID := sess.Values["user"]
+	if sessID == nil {
+		writeAPIResponse(r, w, false, "This action requires being logged in")
+		return
+	}
+	userID := sessID.(string)
+	//
+	user, ok := queryUserBySnowflake(userID)
+	if !ok {
+		writeAPIResponse(r, w, false, "This action requires being a member of this server")
+		return
+	}
+	if !user.admin {
+		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+		return
+	}
+	//
+	err := r.ParseForm()
+	if err != nil {
+		writeAPIResponse(r, w, false, "Error parsing form data")
+		return
+	}
+	//
+	if !containsAll(r.PostForm, "id", "hash", "path") {
+		writeAPIResponse(r, w, false, "Missing POST values")
+	}
+	//
+	ahs := r.PostForm.Get("hash")
+	//
+	queryPrepared("delete from shares where hash = ?", true, ahs)
+	writeAPIResponse(r, w, true, "Successfully deleted share link.")
 }

@@ -34,6 +34,13 @@ type UserRow struct {
 	name      string
 }
 
+//
+type ShareRow struct {
+	id   int
+	hash string
+	path string
+}
+
 // Middleware provides a convenient mechanism for augmenting HTTP requests
 // entering the application. It returns a new handler which may perform various
 // operations and should finish by calling the next HTTP handler.

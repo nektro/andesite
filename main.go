@@ -125,6 +125,10 @@ func main() {
 		{"user", "int"},
 		{"path", "text"},
 	})
+	createTable("shares", []string{"id", "int primary key"}, [][]string{
+		{"hash", "text"}, // character(32)
+		{"path", "text"},
+	})
 
 	//
 	// admin creation from (optional) CLI argument
@@ -204,6 +208,10 @@ func main() {
 	http.HandleFunc("/api/access/delete", handleAccessDelete)
 	http.HandleFunc("/api/access/update", handleAccessUpdate)
 	http.HandleFunc("/api/access/create", handleAccessCreate)
+	http.HandleFunc("/open/", handleShareListing)
+	http.HandleFunc("/api/share/create", handleShareCreate)
+	http.HandleFunc("/api/share/update", handleShareUpdate)
+	http.HandleFunc("/api/share/delete", handleShareDelete)
 
 	log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)

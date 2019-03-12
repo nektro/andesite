@@ -26,6 +26,12 @@
             </div>
         </div>
         <hr>
+        <div>
+            <div class="toggle">
+            <span>User Access</span>
+            <x-switch data-mode="admin_tab"></x-switch>
+            <span>Share Links</span>
+        </div>
         <div id="tab_users">
             <ul class="datalist">
             {{#each accesses}}
@@ -46,6 +52,29 @@
                         <input type="text" name="snowflake" placeholder="User Snowflake">
                         <input type="text" name="path" placeholder="Path">
                         <button class="btn" formaction="{{base}}api/access/create">Add User Access</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+        <div id="tab_shares">
+            <ul class="datalist">
+            {{#each shares}}
+                <li>
+                    <form method="POST">
+                        <input type="hidden" name="id" value="{{id}}">
+                        <input type="text" name="hash" value="{{hash}}" readonly>
+                        <input type="text" name="path" placeholder="Path" value="{{path}}">
+                        <button class="btn" formaction="{{base}}api/share/update">Update</button>
+                        <button class="btn" formaction="{{base}}api/share/delete">Delete</button>
+                        <span><a href="./open/{{hash}}{{path}}" target="_blank">Open</a></span>
+                    </form>
+                </li>
+            {{/each}}
+                <hr>
+                <li>
+                    <form method="POST">
+                        <input type="text" name="path" placeholder="Path">
+                        <button class="btn" formaction="{{base}}api/share/create">Create Sharable Link</button>
                     </form>
                 </li>
             </ul>
