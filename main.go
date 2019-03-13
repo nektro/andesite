@@ -398,3 +398,27 @@ func containsAll(mp url.Values, keys ...string) bool {
 	}
 	return true
 }
+
+func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, requireAdmin bool) (*sessions.Session, UserRow, error) {
+	sess := getSession(r)
+	sessID := sess.Values["user"]
+
+	if sessID == nil {
+		writeUserDenied(r, w, true, true)
+		return nil, UserRow{}, errors.New("")
+	}
+
+	userID := sessID.(string)
+	user, ok := queryUserBySnowflake(userID)
+
+	if !ok {
+		writeAPIResponse(r, w, false, "This action requires being a member of this server")
+		return nil, UserRow{}, errors.New("")
+	}
+	if requireAdmin && !user.admin {
+		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+		return nil, UserRow{}, errors.New("")
+	}
+
+	return sess, user, nil
+}

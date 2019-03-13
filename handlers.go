@@ -93,7 +93,6 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	_id := fixID(respMe["id"])
 	_name := respMe[oauth2Provider.nameProp].(string)
 	sess.Values["user"] = _id
-	sess.Values["name"] = _name
 	sess.Save(r, w)
 	queryAssertUserName(_id, _name)
 
@@ -230,57 +229,36 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 // handler for http://andesite/files/*
 func handleFileListing(w http.ResponseWriter, r *http.Request) (string, []string, string, string, bool, error) {
-	sess := getSession(r)
-	sessID := sess.Values["user"]
-	sessName := sess.Values["name"]
-	if sessID == nil {
-		writeUserDenied(r, w, true, true)
+	_, user, errr := apiBootstrapRequireLogin(r, w, false)
+	if errr != nil {
 		return "", []string{}, "", "", false, errors.New("")
 	}
-	userID := sessID.(string)
-	userName := sessName.(string)
 
 	// get path
 	// remove /files
 	qpath := string(r.URL.Path[6:])
 
-	userUser, _ := queryUserBySnowflake(userID)
-	userAccess := queryAccess(userID)
+	userUser, _ := queryUserBySnowflake(user.snowflake)
+	userAccess := queryAccess(user.snowflake)
 
-	return qpath, userAccess, userID, userName, userUser.admin, nil
+	return qpath, userAccess, user.snowflake, user.name, userUser.admin, nil
 }
 
 // handler for http://andesite/admin
 func handleAdmin(w http.ResponseWriter, r *http.Request) {
-	// get discord snowflake from session cookie
-	sess := getSession(r)
-	sessID := sess.Values["user"]
-	if sessID == nil {
-		writeUserDenied(r, w, false, true)
-		return
-	}
-	userID := sessID.(string)
-
-	// only allow admins
-	useruser, ok := queryUserBySnowflake(userID)
-	admin := false
-	if ok {
-		admin = useruser.admin
-	}
-	if !admin {
-		writeUserDenied(r, w, false, false)
+	_, user, errr := apiBootstrapRequireLogin(r, w, true)
+	if errr != nil {
 		return
 	}
 
 	//
 	accesses := queryAllAccess()
-	sessName := sess.Values["name"]
 	shares := queryAllShares()
 	writeHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
-		"user":     userID,
+		"user":     user.snowflake,
 		"accesses": accesses,
 		"base":     httpBase,
-		"name":     oauth2Provider.namePrefix + sessName.(string),
+		"name":     oauth2Provider.namePrefix + user.name,
 		"shares":   shares,
 	})
 }
@@ -292,21 +270,8 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	sess := getSession(r)
-	sessID := sess.Values["user"]
-	if sessID == nil {
-		writeAPIResponse(r, w, false, "This action requires being logged in")
-		return
-	}
-	userID := sessID.(string)
-	//
-	user, ok := queryUserBySnowflake(userID)
-	if !ok {
-		writeAPIResponse(r, w, false, "This action requires being a member of this server")
-		return
-	}
-	if !user.admin {
-		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	if errr != nil {
 		return
 	}
 	//
@@ -338,21 +303,8 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	sess := getSession(r)
-	sessID := sess.Values["user"]
-	if sessID == nil {
-		writeAPIResponse(r, w, false, "This action requires being logged in")
-		return
-	}
-	userID := sessID.(string)
-	//
-	user, ok := queryUserBySnowflake(userID)
-	if !ok {
-		writeAPIResponse(r, w, false, "This action requires being a member of this server")
-		return
-	}
-	if !user.admin {
-		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	if errr != nil {
 		return
 	}
 	//
@@ -384,21 +336,8 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	sess := getSession(r)
-	sessID := sess.Values["user"]
-	if sessID == nil {
-		writeAPIResponse(r, w, false, "This action requires being logged in")
-		return
-	}
-	userID := sessID.(string)
-	//
-	user, ok := queryUserBySnowflake(userID)
-	if !ok {
-		writeAPIResponse(r, w, false, "This action requires being a member of this server")
-		return
-	}
-	if !user.admin {
-		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	if errr != nil {
 		return
 	}
 	//
@@ -435,21 +374,8 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	sess := getSession(r)
-	sessID := sess.Values["user"]
-	if sessID == nil {
-		writeAPIResponse(r, w, false, "This action requires being logged in")
-		return
-	}
-	userID := sessID.(string)
-	//
-	user, ok := queryUserBySnowflake(userID)
-	if !ok {
-		writeAPIResponse(r, w, false, "This action requires being a member of this server")
-		return
-	}
-	if !user.admin {
-		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	if errr != nil {
 		return
 	}
 	//
@@ -499,21 +425,8 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	sess := getSession(r)
-	sessID := sess.Values["user"]
-	if sessID == nil {
-		writeAPIResponse(r, w, false, "This action requires being logged in")
-		return
-	}
-	userID := sessID.(string)
-	//
-	user, ok := queryUserBySnowflake(userID)
-	if !ok {
-		writeAPIResponse(r, w, false, "This action requires being a member of this server")
-		return
-	}
-	if !user.admin {
-		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	if errr != nil {
 		return
 	}
 	//
@@ -540,21 +453,8 @@ func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	sess := getSession(r)
-	sessID := sess.Values["user"]
-	if sessID == nil {
-		writeAPIResponse(r, w, false, "This action requires being logged in")
-		return
-	}
-	userID := sessID.(string)
-	//
-	user, ok := queryUserBySnowflake(userID)
-	if !ok {
-		writeAPIResponse(r, w, false, "This action requires being a member of this server")
-		return
-	}
-	if !user.admin {
-		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	if errr != nil {
 		return
 	}
 	//
