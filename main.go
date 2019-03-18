@@ -433,3 +433,11 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 
 	return sess, user, nil
 }
+
+func doHttpRequest(req *http.Request) []byte {
+	client := &http.Client{}
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	return body
+}

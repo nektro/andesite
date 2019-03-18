@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"mime"
 	"net/http"
 	"net/url"
@@ -63,11 +62,8 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(oauth2AppID+":"+oauth2AppSecret)))
 	req.Header.Set("Accept", "application/json")
 
-	client := &http.Client{}
-	resp, _ := client.Do(req)
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
 
+	body := doHttpRequest(req)
 	var respJSON OAuth2CallBackResponse
 	json.Unmarshal(body, &respJSON)
 	sess := getSession(r)
@@ -90,11 +86,8 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Authorization", "Bearer "+val.(string))
 
-	client := &http.Client{}
-	resp, _ := client.Do(req)
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
 
+	body := doHttpRequest(req)
 	var respMe map[string]interface{}
 	json.Unmarshal(body, &respMe)
 	_id := fixID(respMe["id"])
