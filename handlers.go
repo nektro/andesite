@@ -270,12 +270,6 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	err := r.ParseForm()
-	if err != nil {
-		writeAPIResponse(r, w, false, "Error parsing form data")
-		return
-	}
-	//
 	if !containsAll(r.PostForm, "id", "snowflake") {
 		writeAPIResponse(r, w, false, "Missing POST values")
 	}
@@ -298,12 +292,6 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	err := r.ParseForm()
-	if err != nil {
-		writeAPIResponse(r, w, false, "Error parsing form data")
-		return
-	}
-	//
 	aid := r.PostForm.Get("id")
 	iid, err := strconv.ParseInt(string(aid), 10, 32)
 	if err != nil {
@@ -323,12 +311,6 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if errr != nil {
-		return
-	}
-	//
-	err := r.ParseForm()
-	if err != nil {
-		writeAPIResponse(r, w, false, "Error parsing form data")
 		return
 	}
 	//
@@ -356,12 +338,6 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if errr != nil {
-		return
-	}
-	//
-	err := r.ParseForm()
-	if err != nil {
-		writeAPIResponse(r, w, false, "Error parsing form data")
 		return
 	}
 	//
@@ -405,12 +381,6 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	err := r.ParseForm()
-	if err != nil {
-		writeAPIResponse(r, w, false, "Error parsing form data")
-		return
-	}
-	//
 	if !containsAll(r.PostForm, "id", "hash", "path") {
 		writeAPIResponse(r, w, false, "Missing POST values")
 	}
@@ -425,12 +395,6 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if errr != nil {
-		return
-	}
-	//
-	err := r.ParseForm()
-	if err != nil {
-		writeAPIResponse(r, w, false, "Error parsing form data")
 		return
 	}
 	//

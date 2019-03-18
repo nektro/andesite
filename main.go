@@ -425,5 +425,11 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 		return nil, UserRow{}, errors.New("")
 	}
 
+	err := r.ParseForm()
+	if err != nil {
+		writeAPIResponse(r, w, false, "Error parsing form data")
+		return nil, UserRow{}, errors.New("")
+	}
+
 	return sess, user, nil
 }
