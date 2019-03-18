@@ -229,7 +229,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 // handler for http://andesite/files/*
 func handleFileListing(w http.ResponseWriter, r *http.Request) (string, []string, string, string, bool, error) {
-	_, user, errr := apiBootstrapRequireLogin(r, w, false)
+	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if errr != nil {
 		return "", []string{}, "", "", false, errors.New("")
 	}
@@ -246,7 +246,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, []string
 
 // handler for http://andesite/admin
 func handleAdmin(w http.ResponseWriter, r *http.Request) {
-	_, user, errr := apiBootstrapRequireLogin(r, w, true)
+	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, true)
 	if errr != nil {
 		return
 	}
@@ -265,12 +265,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/delete
 func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeAPIResponse(r, w, false, "This action requires using HTTP POST")
-		return
-	}
-	//
-	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if errr != nil {
 		return
 	}
@@ -298,12 +293,7 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/update
 func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeAPIResponse(r, w, false, "This action requires using HTTP POST")
-		return
-	}
-	//
-	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if errr != nil {
 		return
 	}
@@ -331,12 +321,7 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/create
 func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeAPIResponse(r, w, false, "This action requires using HTTP POST")
-		return
-	}
-	//
-	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if errr != nil {
 		return
 	}
@@ -369,12 +354,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleShareCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeAPIResponse(r, w, false, "This action requires using HTTP POST")
-		return
-	}
-	//
-	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if errr != nil {
 		return
 	}
@@ -420,12 +400,7 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, []strin
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeAPIResponse(r, w, false, "This action requires using HTTP POST")
-		return
-	}
-	//
-	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if errr != nil {
 		return
 	}
@@ -448,12 +423,7 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleShareDelete(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeAPIResponse(r, w, false, "This action requires using HTTP POST")
-		return
-	}
-	//
-	_, _, errr := apiBootstrapRequireLogin(r, w, true)
+	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if errr != nil {
 		return
 	}

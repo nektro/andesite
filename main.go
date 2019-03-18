@@ -399,7 +399,12 @@ func containsAll(mp url.Values, keys ...string) bool {
 	return true
 }
 
-func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, requireAdmin bool) (*sessions.Session, UserRow, error) {
+func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method string, requireAdmin bool) (*sessions.Session, UserRow, error) {
+	if r.Method != method {
+		writeAPIResponse(r, w, false, "This action requires using HTTP "+method)
+		return nil, UserRow{}, errors.New("")
+	}
+
 	sess := getSession(r)
 	sessID := sess.Values["user"]
 
