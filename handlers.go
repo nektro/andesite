@@ -47,6 +47,7 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	if len(code) == 0 {
 		return
 	}
+
 	parameters := url.Values{}
 	parameters.Add("client_id", oauth2AppID)
 	parameters.Add("client_secret", oauth2AppSecret)
@@ -54,16 +55,19 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	parameters.Add("code", string(code))
 	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 	parameters.Add("state", "none")
+
 	urlR, _ := url.Parse(oauth2Provider.tokenURL)
 	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(oauth2AppID+":"+oauth2AppSecret)))
 	req.Header.Set("Accept", "application/json")
+
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
+
 	var respJSON OAuth2CallBackResponse
 	json.Unmarshal(body, &respJSON)
 	sess := getSession(r)
@@ -80,14 +84,17 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
+
 	urlR, _ := url.Parse(oauth2Provider.meURL)
 	req, _ := http.NewRequest("GET", urlR.String(), strings.NewReader(""))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Authorization", "Bearer "+val.(string))
+
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
+
 	var respMe map[string]interface{}
 	json.Unmarshal(body, &respMe)
 	_id := fixID(respMe["id"])
