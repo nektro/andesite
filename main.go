@@ -194,24 +194,25 @@ func main() {
 		dirs = append(dirs, http.Dir(themeRootPath))
 	}
 
+	mw := chainMiddleware(mwAddAttribution)
 	dirs = append(dirs, http.Dir("www"))
 	dirs = append(dirs, packr.New("", "./www/"))
 	wwFFS = types.MultiplexFileSystem{dirs}
 
-	http.HandleFunc("/", http.FileServer(wwFFS).ServeHTTP)
-	http.HandleFunc("/login", handleOAuthLogin)
-	http.HandleFunc("/callback", handleOAuthCallback)
-	http.HandleFunc("/token", handleOAuthToken)
-	http.HandleFunc("/test", handleTest)
-	http.HandleFunc("/files/", handleDirectoryListing(handleFileListing))
-	http.HandleFunc("/admin", handleAdmin)
-	http.HandleFunc("/api/access/delete", handleAccessDelete)
-	http.HandleFunc("/api/access/update", handleAccessUpdate)
-	http.HandleFunc("/api/access/create", handleAccessCreate)
-	http.HandleFunc("/open/", handleDirectoryListing(handleShareListing))
-	http.HandleFunc("/api/share/create", handleShareCreate)
-	http.HandleFunc("/api/share/update", handleShareUpdate)
-	http.HandleFunc("/api/share/delete", handleShareDelete)
+	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
+	http.HandleFunc("/login", mw(handleOAuthLogin))
+	http.HandleFunc("/callback", mw(handleOAuthCallback))
+	http.HandleFunc("/token", mw(handleOAuthToken))
+	http.HandleFunc("/test", mw(handleTest))
+	http.HandleFunc("/files/", mw(handleDirectoryListing(handleFileListing)))
+	http.HandleFunc("/admin", mw(handleAdmin))
+	http.HandleFunc("/api/access/delete", mw(handleAccessDelete))
+	http.HandleFunc("/api/access/update", mw(handleAccessUpdate))
+	http.HandleFunc("/api/access/create", mw(handleAccessCreate))
+	http.HandleFunc("/open/", mw(handleDirectoryListing(handleShareListing)))
+	http.HandleFunc("/api/share/create", mw(handleShareCreate))
+	http.HandleFunc("/api/share/update", mw(handleShareUpdate))
+	http.HandleFunc("/api/share/delete", mw(handleShareDelete))
 
 	util.Log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
@@ -436,4 +437,24 @@ func doHttpRequest(req *http.Request) []byte {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	return body
+}
+
+// @from https://gist.github.com/gbbr/fa652db0bab132976620bcb7809fd89a
+func chainMiddleware(mw ...Middleware) Middleware {
+	return func(final http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			last := final
+			for i := len(mw) - 1; i >= 0; i-- {
+				last = mw[i](last)
+			}
+			last(w, r)
+		}
+	}
+}
+
+func mwAddAttribution(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Server", "nektro/andesite")
+		next.ServeHTTP(w, r)
+	}
 }
