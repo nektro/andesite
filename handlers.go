@@ -204,7 +204,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"files": data,
 				"admin": isAdmin,
 				"base":  httpBase,
-				"name":  uName,
+				"name":  oauth2Provider.namePrefix + uName,
 			})
 		} else {
 			// access check
