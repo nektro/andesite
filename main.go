@@ -213,6 +213,7 @@ func main() {
 	http.HandleFunc("/api/share/create", mw(handleShareCreate))
 	http.HandleFunc("/api/share/update", mw(handleShareUpdate))
 	http.HandleFunc("/api/share/delete", mw(handleShareDelete))
+	http.HandleFunc("/logout", mw(handleLogout))
 
 	util.Log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)

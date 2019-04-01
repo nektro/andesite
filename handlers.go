@@ -413,3 +413,14 @@ func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 	queryPrepared("delete from shares where hash = ?", true, ahs)
 	writeAPIResponse(r, w, true, "Successfully deleted share link.")
 }
+
+func handleLogout(w http.ResponseWriter, r *http.Request) {
+	sess, _, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, true)
+	if errr != nil {
+		return
+	}
+	//
+	sess.Options.MaxAge = -1
+	sess.Save(r, w)
+	writeResponse(r, w, "Success", "Successfully logged out.", "")
+}
