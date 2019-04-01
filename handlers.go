@@ -272,6 +272,7 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	//
 	if !containsAll(r.PostForm, "id", "snowflake") {
 		writeAPIResponse(r, w, false, "Missing POST values")
+		return
 	}
 	//
 	aid := r.PostForm.Get("id")
@@ -301,6 +302,7 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	//
 	if !containsAll(r.PostForm, "snowflake", "path") {
 		writeAPIResponse(r, w, false, "Missing POST values")
+		return
 	}
 	//
 	queryDoUpdate("access", "path", r.PostForm.Get("path"), "id", strconv.FormatInt(iid, 10))
@@ -316,6 +318,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	//
 	if !containsAll(r.PostForm, "snowflake", "path") {
 		writeAPIResponse(r, w, false, "Missing POST values")
+		return
 	}
 	//
 	aid := queryLastID("access") + 1
@@ -343,6 +346,7 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	//
 	if !containsAll(r.PostForm, "path") {
 		writeAPIResponse(r, w, false, "Missing POST values")
+		return
 	}
 	//
 	aid := queryLastID("shares") + 1
@@ -383,6 +387,7 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	//
 	if !containsAll(r.PostForm, "id", "hash", "path") {
 		writeAPIResponse(r, w, false, "Missing POST values")
+		return
 	}
 	//
 	ahs := r.PostForm.Get("hash")
@@ -400,6 +405,7 @@ func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 	//
 	if !containsAll(r.PostForm, "id", "hash", "path") {
 		writeAPIResponse(r, w, false, "Missing POST values")
+		return
 	}
 	//
 	ahs := r.PostForm.Get("hash")
