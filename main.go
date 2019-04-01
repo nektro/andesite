@@ -47,7 +47,7 @@ var (
 )
 
 func main() {
-	log("Initializing Andesite...")
+	util.Log("Initializing Andesite...")
 
 	flagRoot := flag.String("root", "", "Path of root directory for files")
 	flagPort := flag.Int("port", 8000, "Port to open server on")
@@ -75,7 +75,7 @@ func main() {
 		dieOnError(errors.New("Invalid root type"))
 	}
 	dieOnError(assert(fileExists(metaDir), ".andesite folder does not exist!"))
-	log("Starting in " + rootDir.Base())
+	util.Log("Starting in " + rootDir.Base())
 
 	//
 	// discover OAuth2 config info
@@ -140,11 +140,11 @@ func main() {
 			aid := queryLastID("access") + 1
 			queryDoAddUser(uid, oauth2Provider.dbPrefix+*flagAdmin, true, "")
 			query(fmt.Sprintf("insert into access values ('%d', '%d', '/')", aid, uid), true)
-			log(fmt.Sprintf("Added user %s as an admin", *flagAdmin))
+			util.Log(fmt.Sprintf("Added user %s as an admin", *flagAdmin))
 		} else {
 			if !uu.admin {
 				queryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.id), 10))
-				log(fmt.Sprintf("Set user '%s's status to admin", uu.snowflake))
+				util.Log(fmt.Sprintf("Set user '%s's status to admin", uu.snowflake))
 			}
 		}
 	}
@@ -176,11 +176,11 @@ func main() {
 
 	go func() {
 		sig := <-gracefulStop
-		log(fmt.Sprintf("Caught signal '%+v'", sig))
-		log("Gracefully shutting down...")
+		util.Log(fmt.Sprintf("Caught signal '%+v'", sig))
+		util.Log("Gracefully shutting down...")
 
 		database.Close()
-		log("Saved database to disk")
+		util.Log("Saved database to disk")
 
 		os.Exit(0)
 	}()
@@ -213,7 +213,7 @@ func main() {
 	http.HandleFunc("/api/share/update", handleShareUpdate)
 	http.HandleFunc("/api/share/delete", handleShareDelete)
 
-	log("Initialization complete. Starting server on port " + p)
+	util.Log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
 }
 
@@ -237,10 +237,6 @@ func assert(condition bool, errorMessage string) error {
 func fileExists(file string) bool {
 	_, err := os.Stat(file)
 	return !os.IsNotExist(err)
-}
-
-func log(message string) {
-	fmt.Println("[" + util.GetIsoDateTime() + "][info]  " + message)
 }
 
 func logError(message string) {
