@@ -84,6 +84,7 @@ func queryUserBySnowflake(snowflake string) (UserRow, bool) {
 	}
 	rows.Scan(&ur.id, &ur.snowflake, &ur.admin, &ur.name)
 	rows.Close()
+	ur.snowflake = ur.snowflake[len(oauth2Provider.dbPrefix):]
 	return ur, true
 }
 
@@ -95,6 +96,7 @@ func queryUserByID(id int) (UserRow, bool) {
 	}
 	rows.Scan(&ur.id, &ur.snowflake, &ur.admin, &ur.name)
 	rows.Close()
+	ur.snowflake = ur.snowflake[len(oauth2Provider.dbPrefix):]
 	return ur, true
 }
 
