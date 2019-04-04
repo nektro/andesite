@@ -4,19 +4,21 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
+
+	"github.com/nektro/go-util/util"
 )
 
 func createTable(name string, pk []string, columns [][]string) {
 	if !doesTableExist(name) {
 		query(fmt.Sprintf("create table %s(%s %s)", name, pk[0], pk[1]), true)
-		log(fmt.Sprintf("Created table '%s'", name))
+		util.Log(fmt.Sprintf("Created table '%s'", name))
 	}
 	// add rows
 	pti := queryColumnList(name)
 	for _, col := range columns {
 		if !contains(pti, col[0]) {
 			query(fmt.Sprintf("alter table %s add %s %s", name, col[0], col[1]), true)
-			log(fmt.Sprintf("Added column '%s' to table '%s'", col[0], name))
+			util.Log(fmt.Sprintf("Added column '%s' to table '%s'", col[0], name))
 		}
 	}
 }
