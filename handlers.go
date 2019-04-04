@@ -331,7 +331,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		aud = u.id
 	} else {
 		aud = queryLastID("users") + 1
-		queryDoAddUser(aud, oauth2Provider.dbPrefix+asn, false, "")
+		queryDoAddUser(aud, asn, false, "")
 	}
 	//
 	queryPrepared("insert into access values (?, ?, ?)", true, aid, aud, apt)

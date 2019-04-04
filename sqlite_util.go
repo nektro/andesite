@@ -114,7 +114,7 @@ func queryAllAccess() []map[string]string {
 		result = append(result, map[string]string{
 			"id":        strconv.Itoa(uar.id),
 			"user":      strconv.Itoa(uar.user),
-			"snowflake": ids[uar.user][0][len(oauth2Provider.dbPrefix):],
+			"snowflake": ids[uar.user][0],
 			"name":      ids[uar.user][1],
 			"path":      uar.path,
 		})
@@ -147,7 +147,7 @@ func queryPrepared(q string, modify bool, args ...interface{}) *sql.Rows {
 }
 
 func queryDoAddUser(id int, snowflake string, admin bool, name string) {
-	queryPrepared(fmt.Sprintf("insert into users values ('%d', '%s', '%s', ?)", id, snowflake, boolToString(admin)), true, name)
+	queryPrepared(fmt.Sprintf("insert into users values ('%d', '%s', '%s', ?)", id, oauth2Provider.dbPrefix+snowflake, boolToString(admin)), true, name)
 }
 
 func queryDoUpdate(table string, col string, value string, where string, search string) {

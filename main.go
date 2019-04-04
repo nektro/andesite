@@ -138,7 +138,7 @@ func main() {
 		if !ok {
 			uid := queryLastID("users") + 1
 			aid := queryLastID("access") + 1
-			queryDoAddUser(uid, oauth2Provider.dbPrefix+*flagAdmin, true, "")
+			queryDoAddUser(uid, *flagAdmin, true, "")
 			query(fmt.Sprintf("insert into access values ('%d', '%d', '/')", aid, uid), true)
 			util.Log(fmt.Sprintf("Added user %s as an admin", *flagAdmin))
 		} else {
