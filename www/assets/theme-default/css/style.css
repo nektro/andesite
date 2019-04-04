@@ -128,10 +128,6 @@ body ul.datalist form button.btn {
   cursor: pointer;
 }
 
-body[data-page="/admin"] #tab_shares {
-  display: none;
-}
-
 body[data-page="/admin"] #tab_shares .datalist li form input[type=text]:nth-child(2) {
   max-width: 17em;
 }
@@ -140,14 +136,6 @@ body[data-page="/admin"] #tab_shares .datalist li form a {
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
   font-size: .8em;
   color: inherit;
-}
-
-body[data-page="/admin"].admin_tab #tab_users {
-  display: none;
-}
-
-body[data-page="/admin"].admin_tab #tab_shares {
-  display: block;
 }
 
 body.dark {

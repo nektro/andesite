@@ -132,8 +132,6 @@ body {
 
     &[data-page="/admin"] {
         #tab_shares {
-            display: none;
-
             .datalist {
                 li {
                     form {
@@ -149,15 +147,6 @@ body {
                         }
                     }
                 }
-            }
-        }
-
-        &.admin_tab {
-            #tab_users {
-                display: none;
-            }
-            #tab_shares {
-                display: block;
             }
         }
     }
