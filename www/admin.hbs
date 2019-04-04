@@ -26,13 +26,8 @@
             </div>
         </div>
         <hr>
-        <div>
-            <div class="toggle">
-            <span>User Access</span>
-            <x-switch data-mode="admin_tab"></x-switch>
-            <span>Share Links</span>
-        </div>
-        <div id="tab_users">
+        <details open id="tab_users">
+            <summary>User Access</summary>
             <ul class="datalist">
             {{#each accesses}}
                 <li>
@@ -55,8 +50,9 @@
                     </form>
                 </li>
             </ul>
-        </div>
-        <div id="tab_shares">
+        </details>
+        <details open id="tab_shares">
+            <summary>Share Links</summary>
             <ul class="datalist">
             {{#each shares}}
                 <li>
@@ -78,6 +74,6 @@
                     </form>
                 </li>
             </ul>
-        </div>
+        </details>
     </body>
 </html>
