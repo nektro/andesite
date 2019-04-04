@@ -415,7 +415,7 @@ func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
-	sess, _, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, true)
+	sess, _, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if errr != nil {
 		return
 	}
