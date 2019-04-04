@@ -419,7 +419,7 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 		return nil, UserRow{}, errors.New("")
 	}
 	if requireAdmin && !user.admin {
-		writeAPIResponse(r, w, false, "This action requires being a site administrator")
+		writeAPIResponse(r, w, false, "This action requires being a site administrator. ("+userID+")")
 		return nil, UserRow{}, errors.New("")
 	}
 
