@@ -1,6 +1,7 @@
 package main
 
 type Oauth2Provider struct {
+	id           string
 	authorizeURL string
 	tokenURL     string
 	meURL        string
@@ -13,6 +14,7 @@ type Oauth2Provider struct {
 var (
 	Oauth2Providers = map[string]Oauth2Provider{
 		"discord": Oauth2Provider{
+			"discord",
 			"https://discordapp.com/api/oauth2/authorize",
 			"https://discordapp.com/api/oauth2/token",
 			"https://discordapp.com/api/users/@me",
@@ -22,6 +24,7 @@ var (
 			"@",
 		},
 		"reddit": Oauth2Provider{
+			"reddit",
 			"https://old.reddit.com/api/v1/authorize",
 			"https://old.reddit.com/api/v1/access_token",
 			"https://oauth.reddit.com/api/v1/me",
@@ -31,6 +34,7 @@ var (
 			"u/",
 		},
 		"github": Oauth2Provider{
+			"github",
 			"https://github.com/login/oauth/authorize",
 			"https://github.com/login/oauth/access_token",
 			"https://api.github.com/user",
@@ -40,6 +44,7 @@ var (
 			"@",
 		},
 		"google": Oauth2Provider{
+			"google",
 			"https://accounts.google.com/o/oauth2/v2/auth",
 			"https://www.googleapis.com/oauth2/v4/token",
 			"https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
@@ -49,6 +54,7 @@ var (
 			"",
 		},
 		"facebook": Oauth2Provider{
+			"facebook",
 			"https://graph.facebook.com/oauth/authorize",
 			"https://graph.facebook.com/oauth/access_token",
 			"https://graph.facebook.com/me",
