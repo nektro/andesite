@@ -415,7 +415,7 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 	user, ok := queryUserBySnowflake(userID)
 
 	if !ok {
-		writeAPIResponse(r, w, false, "This action requires being a member of this server")
+		writeResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+userID+")", "")
 		return nil, UserRow{}, errors.New("")
 	}
 	if requireAdmin && !user.admin {
