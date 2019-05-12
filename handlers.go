@@ -26,12 +26,12 @@ func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		w.Header().Add("Location", "./files/")
 	} else {
-		urlR, _ := url.Parse(oauth2Provider.authorizeURL)
+		urlR, _ := url.Parse(oauth2Provider.idp.AuthorizeURL)
 		parameters := url.Values{}
 		parameters.Add("client_id", oauth2AppID)
 		parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 		parameters.Add("response_type", "code")
-		parameters.Add("scope", oauth2Provider.scope)
+		parameters.Add("scope", oauth2Provider.idp.Scope)
 		parameters.Add("duration", "temporary")
 		parameters.Add("state", "none")
 		urlR.RawQuery = parameters.Encode()
@@ -55,7 +55,7 @@ func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
 	parameters.Add("state", "none")
 
-	urlR, _ := url.Parse(oauth2Provider.tokenURL)
+	urlR, _ := url.Parse(oauth2Provider.idp.TokenURL)
 	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -81,7 +81,7 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	urlR, _ := url.Parse(oauth2Provider.meURL)
+	urlR, _ := url.Parse(oauth2Provider.idp.MeURL)
 	req, _ := http.NewRequest("GET", urlR.String(), strings.NewReader(""))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Authorization", "Bearer "+val.(string))
@@ -91,7 +91,7 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	var respMe map[string]interface{}
 	json.Unmarshal(body, &respMe)
 	_id := fixID(respMe["id"])
-	_name := respMe[oauth2Provider.nameProp].(string)
+	_name := respMe[oauth2Provider.idp.NameProp].(string)
 	sess.Values["user"] = _id
 	sess.Save(r, w)
 	queryAssertUserName(_id, _name)
@@ -204,7 +204,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"files": data,
 				"admin": isAdmin,
 				"base":  httpBase,
-				"name":  oauth2Provider.namePrefix + uName,
+				"name":  oauth2Provider.idp.NamePrefix + uName,
 			})
 		} else {
 			// access check
@@ -258,7 +258,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		"user":     user.snowflake,
 		"accesses": accesses,
 		"base":     httpBase,
-		"name":     oauth2Provider.namePrefix + user.name,
+		"name":     oauth2Provider.idp.NamePrefix + user.name,
 		"shares":   shares,
 	})
 }

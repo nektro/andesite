@@ -1,77 +1,39 @@
 package main
 
+import (
+	"github.com/nektro/go.oauth2"
+)
+
 type Oauth2Provider struct {
-	id           string
-	authorizeURL string
-	tokenURL     string
-	meURL        string
-	scope        string
-	nameProp     string
-	dbPrefix     string
-	namePrefix   string
+	idp oauth2.Provider
+	dbp string
 }
 
 var (
 	Oauth2Providers = map[string]Oauth2Provider{
 		"discord": Oauth2Provider{
-			"discord",
-			"https://discordapp.com/api/oauth2/authorize",
-			"https://discordapp.com/api/oauth2/token",
-			"https://discordapp.com/api/users/@me",
-			"identify",
-			"username",
+			oauth2.ProviderDiscord,
 			"",
-			"@",
 		},
 		"reddit": Oauth2Provider{
-			"reddit",
-			"https://old.reddit.com/api/v1/authorize",
-			"https://old.reddit.com/api/v1/access_token",
-			"https://oauth.reddit.com/api/v1/me",
-			"identity",
-			"name",
+			oauth2.ProviderReddit,
 			"1:",
-			"u/",
 		},
 		"github": Oauth2Provider{
-			"github",
-			"https://github.com/login/oauth/authorize",
-			"https://github.com/login/oauth/access_token",
-			"https://api.github.com/user",
-			"read:user",
-			"login",
+			oauth2.ProviderGitHub,
 			"2:",
-			"@",
 		},
 		"google": Oauth2Provider{
-			"google",
-			"https://accounts.google.com/o/oauth2/v2/auth",
-			"https://www.googleapis.com/oauth2/v4/token",
-			"https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
-			"profile",
-			"name",
+			oauth2.ProviderGoogle,
 			"3:",
-			"",
 		},
 		"facebook": Oauth2Provider{
-			"facebook",
-			"https://graph.facebook.com/oauth/authorize",
-			"https://graph.facebook.com/oauth/access_token",
-			"https://graph.facebook.com/me",
-			"",
-			"name",
+			oauth2.ProviderFacebook,
 			"4:",
-			"",
 		},
 		"microsoft": Oauth2Provider{
-			"microsoft",
-			"https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-			"https://login.microsoftonline.com/common/oauth2/v2.0/token",
-			"https://graph.microsoft.com/v1.0/me/",
-			"https://graph.microsoft.com/user.read",
-			"displayName",
+			oauth2.ProviderMicrosoft,
 			"5:",
-			"",
 		},
 	}
 )
