@@ -194,6 +194,9 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				if files[i].IsDir() {
 					ext = ".folder"
 				}
+				if len(ext) == 0 {
+					ext = ".asc"
+				}
 				data[gi] = map[string]string{
 					"name": a,
 					"size": byteCountIEC(files[i].Size()),
