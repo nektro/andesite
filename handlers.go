@@ -282,7 +282,7 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	query(fmt.Sprintf("delete from access where id = '%d'", iid), true)
+	database.Query(true, fmt.Sprintf("delete from access where id = '%d'", iid))
 	writeAPIResponse(r, w, true, fmt.Sprintf("Removed access from %s.", r.PostForm.Get("snowflake")))
 }
 
@@ -321,7 +321,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := queryLastID("access") + 1
+	aid := database.QueryNextID("access")
 	asn := r.PostForm.Get("snowflake")
 	apt := r.PostForm.Get("path")
 	//
@@ -330,11 +330,11 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		aud = u.id
 	} else {
-		aud = queryLastID("users") + 1
+		aud = database.QueryNextID("users")
 		queryDoAddUser(aud, asn, false, "")
 	}
 	//
-	queryPrepared("insert into access values (?, ?, ?)", true, aid, aud, apt)
+	database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, aud, apt)
 	writeAPIResponse(r, w, true, fmt.Sprintf("Created access for %s.", asn))
 }
 
@@ -349,13 +349,13 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := queryLastID("shares") + 1
-	ahs_ := md5.Sum([]byte(fmt.Sprintf("astheno.andesite.share.%s.%s", strconv.FormatInt(int64(aid), 10), util.GetIsoDateTime())))
-	ahs := hex.EncodeToString(ahs_[:])
+	aid := database.QueryNextID("shares")
+	ahs1 := md5.Sum([]byte(fmt.Sprintf("astheno.andesite.share.%s.%s", strconv.FormatInt(int64(aid), 10), util.GetIsoDateTime())))
+	ahs2 := hex.EncodeToString(ahs1[:])
 	fpath := r.PostForm.Get("path")
 	//
-	queryPrepared("insert into shares values (?, ?, ?)", true, aid, ahs, fpath)
-	writeAPIResponse(r, w, true, fmt.Sprintf("Created share with code %s for folder %s.", ahs, fpath))
+	database.QueryPrepared(true, "insert into shares values (?, ?, ?)", aid, ahs2, fpath)
+	writeAPIResponse(r, w, true, fmt.Sprintf("Created share with code %s for folder %s.", ahs2, fpath))
 }
 
 func handleShareListing(w http.ResponseWriter, r *http.Request) (string, []string, string, string, bool, error) {
@@ -410,7 +410,7 @@ func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 	//
 	ahs := r.PostForm.Get("hash")
 	//
-	queryPrepared("delete from shares where hash = ?", true, ahs)
+	database.QueryPrepared(true, "delete from shares where hash = ?", ahs)
 	writeAPIResponse(r, w, true, "Successfully deleted share link.")
 }
 

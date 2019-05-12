@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,6 +18,7 @@ import (
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/types"
 	"github.com/nektro/go-util/util"
 
@@ -37,7 +37,7 @@ var (
 	oauth2AppID     string
 	oauth2AppSecret string
 	oauth2Provider  Oauth2Provider
-	database        *sql.DB
+	database        *sqlite.DB
 	wwFFS           types.MultiplexFileSystem
 	httpBase        string
 	rootDir         RootDir
@@ -110,22 +110,19 @@ func main() {
 	//
 	// database initialization
 
-	db, err := sql.Open("sqlite3", "file:"+metaDir+"/access.db?mode=rwc&cache=shared")
-	checkErr(err)
-	database = db
-
+	database = sqlite.Connect(metaDir)
 	checkErr(database.Ping())
 
-	createTable("users", []string{"id", "int primary key"}, [][]string{
+	database.CreateTable("users", []string{"id", "int primary key"}, [][]string{
 		{"snowflake", "text"},
 		{"admin", "tinyint(1)"},
 		{"name", "text"},
 	})
-	createTable("access", []string{"id", "int primary key"}, [][]string{
+	database.CreateTable("access", []string{"id", "int primary key"}, [][]string{
 		{"user", "int"},
 		{"path", "text"},
 	})
-	createTable("shares", []string{"id", "int primary key"}, [][]string{
+	database.CreateTable("shares", []string{"id", "int primary key"}, [][]string{
 		{"hash", "text"}, // character(32)
 		{"path", "text"},
 	})
@@ -136,14 +133,14 @@ func main() {
 	if *flagAdmin != "" {
 		uu, ok := queryUserBySnowflake(*flagAdmin)
 		if !ok {
-			uid := queryLastID("users") + 1
-			aid := queryLastID("access") + 1
+			uid := database.QueryNextID("users")
+			aid := database.QueryNextID("access")
 			queryDoAddUser(uid, *flagAdmin, true, "")
-			query(fmt.Sprintf("insert into access values ('%d', '%d', '/')", aid, uid), true)
+			database.Query(true, fmt.Sprintf("insert into access values ('%d', '%d', '/')", aid, uid))
 			util.Log(fmt.Sprintf("Added user %s as an admin", *flagAdmin))
 		} else {
 			if !uu.admin {
-				queryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.id), 10))
+				database.QueryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.id), 10))
 				util.Log(fmt.Sprintf("Set user '%s's status to admin", uu.snowflake))
 			}
 		}
