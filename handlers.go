@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -189,10 +190,15 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				} else {
 					a = name
 				}
+				ext := filepath.Ext(a)
+				if files[i].IsDir() {
+					ext = ".folder"
+				}
 				data[gi] = map[string]string{
 					"name": a,
 					"size": byteCountIEC(files[i].Size()),
 					"mod":  files[i].ModTime().UTC().String()[:19],
+					"ext":  ext[1:],
 				}
 				gi++
 			}
