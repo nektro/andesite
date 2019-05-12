@@ -238,7 +238,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, []string
 	qpath := string(r.URL.Path[6:])
 
 	userUser, _ := queryUserBySnowflake(user.snowflake)
-	userAccess := queryAccess(user.snowflake)
+	userAccess := queryAccess(user)
 
 	return qpath, userAccess, user.snowflake, user.name, userUser.admin, nil
 }
