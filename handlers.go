@@ -189,12 +189,10 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				} else {
 					a = name
 				}
-				b := byteCountIEC(files[i].Size())
-				c := files[i].ModTime().UTC().String()[:19]
 				data[gi] = map[string]string{
 					"name": a,
-					"size": b,
-					"mod":  c,
+					"size": byteCountIEC(files[i].Size()),
+					"mod":  files[i].ModTime().UTC().String()[:19],
 				}
 				gi++
 			}
