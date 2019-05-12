@@ -93,6 +93,7 @@ func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
 	_id := fixID(respMe["id"])
 	_name := respMe[oauth2Provider.idp.NameProp].(string)
 	sess.Values["user"] = _id
+	sess.Values["name"] = _name
 	sess.Save(r, w)
 	queryAssertUserName(_id, _name)
 
