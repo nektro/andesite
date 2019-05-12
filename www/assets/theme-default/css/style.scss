@@ -69,7 +69,7 @@ body {
             &:nth-child(1) {
                 text-align: right;
             }
-            &:nth-child(4) {
+            &:nth-child(5) {
                 text-align: right;
             }
             a {
@@ -79,6 +79,10 @@ body {
                 &:hover {
                     text-decoration: underline;
                 }
+            }
+            span {
+                display: block;
+                margin: auto;
             }
         }
     }
