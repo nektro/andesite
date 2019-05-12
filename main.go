@@ -311,7 +311,7 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	sessName := sess.Values["name"]
 	if sessName != nil {
 		sessID := sess.Values["user"]
-		me += fmt.Sprintf(" (%s%s - %s)", oauth2Provider.namePrefix, sessName.(string), sessID.(string))
+		me += fmt.Sprintf("%s%s (%s)", oauth2Provider.idp.NamePrefix, sessName.(string), sessID.(string))
 	}
 
 	message := ""
@@ -319,7 +319,7 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 		if showLogin {
 			message = "You" + me + " do not have access to this resource."
 		} else {
-			message = "Unable to find the requested resource for you."
+			message = "Unable to find the requested resource for you " + me + "."
 		}
 	} else {
 		message = "Admin priviledge required. Access denied."
