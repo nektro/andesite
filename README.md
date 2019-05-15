@@ -105,6 +105,7 @@ See [`deployment.md`](docs/deployment.md)
 - https://github.com/kataras/go-sessions - HTTP Session manager for fasthttp
 - https://github.com/nektro/go-util - Go utilities for simplifying common complex tasks
 - https://github.com/spf13/pflag - Optimized flag handler that makes program flags POSIX compliant
+- https://github.com/nektro/go.oauth2 - OAuth2 Client library for Go
 
 ## Contributing
 We take issues all the time right here on GitHub. We use labels extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it's been answered!

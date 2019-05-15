@@ -2,14 +2,11 @@ package main
 
 import (
 	"crypto/md5"
-	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"mime"
 	"net/http"
-	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -20,86 +17,18 @@ import (
 	"github.com/nektro/go-util/util"
 )
 
-// handler for http://andesite/login
-func handleOAuthLogin(w http.ResponseWriter, r *http.Request) {
+func helperIsLoggedIn(r *http.Request) bool {
 	sess := getSession(r)
 	_, ok := sess.Values["user"]
-	if ok {
-		w.Header().Add("Location", "./files/")
-	} else {
-		urlR, _ := url.Parse(oauth2Provider.idp.AuthorizeURL)
-		parameters := url.Values{}
-		parameters.Add("client_id", oauth2AppID)
-		parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
-		parameters.Add("response_type", "code")
-		parameters.Add("scope", oauth2Provider.idp.Scope)
-		parameters.Add("duration", "temporary")
-		parameters.Add("state", "none")
-		urlR.RawQuery = parameters.Encode()
-		w.Header().Add("Location", urlR.String())
-	}
-	w.WriteHeader(http.StatusMovedPermanently)
+	return ok
 }
 
-// handler for http://andesite/callback
-func handleOAuthCallback(w http.ResponseWriter, r *http.Request) {
-	code := r.URL.Query().Get("code")
-	if len(code) == 0 {
-		return
-	}
-
-	parameters := url.Values{}
-	parameters.Add("client_id", oauth2AppID)
-	parameters.Add("client_secret", oauth2AppSecret)
-	parameters.Add("grant_type", "authorization_code")
-	parameters.Add("code", string(code))
-	parameters.Add("redirect_uri", fullHost(r)+httpBase+"callback")
-	parameters.Add("state", "none")
-
-	urlR, _ := url.Parse(oauth2Provider.idp.TokenURL)
-	req, _ := http.NewRequest("POST", urlR.String(), strings.NewReader(parameters.Encode()))
-	req.Header.Set("User-Agent", "nektro/andesite")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(oauth2AppID+":"+oauth2AppSecret)))
-	req.Header.Set("Accept", "application/json")
-
-
-	body := doHttpRequest(req)
-	var respJSON OAuth2CallBackResponse
-	json.Unmarshal(body, &respJSON)
+func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string) {
 	sess := getSession(r)
-	sess.Values[accessToken] = respJSON.AccessToken
+	sess.Values["user"] = id
+	sess.Values["name"] = name
 	sess.Save(r, w)
-	w.Header().Add("Location", "./token")
-	w.WriteHeader(http.StatusMovedPermanently)
-}
-
-// handler for http://andesite/token
-func handleOAuthToken(w http.ResponseWriter, r *http.Request) {
-	sess := getSession(r)
-	val, ok := sess.Values[accessToken]
-	if !ok {
-		return
-	}
-
-	urlR, _ := url.Parse(oauth2Provider.idp.MeURL)
-	req, _ := http.NewRequest("GET", urlR.String(), strings.NewReader(""))
-	req.Header.Set("User-Agent", "nektro/andesite")
-	req.Header.Set("Authorization", "Bearer "+val.(string))
-
-
-	body := doHttpRequest(req)
-	var respMe map[string]interface{}
-	json.Unmarshal(body, &respMe)
-	_id := fixID(respMe["id"])
-	_name := respMe[oauth2Provider.idp.NameProp].(string)
-	sess.Values["user"] = _id
-	sess.Values["name"] = _name
-	sess.Save(r, w)
-	queryAssertUserName(_id, _name)
-
-	w.Header().Add("Location", "./files/")
-	w.WriteHeader(http.StatusMovedPermanently)
+	queryAssertUserName(id, name)
 }
 
 // handler for http://andesite/test

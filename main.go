@@ -14,6 +14,8 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/nektro/go.oauth2"
+
 	"github.com/aymerick/raymond"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/securecookie"
@@ -197,9 +199,8 @@ func main() {
 	wwFFS = types.MultiplexFileSystem{dirs}
 
 	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
-	http.HandleFunc("/login", mw(handleOAuthLogin))
-	http.HandleFunc("/callback", mw(handleOAuthCallback))
-	http.HandleFunc("/token", mw(handleOAuthToken))
+	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.idp, oauth2AppID)))
+	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider.idp, oauth2AppID, oauth2AppSecret, helperOA2SaveInfo, "./files")))
 	http.HandleFunc("/test", mw(handleTest))
 	http.HandleFunc("/files/", mw(handleDirectoryListing(handleFileListing)))
 	http.HandleFunc("/admin", mw(handleAdmin))
