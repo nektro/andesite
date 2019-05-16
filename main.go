@@ -14,8 +14,6 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/nektro/go.oauth2"
-
 	"github.com/aymerick/raymond"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/securecookie"
@@ -23,6 +21,7 @@ import (
 	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/types"
 	"github.com/nektro/go-util/util"
+	"github.com/nektro/go.oauth2"
 
 	flag "github.com/spf13/pflag"
 
