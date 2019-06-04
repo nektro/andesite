@@ -24,8 +24,6 @@ import (
 	"github.com/nektro/go.oauth2"
 
 	flag "github.com/spf13/pflag"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
