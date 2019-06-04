@@ -136,15 +136,19 @@ func main() {
 		uu, ok := queryUserBySnowflake(*flagAdmin)
 		if !ok {
 			uid := database.QueryNextID("users")
-			aid := database.QueryNextID("access")
 			queryDoAddUser(uid, *flagAdmin, true, "")
-			database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, uid))
 			Log(F("Added user %s as an admin", *flagAdmin))
 		} else {
 			if !uu.admin {
 				database.QueryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.id), 10))
 				Log(F("Set user '%s's status to admin", uu.snowflake))
 			}
+		}
+		nu, _ := queryUserBySnowflake(*flagAdmin)
+		if !Contains(queryAccess(nu), "/") {
+			aid := database.QueryNextID("access")
+			database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, nu.id))
+			Log(F("Gave %s root folder access", nu.name))
 		}
 	}
 
