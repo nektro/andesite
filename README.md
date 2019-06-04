@@ -1,7 +1,6 @@
 # Andesite
 ![loc](https://tokei.rs/b1/github/nektro/andesite)
 [![license](https://img.shields.io/github/license/nektro/andesite.svg)](https://github.com/nektro/andesite/blob/master/LICENSE)
-[![paypal](https://img.shields.io/badge/donate-paypal-blue.svg?logo=paypal)](https://www.paypal.me/nektro)
 [![discord](https://img.shields.io/discord/551971034593755159.svg)](https://discord.gg/P6Y4zQC)
 
 Share folders in an Open Directory without making your entire server public. Manages users with OAuth2.
