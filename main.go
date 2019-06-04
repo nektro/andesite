@@ -26,6 +26,7 @@ import (
 	flag "github.com/spf13/pflag"
 
 	. "github.com/nektro/go-util/alias"
+	. "github.com/nektro/go-util/util"
 )
 
 const (
@@ -66,16 +67,16 @@ func main() {
 	case RootTypeDir:
 		rootDir = FsRoot{*flagRoot}
 		s, _ := filepath.Abs(*flagRoot)
-		dieOnError(assert(fileExists(s), "Please pass a valid directory as a --root parameter!"))
+		DieOnError(Assert(DoesFileExist(s), "Please pass a valid directory as a --root parameter!"))
 		metaDir = s + pthAnd
 	// case RootTypeHttp:
 	// 	rootDir = HttpRoot{*flagRoot}
 	// 	s, _ := filepath.Abs(*flagMeta)
 	// 	metaDir = s
 	default:
-		dieOnError(E("Invalid root type"))
+		DieOnError(E("Invalid root type"))
 	}
-	dieOnError(assert(fileExists(metaDir), ".andesite folder does not exist!"))
+	DieOnError(Assert(DoesFileExist(metaDir), ".andesite folder does not exist!"))
 	util.Log("Starting in " + rootDir.Base())
 
 	//
@@ -89,11 +90,11 @@ func main() {
 	}
 	if _, ok := Oauth2Providers[config.Auth]; ok {
 		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*ConfigIDP)
-		dieOnError(assert(cidp.ID != "", F("config.json[%s][id] must not be empty!", config.Auth)))
-		dieOnError(assert(cidp.Secret != "", F("config.json[%s][secret] must not be empty!", config.Auth)))
+		DieOnError(Assert(cidp.ID != "", F("config.json[%s][id] must not be empty!", config.Auth)))
+		DieOnError(Assert(cidp.Secret != "", F("config.json[%s][secret] must not be empty!", config.Auth)))
 		oauth2AppConfig = cidp
 	} else {
-		dieOnError(E(F("Invalid OAuth2 Client type '%s'", config.Auth)))
+		DieOnError(E(F("Invalid OAuth2 Client type '%s'", config.Auth)))
 	}
 
 	oauth2Provider = Oauth2Providers[config.Auth]
@@ -147,8 +148,8 @@ func main() {
 		themeDirName = "theme-" + stheme
 		themeRootPath = metaDir + themeDirName + "/"
 		fi, err := os.Stat(themeRootPath)
-		dieOnError(err, "Theme directory must exist if the --theme option is present")
-		dieOnError(assert(fi.IsDir(), "Theme directory must be a directory!"))
+		DieOnError(err, "Theme directory must exist if the --theme option is present")
+		DieOnError(Assert(fi.IsDir(), "Theme directory must be a directory!"))
 	}
 
 	//
@@ -207,38 +208,6 @@ func main() {
 	http.ListenAndServe(":"+p, nil)
 }
 
-func dieOnError(err error, args ...string) {
-	if err != nil {
-		logError(F("%q", err))
-		for _, item := range args {
-			logError(item)
-		}
-		os.Exit(1)
-	}
-}
-
-func assert(condition bool, errorMessage string) error {
-	if condition {
-		return nil
-	}
-	return E(errorMessage)
-}
-
-func fileExists(file string) bool {
-	_, err := os.Stat(file)
-	return !os.IsNotExist(err)
-}
-
-func logError(message string) {
-	fmt.Println("[" + util.GetIsoDateTime() + "][error] " + message)
-}
-
-func readFile(path string) []byte {
-	reader, _ := os.Open(path)
-	bytes, _ := ioutil.ReadAll(reader)
-	return bytes
-}
-
 func readServerFile(path string) []byte {
 	reader, _ := wwFFS.Open(path)
 	bytes, _ := ioutil.ReadAll(reader)
@@ -267,15 +236,6 @@ func fullHost(r *http.Request) string {
 		urL += "s"
 	}
 	return urL + "://" + r.Host
-}
-
-func contains(stack []string, needle string) bool {
-	for _, varr := range stack {
-		if varr == needle {
-			return true
-		}
-	}
-	return false
 }
 
 func filter(stack []os.FileInfo, cb func(os.FileInfo) bool) []os.FileInfo {
