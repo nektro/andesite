@@ -5,13 +5,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>{{title}}</title>
-        <link rel="stylesheet" href="{{base}}assets/theme-default/css/style.min.css">
-        <script type="module" src="{{base}}assets/theme-default/js/x-switch.js"></script>
+        <!---->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.css" integrity="sha256-S4n5rcKkPwT9YZGXPue8OorJ7GCPxBA5o/Z0ALWXyHs=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.js" integrity="sha256-x9fzgXT3ttK2cZF12FIafkDJzEqqLnaWcchT+Y/plJ4=" crossorigin="anonymous"></script>
+        <!---->
+        <style>
+            body > div {
+                margin: 1em;
+            }
+        </style>
     </head>
     <body>
-        <h1>{{title}}</h1>
-        <p>{{message}}</p>
-        <p>{{{link}}}</p>
-        <x-switch data-mode="dark" class="hidden"></x-switch>
+        <div class="ui main menu">
+            <div class="right item">Powered by&nbsp;<a href="https://github.com/nektro/andesite" target="_blank">Andesite</a></div>
+        </div>
+        <div>
+            <h1 class="ui header">{{title}}</h1>
+            <p>{{message}}</p>
+            <p>{{{link}}}</p>
+        </div>
     </body>
 </html>
