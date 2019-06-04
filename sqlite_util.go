@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	. "github.com/nektro/go-util/alias"
+	. "github.com/nektro/go-util/util"
 )
 
 func queryAccess(user UserRow) []string {
@@ -80,6 +81,14 @@ func queryAssertUserName(snowflake string, name string) {
 	} else {
 		uid := database.QueryNextID("users")
 		queryDoAddUser(uid, snowflake, false, name)
+
+		if uid == 0 {
+			// always admin first user
+			database.QueryDoUpdate("users", "admin", "1", "id", "0")
+			aid := database.QueryNextID("access")
+			database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, uid))
+			Log(F("Set user '%s's status to admin", snowflake))
+		}
 	}
 }
 
