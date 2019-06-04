@@ -56,3 +56,18 @@ const (
 	RootTypeDir  RootDirType = "dir"
 	RootTypeHttp             = "http"
 )
+
+type Config struct {
+	Auth      string     `json:"auth"`
+	Discord   *ConfigIDP `json:"discord"`
+	Reddit    *ConfigIDP `json:"reddit"`
+	GitHub    *ConfigIDP `json:"github"`
+	Google    *ConfigIDP `json:"google"`
+	Facebook  *ConfigIDP `json:"facebook"`
+	Microsoft *ConfigIDP `json:"microsoft"`
+}
+
+type ConfigIDP struct {
+	ID     string `json:"id"`
+	Secret string `json:"secret"`
+}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -10,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"reflect"
 	"runtime/debug"
 	"strconv"
 	"syscall"
@@ -34,8 +34,8 @@ const (
 )
 
 var (
-	oauth2AppID     string
-	oauth2AppSecret string
+	config          *Config
+	oauth2AppConfig *ConfigIDP
 	oauth2Provider  Oauth2Provider
 	database        *sqlite.DB
 	wwFFS           types.MultiplexFileSystem
@@ -81,31 +81,21 @@ func main() {
 	// discover OAuth2 config info
 
 	configPath := metaDir + "/config.json"
-	dieOnError(assert(fileExists(configPath), "config.json does not exist!"))
-	configBytes := readFile(configPath)
-	var config map[string]interface{}
-	json.Unmarshal(configBytes, &config)
+	etc.InitConfig(configPath, &config)
 
-	ca := config["auth"]
-	if ca == nil {
-		dieOnError(errors.New("config.json[auth] is missing"))
+	if len(config.Auth) == 0 {
+		config.Auth = "discord"
 	}
-	cas := ca.(string)
-	if len(cas) == 0 {
-		cas = "discord"
-	}
-	if _, ok := Oauth2Providers[cas]; ok {
-		if config[cas] == nil {
-			dieOnError(errors.New(fmt.Sprintf("config.json[%s] is missing", cas)))
-		}
-		acm := config[cas].(map[string]interface{})
-		oauth2AppID = acm["id"].(string)
-		oauth2AppSecret = acm["secret"].(string)
+	if _, ok := Oauth2Providers[config.Auth]; ok {
+		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*ConfigIDP)
+		dieOnError(assert(cidp.ID != "", fmt.Sprintf("config.json[%s][id] must not be empty!", config.Auth)))
+		dieOnError(assert(cidp.Secret != "", fmt.Sprintf("config.json[%s][secret] must not be empty!", config.Auth)))
+		oauth2AppConfig = cidp
 	} else {
-		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", cas)))
+		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", config.Auth)))
 	}
 
-	oauth2Provider = Oauth2Providers[cas]
+	oauth2Provider = Oauth2Providers[config.Auth]
 
 	//
 	// database initialization
@@ -198,8 +188,8 @@ func main() {
 	wwFFS = types.MultiplexFileSystem{dirs}
 
 	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
-	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.idp, oauth2AppID)))
-	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider.idp, oauth2AppID, oauth2AppSecret, helperOA2SaveInfo, "./files")))
+	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.idp, oauth2AppConfig.ID)))
+	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider.idp, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
 	http.HandleFunc("/test", mw(handleTest))
 	http.HandleFunc("/files/", mw(handleDirectoryListing(handleFileListing)))
 	http.HandleFunc("/admin", mw(handleAdmin))
@@ -450,4 +440,16 @@ func mwAddAttribution(next http.HandlerFunc) http.HandlerFunc {
 		w.Header().Add("Server", "nektro/andesite")
 		next.ServeHTTP(w, r)
 	}
+}
+
+func findStructValueWithTag(item interface{}, ttype string, tag string) reflect.Value {
+	v := reflect.ValueOf(config).Elem()
+	t := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		f := t.Field(i)
+		if f.Tag.Get(ttype) == tag {
+			return v.FieldByName(f.Name)
+		}
+	}
+	return reflect.Zero(nil)
 }
