@@ -16,6 +16,8 @@ import (
 
 	"github.com/nektro/go-util/util"
 	"github.com/nektro/go.etc"
+
+	. "github.com/nektro/go-util/alias"
 )
 
 func helperIsLoggedIn(r *http.Request) bool {
@@ -220,8 +222,8 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	database.Query(true, fmt.Sprintf("delete from access where id = '%d'", iid))
-	writeAPIResponse(r, w, true, fmt.Sprintf("Removed access from %s.", r.PostForm.Get("snowflake")))
+	database.Query(true, F("delete from access where id = '%d'", iid))
+	writeAPIResponse(r, w, true, F("Removed access from %s.", r.PostForm.Get("snowflake")))
 }
 
 // handler for http://andesite/api/access/update
@@ -244,7 +246,7 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	queryDoUpdate("access", "path", r.PostForm.Get("path"), "id", strconv.FormatInt(iid, 10))
-	writeAPIResponse(r, w, true, fmt.Sprintf("Updated access for %s.", r.PostForm.Get("snowflake")))
+	writeAPIResponse(r, w, true, F("Updated access for %s.", r.PostForm.Get("snowflake")))
 }
 
 // handler for http://andesite/api/access/create
@@ -273,7 +275,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, aud, apt)
-	writeAPIResponse(r, w, true, fmt.Sprintf("Created access for %s.", asn))
+	writeAPIResponse(r, w, true, F("Created access for %s.", asn))
 }
 
 func handleShareCreate(w http.ResponseWriter, r *http.Request) {
@@ -288,12 +290,12 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	aid := database.QueryNextID("shares")
-	ahs1 := md5.Sum([]byte(fmt.Sprintf("astheno.andesite.share.%s.%s", strconv.FormatInt(int64(aid), 10), util.GetIsoDateTime())))
+	ahs1 := md5.Sum([]byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(int64(aid), 10), util.GetIsoDateTime())))
 	ahs2 := hex.EncodeToString(ahs1[:])
 	fpath := r.PostForm.Get("path")
 	//
 	database.QueryPrepared(true, "insert into shares values (?, ?, ?)", aid, ahs2, fpath)
-	writeAPIResponse(r, w, true, fmt.Sprintf("Created share with code %s for folder %s.", ahs2, fpath))
+	writeAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ahs2, fpath))
 }
 
 func handleShareListing(w http.ResponseWriter, r *http.Request) (string, []string, string, string, bool, error) {

@@ -1,13 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
+
+	. "github.com/nektro/go-util/alias"
 )
 
 func queryAccess(user UserRow) []string {
 	result := []string{}
-	rows := database.Query(false, fmt.Sprintf("select * from access where user = '%d'", user.id))
+	rows := database.Query(false, F("select * from access where user = '%d'", user.id))
 	for rows.Next() {
 		var rau UserAccessRow
 		rows.Scan(&rau.id, &rau.user, &rau.path)
@@ -19,7 +20,7 @@ func queryAccess(user UserRow) []string {
 
 func queryUserBySnowflake(snowflake string) (UserRow, bool) {
 	var ur UserRow
-	rows := database.Query(false, fmt.Sprintf("select * from users where snowflake = '%s'", oauth2Provider.dbp+snowflake))
+	rows := database.Query(false, F("select * from users where snowflake = '%s'", oauth2Provider.dbp+snowflake))
 	if !rows.Next() {
 		return ur, false
 	}
@@ -31,7 +32,7 @@ func queryUserBySnowflake(snowflake string) (UserRow, bool) {
 
 func queryUserByID(id int) (UserRow, bool) {
 	var ur UserRow
-	rows := database.Query(false, fmt.Sprintf("select * from users where id = '%d'", id))
+	rows := database.Query(false, F("select * from users where id = '%d'", id))
 	if !rows.Next() {
 		return ur, false
 	}
@@ -65,11 +66,11 @@ func queryAllAccess() []map[string]string {
 }
 
 func queryDoAddUser(id int, snowflake string, admin bool, name string) {
-	database.QueryPrepared(true, fmt.Sprintf("insert into users values ('%d', '%s', '%s', ?)", id, oauth2Provider.dbp+snowflake, boolToString(admin)), name)
+	database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?)", id, oauth2Provider.dbp+snowflake, boolToString(admin)), name)
 }
 
 func queryDoUpdate(table string, col string, value string, where string, search string) {
-	database.QueryPrepared(true, fmt.Sprintf("update %s set %s = ? where %s = ?", table, col, where), value, search)
+	database.QueryPrepared(true, F("update %s set %s = ? where %s = ?", table, col, where), value, search)
 }
 
 func queryAssertUserName(snowflake string, name string) {

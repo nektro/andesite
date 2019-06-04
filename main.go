@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -25,6 +24,8 @@ import (
 	"github.com/nektro/go.oauth2"
 
 	flag "github.com/spf13/pflag"
+
+	. "github.com/nektro/go-util/alias"
 )
 
 const (
@@ -72,7 +73,7 @@ func main() {
 	// 	s, _ := filepath.Abs(*flagMeta)
 	// 	metaDir = s
 	default:
-		dieOnError(errors.New("Invalid root type"))
+		dieOnError(E("Invalid root type"))
 	}
 	dieOnError(assert(fileExists(metaDir), ".andesite folder does not exist!"))
 	util.Log("Starting in " + rootDir.Base())
@@ -88,11 +89,11 @@ func main() {
 	}
 	if _, ok := Oauth2Providers[config.Auth]; ok {
 		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*ConfigIDP)
-		dieOnError(assert(cidp.ID != "", fmt.Sprintf("config.json[%s][id] must not be empty!", config.Auth)))
-		dieOnError(assert(cidp.Secret != "", fmt.Sprintf("config.json[%s][secret] must not be empty!", config.Auth)))
+		dieOnError(assert(cidp.ID != "", F("config.json[%s][id] must not be empty!", config.Auth)))
+		dieOnError(assert(cidp.Secret != "", F("config.json[%s][secret] must not be empty!", config.Auth)))
 		oauth2AppConfig = cidp
 	} else {
-		dieOnError(errors.New(fmt.Sprintf("Invalid OAuth2 Client type '%s'", config.Auth)))
+		dieOnError(E(F("Invalid OAuth2 Client type '%s'", config.Auth)))
 	}
 
 	oauth2Provider = Oauth2Providers[config.Auth]
@@ -126,12 +127,12 @@ func main() {
 			uid := database.QueryNextID("users")
 			aid := database.QueryNextID("access")
 			queryDoAddUser(uid, *flagAdmin, true, "")
-			database.Query(true, fmt.Sprintf("insert into access values ('%d', '%d', '/')", aid, uid))
-			util.Log(fmt.Sprintf("Added user %s as an admin", *flagAdmin))
+			database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, uid))
+			util.Log(F("Added user %s as an admin", *flagAdmin))
 		} else {
 			if !uu.admin {
 				database.QueryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.id), 10))
-				util.Log(fmt.Sprintf("Set user '%s's status to admin", uu.snowflake))
+				util.Log(F("Set user '%s's status to admin", uu.snowflake))
 			}
 		}
 	}
@@ -163,7 +164,7 @@ func main() {
 
 	go func() {
 		sig := <-gracefulStop
-		util.Log(fmt.Sprintf("Caught signal '%+v'", sig))
+		util.Log(F("Caught signal '%+v'", sig))
 		util.Log("Gracefully shutting down...")
 
 		database.Close()
@@ -208,7 +209,7 @@ func main() {
 
 func dieOnError(err error, args ...string) {
 	if err != nil {
-		logError(fmt.Sprintf("%q", err))
+		logError(F("%q", err))
 		for _, item := range args {
 			logError(item)
 		}
@@ -220,7 +221,7 @@ func assert(condition bool, errorMessage string) error {
 	if condition {
 		return nil
 	}
-	return errors.New(errorMessage)
+	return E(errorMessage)
 }
 
 func fileExists(file string) bool {
@@ -246,14 +247,14 @@ func readServerFile(path string) []byte {
 
 func reduceNumber(input int64, unit int64, base string, prefixes string) string {
 	if input < unit {
-		return fmt.Sprintf("%d "+base, input)
+		return F("%d "+base, input)
 	}
 	div, exp := int64(unit), 0
 	for n := input / unit; n >= unit; n /= unit {
 		div *= unit
 		exp++
 	}
-	return fmt.Sprintf("%.1f %ci", float64(input)/float64(div), prefixes[exp]) + base
+	return F("%.1f %ci", float64(input)/float64(div), prefixes[exp]) + base
 }
 
 func byteCountIEC(b int64) string {
@@ -290,7 +291,7 @@ func filter(stack []os.FileInfo, cb func(os.FileInfo) bool) []os.FileInfo {
 func checkErr(err error, args ...string) {
 	if err != nil {
 		fmt.Println("Error")
-		fmt.Println(fmt.Sprintf("%q: %s", err, args))
+		fmt.Println(F("%q: %s", err, args))
 		debug.PrintStack()
 	}
 }
@@ -301,7 +302,7 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	sessName := sess.Values["name"]
 	if sessName != nil {
 		sessID := sess.Values["user"]
-		me += fmt.Sprintf("%s%s (%s)", oauth2Provider.idp.NamePrefix, sessName.(string), sessID.(string))
+		me += F("%s%s (%s)", oauth2Provider.idp.NamePrefix, sessName.(string), sessID.(string))
 	}
 
 	message := ""
@@ -382,7 +383,7 @@ func containsAll(mp url.Values, keys ...string) bool {
 func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method string, requireAdmin bool) (*sessions.Session, UserRow, error) {
 	if r.Method != method {
 		writeAPIResponse(r, w, false, "This action requires using HTTP "+method)
-		return nil, UserRow{}, errors.New("")
+		return nil, UserRow{}, E("")
 	}
 
 	sess := etc.GetSession(r)
@@ -390,7 +391,7 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 
 	if sessID == nil {
 		writeUserDenied(r, w, true, true)
-		return nil, UserRow{}, errors.New("")
+		return nil, UserRow{}, E("")
 	}
 
 	userID := sessID.(string)
@@ -398,17 +399,17 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 
 	if !ok {
 		writeResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+userID+")", "")
-		return nil, UserRow{}, errors.New("")
+		return nil, UserRow{}, E("")
 	}
 	if requireAdmin && !user.admin {
 		writeAPIResponse(r, w, false, "This action requires being a site administrator. ("+userID+")")
-		return nil, UserRow{}, errors.New("")
+		return nil, UserRow{}, E("")
 	}
 
 	err := r.ParseForm()
 	if err != nil {
 		writeAPIResponse(r, w, false, "Error parsing form data")
-		return nil, UserRow{}, errors.New("")
+		return nil, UserRow{}, E("")
 	}
 
 	return sess, user, nil
