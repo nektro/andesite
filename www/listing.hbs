@@ -5,52 +5,67 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Index of {{path}}</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <!---->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.css" integrity="sha256-S4n5rcKkPwT9YZGXPue8OorJ7GCPxBA5o/Z0ALWXyHs=" crossorigin="anonymous" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/file-icon-vectors@1.0.0/dist/file-icon-square-o.min.css">
-        <link rel="stylesheet" href="{{base}}assets/theme-default/css/style.min.css">
-        <script type="module" src="{{base}}assets/theme-default/js/x-switch.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.js" integrity="sha256-x9fzgXT3ttK2cZF12FIafkDJzEqqLnaWcchT+Y/plJ4=" crossorigin="anonymous"></script>
+        <script src="https://semantic-ui.com/javascript/library/tablesort.js"></script>
+        <!---->
+        <style>
+            body > div {
+                margin: 1em;
+            }
+            table.table tr td {
+                white-space: nowrap;
+            }
+            table.table tr td:nth-child(5) {
+                text-align: right;
+            }
+            table.table {
+                font-family: 'Source Code Pro', 'Courier New', monospace;
+            }
+            table.table tr td {
+                padding: .2em .7em !important;
+            }
+        </style>
+        <script>
+            (function() {
+                $(document).ready(function() {
+                    $("table.sortable").tablesort();
+                })
+            })();
+        </script>
     </head>
     <body>
-        <h1>Index of {{path}}</h1>
-        <p>Welcome, {{name}} ({{user}})</p>
-        <div class="flex row">
-            <div class="flex row">
-                <a class="btn" href="{{base}}files/">Root Directory</a>
-                <a class="btn" href="../">Parent Directory</a>
-                {{#if admin}}
-                <a class="btn" href="{{base}}admin">Admin Panel</a>
-                {{/if}}
-            </div>
-            <div class="grow"></div>
-            <div class="flex row">
-                <div class="toggle">
-                    <span class="fa fa-fw fa-th-list"></span>
-                    <x-switch data-mode="grid"></x-switch>
-                    <span class="fa fa-fw fa-th"></span>
-                </div>
-                <div class="toggle">
-                    <span class="fa fa-fw fa-sun-o"></span>
-                    <x-switch data-mode="dark"></x-switch>
-                    <span class="fa fa-fw fa-moon-o"></span>
-                </div>
-            </div>
+        <div class="ui main menu">
+            <div class="header item">Welcome, {{name}}</div>
+            <div class="item">{{user}}</div>
+            {{#if admin}}
+            <div class="item"><a href="{{base}}admin">Admin Panel</a></div>
+            {{/if}}
+            <div class="right item">Powered by&nbsp;<a href="https://github.com/nektro/andesite" target="_blank">Andesite</a></div>
         </div>
-        <hr>
-        <table>
-            <thead>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>Name</td>
-                    <td>Last Modified</td>
-                    <td>Size</td>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each files}}
-                <tr><td>{{@index}}</td><td><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{name}}" title="{{name}}">{{name}}</a></td><td>{{mod}}</td><td>{{size}}</td></tr>
-                {{/each}}
-            </tbody>
-        </table>
+        <div>
+            <h1 class="ui header">Index of {{path}}</h1>
+            <div class="ui divider"></div>
+            <table class="ui sortable compact table">
+                <thead>
+                    <th class="collapsing no-sort"></th>
+                    <th class="collapsing no-sort"></th>
+                    <th class="collapsing">Name</th>
+                    <th class="collapsing">Last Modified</th>
+                    <th class="collapsing">Size</th>
+                    <th class="no-sort"></th>
+                </thead>
+                <tbody>
+                    <tr><td></td><td></td><td><a href="../">../</a></td><td></td><td></td><td></td></tr>
+                    {{#each files}}
+                    <tr><td>{{@index}}</td><td><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{name}}" title="{{name}}">{{name}}</a></td><td>{{mod}}</td><td>{{size}}</td><td></td></tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
     </body>
 </html>
