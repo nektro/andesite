@@ -21,6 +21,7 @@ import (
 	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/types"
 	"github.com/nektro/go-util/util"
+	"github.com/nektro/go.etc"
 	"github.com/nektro/go.oauth2"
 
 	flag "github.com/spf13/pflag"
@@ -182,6 +183,7 @@ func main() {
 	}()
 
 	//
+	etc.SetSessionName("session_andesite_test")
 
 	p := strconv.Itoa(*flagPort)
 	dirs := []http.FileSystem{}
@@ -305,7 +307,7 @@ func checkErr(err error, args ...string) {
 
 func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, showLogin bool) {
 	me := ""
-	sess := getSession(r)
+	sess := etc.GetSession(r)
 	sessName := sess.Values["name"]
 	if sessName != nil {
 		sessID := sess.Values["user"]
@@ -369,11 +371,6 @@ func boolToString(x bool) string {
 	return "0"
 }
 
-func getSession(r *http.Request) *sessions.Session {
-	sess, _ := store.Get(r, "session_andesite")
-	return sess
-}
-
 func writeResponse(r *http.Request, w http.ResponseWriter, title string, message string, link string) {
 	writeHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
 		"title":   title,
@@ -398,7 +395,7 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 		return nil, UserRow{}, errors.New("")
 	}
 
-	sess := getSession(r)
+	sess := etc.GetSession(r)
 	sessID := sess.Values["user"]
 
 	if sessID == nil {

@@ -15,16 +15,17 @@ import (
 	"strings"
 
 	"github.com/nektro/go-util/util"
+	"github.com/nektro/go.etc"
 )
 
 func helperIsLoggedIn(r *http.Request) bool {
-	sess := getSession(r)
+	sess := etc.GetSession(r)
 	_, ok := sess.Values["user"]
 	return ok
 }
 
 func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string) {
-	sess := getSession(r)
+	sess := etc.GetSession(r)
 	sess.Values["user"] = id
 	sess.Values["name"] = name
 	sess.Save(r, w)
@@ -35,7 +36,7 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 func handleTest(w http.ResponseWriter, r *http.Request) {
 	// sessions test
 	// increment number every refresh
-	sess := getSession(r)
+	sess := etc.GetSession(r)
 	i := sess.Values["int"]
 	if i == nil {
 		i = 0
