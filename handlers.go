@@ -46,7 +46,7 @@ func handleTest(w http.ResponseWriter, r *http.Request) {
 	j := i.(int)
 	sess.Values["int"] = j + 1
 	sess.Save(r, w)
-	fmt.Fprintf(w, strconv.Itoa(j))
+	fmt.Fprintln(w, strconv.Itoa(j))
 }
 
 func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, []string, string, string, bool, error)) func(http.ResponseWriter, *http.Request) {
