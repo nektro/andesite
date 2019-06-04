@@ -65,6 +65,7 @@ func main() {
 
 	switch RootDirType(*flagRType) {
 	case RootTypeDir:
+		DieOnError(Assert(*flagRoot != "", "Please pass a valid directory as a --root parameter!"))
 		rootDir = FsRoot{*flagRoot}
 		s, _ := filepath.Abs(*flagRoot)
 		DieOnError(Assert(DoesFileExist(s), "Please pass a valid directory as a --root parameter!"))
