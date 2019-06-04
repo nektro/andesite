@@ -17,6 +17,7 @@ import (
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"github.com/mitchellh/go-homedir"
 	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/types"
 	"github.com/nektro/go-util/util"
@@ -32,7 +33,6 @@ import (
 const (
 	version     = 1
 	accessToken = "access_token"
-	pthAnd      = "/.andesite/"
 )
 
 var (
@@ -57,6 +57,7 @@ func main() {
 	flagTheme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
 	flagBase := flag.String("base", "/", "")
 	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
+	flagUseHome := flag.Bool("use-home", false, "When true, will place config folder in ~/.config/andesite")
 	// flagMeta := flag.String("meta", "", "")
 	flag.Parse()
 
@@ -68,7 +69,17 @@ func main() {
 		rootDir = FsRoot{*flagRoot}
 		s, _ := filepath.Abs(*flagRoot)
 		DieOnError(Assert(DoesFileExist(s), "Please pass a valid directory as a --root parameter!"))
-		metaDir = s + pthAnd
+		if *flagUseHome {
+			dir, _ := homedir.Dir()
+			metaDir = dir + "/.config/andesite"
+
+		} else {
+			metaDir = s + "/.andesite"
+		}
+		if !DoesFileExist(metaDir) {
+			Log("Configuration directory does not exist, creating!")
+			os.Mkdir(metaDir, os.ModeDir)
+		}
 	// case RootTypeHttp:
 	// 	rootDir = HttpRoot{*flagRoot}
 	// 	s, _ := filepath.Abs(*flagMeta)
@@ -76,7 +87,8 @@ func main() {
 	default:
 		DieOnError(E("Invalid root type"))
 	}
-	DieOnError(Assert(DoesFileExist(metaDir), ".andesite folder does not exist!"))
+
+	util.Log("Reading configuration info from", metaDir)
 	util.Log("Starting in " + rootDir.Base())
 
 	//
