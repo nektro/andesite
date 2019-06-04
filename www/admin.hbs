@@ -5,75 +5,107 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Andesite Admin Panel</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-        <link rel="stylesheet" href="{{base}}assets/theme-default/css/style.min.css">
-        <script type="module" src="{{base}}assets/theme-default/js/x-switch.js"></script>
+        <!---->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.css" integrity="sha256-S4n5rcKkPwT9YZGXPue8OorJ7GCPxBA5o/Z0ALWXyHs=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.js" integrity="sha256-x9fzgXT3ttK2cZF12FIafkDJzEqqLnaWcchT+Y/plJ4=" crossorigin="anonymous"></script>
+        <!---->
+        <style>
+            body > div {
+                margin: 1em;
+            }
+            table.table input[type=text] {
+                display: block;
+                width: 100%;
+                padding: .4em .8em;
+                border: 1px solid rgba(0, 0, 0, .3);
+                border-radius: .2em;
+            }
+            table.table input[type=text][name=snowflake] {
+                min-width: 13em
+            }
+            table.table input[type=text][name=name] {
+                min-width: 15em
+            }
+            table.table input[type=text][name=hash] {
+                min-width: 20em;
+            }
+        </style>
     </head>
-    <body data-page="/admin">
-        <h1>Andesite Admin Panel</h1>
-        <p>Welcome, {{name}} ({{user}})</p>
-        <div class="flex row">
-            <div class="flex row">
-                <a class="btn" href="{{base}}files/">Back to Files</a>
-            </div>
-            <div class="grow"></div>
-            <div class="flex row">
-                <div class="toggle">
-                    <span class="fa fa-fw fa-sun-o"></span>
-                    <x-switch data-mode="dark"></x-switch>
-                    <span class="fa fa-fw fa-moon-o"></span>
-                </div>
-            </div>
+    <body>
+        <div class="ui main menu">
+            <div class="header item">Welcome, {{name}}</div>
+            <div class="item">{{user}}</div>
+            <div class="item"><a href="./files/">Back to Files</a></div>
+            <div class="right item">Powered by&nbsp;<a href="https://github.com/nektro/andesite" target="_blank">Andesite</a></div>
         </div>
-        <hr>
-        <details open id="tab_users">
-            <summary>User Access</summary>
-            <ul class="datalist">
-            {{#each accesses}}
-                <li>
-                    <form method="POST">
-                        <input type="hidden" name="id" value="{{id}}">
-                        <input type="text" name="snowflake" placeholder="User Snowflake" value="{{snowflake}}">
-                        <input type="text" name="name" placeholder="{User Name}" value="{{name}}" readonly>
-                        <input type="text" name="path" placeholder="Path" value="{{path}}">
-                        <button class="btn" formaction="{{base}}api/access/update">Update</button>
-                        <button class="btn" formaction="{{base}}api/access/delete">Delete</button>
-                    </form>
-                </li>
-            {{/each}}
-                <hr>
-                <li>
-                    <form method="POST">
-                        <input type="text" name="snowflake" placeholder="User Snowflake">
-                        <input type="text" name="path" placeholder="Path">
-                        <button class="btn" formaction="{{base}}api/access/create">Add Access</button>
-                    </form>
-                </li>
-            </ul>
-        </details>
-        <details open id="tab_shares">
-            <summary>Share Links</summary>
-            <ul class="datalist">
-            {{#each shares}}
-                <li>
-                    <form method="POST">
-                        <input type="hidden" name="id" value="{{id}}">
-                        <input type="text" name="hash" value="{{hash}}" readonly>
-                        <input type="text" name="path" placeholder="Path" value="{{path}}">
-                        <button class="btn" formaction="{{base}}api/share/update">Update</button>
-                        <button class="btn" formaction="{{base}}api/share/delete">Delete</button>
-                        <span><a href="./open/{{hash}}{{path}}" target="_blank">Open</a></span>
-                    </form>
-                </li>
-            {{/each}}
-                <hr>
-                <li>
-                    <form method="POST">
-                        <input type="text" name="path" placeholder="Path">
-                        <button class="btn" formaction="{{base}}api/share/create">Create Link</button>
-                    </form>
-                </li>
-            </ul>
-        </details>
+        <div>
+            <h1 class="ui header">Andesite Admin Panel</h1>
+            <details open id="tab_users">
+                <summary>User Access</summary>
+                <table class="ui compact table">
+                    <thead>
+                        <th class="collapsing">Snowflake</th>
+                        <th class="collapsing">User Name</th>
+                        <th>Path</th>
+                        <th class="collapsing"></th>
+                        <th class="collapsing"></th>
+                    </thead>
+                    <tbody>
+                        {{#each accesses}}
+                        <tr>
+                            <form method="POST">
+                                <input type="hidden" name="id" value="{{id}}">
+                                <td><input type="text" name="snowflake" placeholder="User Snowflake" value="{{snowflake}}"></td>
+                                <td><input type="text" name="name" placeholder="{User Name}" value="{{name}}" readonly></td>
+                                <td><input type="text" name="path" placeholder="Path" value="{{path}}"></td>
+                                <td><button class="ui button" formaction="./api/access/update">Update</button></td>
+                                <td><button class="ui button" formaction="./api/access/delete">Delete</button></td>
+                            </form>
+                        </tr>
+                        {{/each}}
+                        <tr>
+                            <form method="POST">
+                                <td><input type="text" name="snowflake" placeholder="User Snowflake"></td>
+                                <td colspan="2"><input type="text" name="path" placeholder="Path"></td>
+                                <td colspan="2"><button class="ui button" formaction="./api/access/create">Add Access</button></td>
+                            </form>
+                        </tr>
+                    </tbody>
+                </table>
+            </details>
+            <details open id="tab_shares">
+                <summary>Share Links</summary>
+                <table class="ui compact table">
+                    <thead>
+                        <th class="collapsing">Hash</th>
+                        <th>Path</th>
+                        <th class="collapsing"></th>
+                        <th class="collapsing"></th>
+                        <th class="collapsing"></th>
+                    </thead>
+                    <tbody>
+                        {{#each shares}}
+                        <tr>
+                            <form method="POST">
+                                <input type="hidden" name="id" value="{{id}}">
+                                <td><input type="text" name="hash" value="{{hash}}" readonly></td>
+                                <td><input type="text" name="path" placeholder="Path" value="{{path}}"></td>
+                                <td><button class="ui button" formaction="./api/share/update">Update</button></td>
+                                <td><button class="ui button" formaction="./api/share/delete">Delete</button></td>
+                                <td><a href="./open/{{hash}}{{path}}" target="_blank">Open</a></td>
+                            </form>
+                        </tr>
+                        {{/each}}
+                        <tr>
+                            <form method="POST">
+                                <td colspan="2"><input type="text" name="path" placeholder="Path"></td>
+                                <td colspan="2"><button class="ui button" formaction="./api/share/create">Create Link</button></td>
+                            </form>
+                        </tr>
+                    </tbody>
+                </table>
+            </details>
+        </div>
     </body>
 </html>
