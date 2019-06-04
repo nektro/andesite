@@ -20,7 +20,6 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/types"
-	"github.com/nektro/go-util/util"
 	"github.com/nektro/go.etc"
 	"github.com/nektro/go.oauth2"
 
@@ -49,7 +48,7 @@ var (
 )
 
 func main() {
-	util.Log("Initializing Andesite...")
+	Log("Initializing Andesite...")
 
 	flagRoot := flag.String("root", "", "Path of root directory for files")
 	flagPort := flag.Int("port", 8000, "Port to open server on")
@@ -88,8 +87,8 @@ func main() {
 		DieOnError(E("Invalid root type"))
 	}
 
-	util.Log("Reading configuration info from", metaDir)
-	util.Log("Starting in " + rootDir.Base())
+	Log("Reading configuration info from", metaDir)
+	Log("Starting in " + rootDir.Base())
 
 	//
 	// discover OAuth2 config info
@@ -141,11 +140,11 @@ func main() {
 			aid := database.QueryNextID("access")
 			queryDoAddUser(uid, *flagAdmin, true, "")
 			database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, uid))
-			util.Log(F("Added user %s as an admin", *flagAdmin))
+			Log(F("Added user %s as an admin", *flagAdmin))
 		} else {
 			if !uu.admin {
 				database.QueryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.id), 10))
-				util.Log(F("Set user '%s's status to admin", uu.snowflake))
+				Log(F("Set user '%s's status to admin", uu.snowflake))
 			}
 		}
 	}
@@ -177,11 +176,11 @@ func main() {
 
 	go func() {
 		sig := <-gracefulStop
-		util.Log(F("Caught signal '%+v'", sig))
-		util.Log("Gracefully shutting down...")
+		Log(F("Caught signal '%+v'", sig))
+		Log("Gracefully shutting down...")
 
 		database.Close()
-		util.Log("Saved database to disk")
+		Log("Saved database to disk")
 
 		os.Exit(0)
 	}()
@@ -216,7 +215,7 @@ func main() {
 	http.HandleFunc("/api/share/delete", mw(handleShareDelete))
 	http.HandleFunc("/logout", mw(handleLogout))
 
-	util.Log("Initialization complete. Starting server on port " + p)
+	Log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
 }
 
