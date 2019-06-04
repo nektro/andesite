@@ -56,7 +56,6 @@ func main() {
 	flagTheme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
 	flagBase := flag.String("base", "/", "")
 	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
-	flagUseHome := flag.Bool("use-home", false, "When true, will place config folder in ~/.config/andesite")
 	// flagMeta := flag.String("meta", "", "")
 	flag.Parse()
 
@@ -69,12 +68,11 @@ func main() {
 		rootDir = FsRoot{*flagRoot}
 		s, _ := filepath.Abs(*flagRoot)
 		DieOnError(Assert(DoesFileExist(s), "Please pass a valid directory as a --root parameter!"))
-		if *flagUseHome {
+
+		metaDir = s + "/.andesite"
+		if !DoesFileExist(metaDir) {
 			dir, _ := homedir.Dir()
 			metaDir = dir + "/.config/andesite"
-
-		} else {
-			metaDir = s + "/.andesite"
 		}
 		if !DoesFileExist(metaDir) {
 			Log("Configuration directory does not exist, creating!")
