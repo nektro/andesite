@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/nektro/go.oauth2"
 )
 
 //
@@ -58,20 +60,23 @@ const (
 )
 
 type Config struct {
-	Root      string     `json:"root"`
-	Port      int        `json:"port"`
-	Themes    []string   `json:"themes"`
-	HTTPBase  string     `json:"base"`
-	Auth      string     `json:"auth"`
-	Discord   *ConfigIDP `json:"discord"`
-	Reddit    *ConfigIDP `json:"reddit"`
-	GitHub    *ConfigIDP `json:"github"`
-	Google    *ConfigIDP `json:"google"`
-	Facebook  *ConfigIDP `json:"facebook"`
-	Microsoft *ConfigIDP `json:"microsoft"`
+	Root      string            `json:"root"`
+	Port      int               `json:"port"`
+	Themes    []string          `json:"themes"`
+	HTTPBase  string            `json:"base"`
+	Auth      string            `json:"auth"`
+	Discord   *ConfigIDP        `json:"discord"`
+	Reddit    *ConfigIDP        `json:"reddit"`
+	GitHub    *ConfigIDP        `json:"github"`
+	Google    *ConfigIDP        `json:"google"`
+	Facebook  *ConfigIDP        `json:"facebook"`
+	Microsoft *ConfigIDP        `json:"microsoft"`
+	Providers []oauth2.Provider `json:"providers"`
+	CustomIds []ConfigIDP       `json:"custom"`
 }
 
 type ConfigIDP struct {
+	Auth   string `json:"auth"`
 	ID     string `json:"id"`
 	Secret string `json:"secret"`
 }

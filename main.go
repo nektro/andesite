@@ -115,16 +115,37 @@ func main() {
 	if len(config.Auth) == 0 {
 		config.Auth = "discord"
 	}
-	if _, ok := Oauth2Providers[config.Auth]; ok {
+	if cfp, ok := Oauth2Providers[config.Auth]; ok {
 		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*ConfigIDP)
 		DieOnError(Assert(cidp.ID != "", F("config.json[%s][id] must not be empty!", config.Auth)))
 		DieOnError(Assert(cidp.Secret != "", F("config.json[%s][secret] must not be empty!", config.Auth)))
 		oauth2AppConfig = cidp
+		oauth2Provider = cfp
 	} else {
-		DieOnError(E(F("Invalid OAuth2 Client type '%s'", config.Auth)))
+		foundP := false
+		for _, item := range config.Providers {
+			if item.ID == config.Auth {
+				oauth2Provider = Oauth2Provider{item, config.Auth}
+				foundP = true
+				break
+			}
+		}
+		if !foundP {
+			DieOnError(E(F("Unable to find OAuth2 app type '%s' in config.json", config.Auth)))
+		}
+		//
+		foundI := false
+		for _, item := range config.CustomIds {
+			if item.Auth == config.Auth {
+				oauth2AppConfig = &item
+				foundI = true
+				break
+			}
+		}
+		if !foundI {
+			DieOnError(E(F("Unable to find OAuth2 client config for '%s' config.json", config.Auth)))
+		}
 	}
-
-	oauth2Provider = Oauth2Providers[config.Auth]
 
 	//
 	// database initialization
