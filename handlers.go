@@ -32,6 +32,7 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 	sess.Values["name"] = name
 	sess.Save(r, w)
 	queryAssertUserName(id, name)
+	Log("[user-login]", provider, id, name)
 }
 
 // handler for http://andesite/test
