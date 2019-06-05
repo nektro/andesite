@@ -51,22 +51,39 @@ func main() {
 	Log("Initializing Andesite...")
 
 	flagRoot := flag.String("root", "", "Path of root directory for files")
-	flagPort := flag.Int("port", 8000, "Port to open server on")
-	flagAdmin := flag.String("admin", "", "Discord User ID of the user that is distinguished as the site owner")
-	flagTheme := flag.String("theme", "", "Name of the custom theme to use for the HTML pages")
-	flagBase := flag.String("base", "/", "")
+	flagPort := flag.Int("port", 0, "Port to open server on")
+	flagAdmin := flag.String("admin", "", "Discord User ID of the user that is distinguished as a site owner")
+	flagTheme := flag.StringArray("theme", []string{}, "Name of the custom theme to use for the HTML pages")
+	flagBase := flag.String("base", "", "")
 	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
 	// flagMeta := flag.String("meta", "", "")
 	flag.Parse()
+
+	//
+	// parse options and find config
+
+	var cff *Config
+	if *flagRoot == "" {
+		dir, _ := homedir.Dir()
+		md := dir + "/.config/andesite"
+		cf := md + "/config.json"
+		if DoesFileExist(md) {
+			etc.InitConfig(cf, &cff)
+		}
+	}
+
+	opRoot := findFirstNonEmpty(*flagRoot, cff.Root)
+	opPort := findFirstNonZero(*flagPort, cff.Port, 8000)
+	opBase := findFirstNonEmpty(*flagBase, cff.HTTPBase, "/")
 
 	//
 	// configure root dir
 
 	switch RootDirType(*flagRType) {
 	case RootTypeDir:
-		DieOnError(Assert(*flagRoot != "", "Please pass a valid directory as a --root parameter!"))
-		rootDir = FsRoot{*flagRoot}
-		s, _ := filepath.Abs(*flagRoot)
+		DieOnError(Assert(opRoot != "", "Please pass a valid directory as a --root parameter!"))
+		rootDir = FsRoot{opRoot}
+		s, _ := filepath.Abs(opRoot)
 		DieOnError(Assert(DoesFileExist(s), "Please pass a valid directory as a --root parameter!"))
 
 		metaDir = s + "/.andesite"
@@ -79,7 +96,7 @@ func main() {
 			os.Mkdir(metaDir, os.ModeDir)
 		}
 	// case RootTypeHttp:
-	// 	rootDir = HttpRoot{*flagRoot}
+	// 	rootDir = HttpRoot{opRoot}
 	// 	s, _ := filepath.Abs(*flagMeta)
 	// 	metaDir = s
 	default:
@@ -153,22 +170,8 @@ func main() {
 	}
 
 	//
-	// theme check from (optional) CLI argument
-
-	themeRootPath := ""
-	themeDirName := ""
-	if *flagTheme != "" {
-		stheme := *flagTheme
-		themeDirName = "theme-" + stheme
-		themeRootPath = metaDir + themeDirName + "/"
-		fi, err := os.Stat(themeRootPath)
-		DieOnError(err, "Theme directory must exist if the --theme option is present")
-		DieOnError(Assert(fi.IsDir(), "Theme directory must be a directory!"))
-	}
-
-	//
 	// set HTTP base dir
-	httpBase = *flagBase
+	httpBase = opBase
 
 	//
 	// graceful stop
@@ -189,14 +192,28 @@ func main() {
 	}()
 
 	//
-	etc.SetSessionName("session_andesite_test")
+	// http server pre-setup
 
-	p := strconv.Itoa(*flagPort)
+	etc.SetSessionName("session_andesite_test")
+	p := strconv.Itoa(opPort)
 	dirs := []http.FileSystem{}
 
-	if themeRootPath != "" {
-		dirs = append(dirs, http.Dir(themeRootPath))
+	//
+	// theme setup
+
+	for _, item := range *flagTheme {
+		loc := metaDir + "/themes/" + item
+		DieOnError(Assert(DoesDirectoryExist(loc), F("'%s' does not exist!", loc)))
+		dirs = append(dirs, http.Dir(loc))
 	}
+	for _, item := range cff.Themes {
+		loc := metaDir + "/themes/" + item
+		DieOnError(Assert(DoesDirectoryExist(loc), F("'%s' does not exist!", loc)))
+		dirs = append(dirs, http.Dir(loc))
+	}
+
+	//
+	// http server setup and launch
 
 	mw := chainMiddleware(mwAddAttribution)
 	dirs = append(dirs, http.Dir("www"))
@@ -427,4 +444,22 @@ func findStructValueWithTag(item interface{}, ttype string, tag string) reflect.
 		}
 	}
 	return reflect.Zero(nil)
+}
+
+func findFirstNonEmpty(values ...string) string {
+	for _, item := range values {
+		if len(item) > 0 {
+			return item
+		}
+	}
+	return ""
+}
+
+func findFirstNonZero(values ...int) int {
+	for _, item := range values {
+		if item != 0 {
+			return item
+		}
+	}
+	return 0
 }

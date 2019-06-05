@@ -58,6 +58,10 @@ const (
 )
 
 type Config struct {
+	Root      string     `json:"root"`
+	Port      int        `json:"port"`
+	Themes    []string   `json:"themes"`
+	HTTPBase  string     `json:"base"`
 	Auth      string     `json:"auth"`
 	Discord   *ConfigIDP `json:"discord"`
 	Reddit    *ConfigIDP `json:"reddit"`
