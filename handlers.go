@@ -14,10 +14,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nektro/go-util/util"
 	"github.com/nektro/go.etc"
 
 	. "github.com/nektro/go-util/alias"
+	. "github.com/nektro/go-util/util"
 )
 
 func helperIsLoggedIn(r *http.Request) bool {
@@ -290,7 +290,7 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	aid := database.QueryNextID("shares")
-	ahs1 := md5.Sum([]byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(int64(aid), 10), util.GetIsoDateTime())))
+	ahs1 := md5.Sum([]byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(int64(aid), 10), GetIsoDateTime())))
 	ahs2 := hex.EncodeToString(ahs1[:])
 	fpath := r.PostForm.Get("path")
 	//
