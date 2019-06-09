@@ -209,6 +209,7 @@ func main() {
 		database.Close()
 		Log("Saved database to disk")
 
+		Log("Done!")
 		os.Exit(0)
 	}()
 
