@@ -82,8 +82,8 @@ func main() {
 	switch RootDirType(*flagRType) {
 	case RootTypeDir:
 		DieOnError(Assert(opRoot != "", "Please pass a valid directory as a --root parameter!"))
-		rootDir = FsRoot{opRoot}
 		s, _ := filepath.Abs(opRoot)
+		rootDir = FsRoot{s}
 		DieOnError(Assert(DoesFileExist(s), "Please pass a valid directory as a --root parameter!"))
 
 		metaDir = s + "/.andesite"
