@@ -122,7 +122,7 @@ When making a pull request, please have it be associated with an issue and make 
 ## Contact
 - hello@nektro.net
 - Meghan#2032 on discordapp.com
-- @nektro on twitter.com and mastodon.social
+- https://twitter.com/nektro
 
 ## License
 Apache 2.0
