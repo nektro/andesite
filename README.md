@@ -27,9 +27,10 @@ Go to the developers dashboard of your choosing for the authentication platform 
 | Facebook | `facebook` | https://developers.facebook.com/apps/ |
 | Microsoft | `microsoft` | https://apps.dev.microsoft.com/ |
 
-Once there, create an application and obtain the Client ID and Client Secret. Here you can also fill out a picture and description that will be displayed during the authorization of users on your chosen Identity Provider. When prompted for the "Redirect URI" during the app setup process, the URL to use will be `http://andesite/callback`, replacing `andesite` with any origins you wish Andesite to be usable from, such as `example.com` or `localhost`.
 
-Once you have finished the app creation process and obtained the Client ID and Client Secret, create a folder in the root of the directory you will be serving with the name `.andesite`. If your file manager does not allow you to do this at first, you can open a command prompt/terminal and run `mkdir .andesite`.
+Once there, create an application and obtain the Client ID and Client Secret. Here you can also fill out a picture and description that will be displayed during the authorization of users on your chosen Identity Provider. When prompted for the "Redirect URI" during the app setup process, the URL to use will be `http://andesite/callback`, replacing `andesite` with any origins you wish Andesite to be usable from, such as `example.com` or `localhost:800`.
+
+Once you have finished the app creation process and obtained the Client ID and Client Secret, create a folder in your home directory at the path of `~/.config/andesite/`. All of Andesite's config and local save files will go here. This directory will be referred to at `.andesite` going forward.
 
 In the `.andesite` folder make a `config.json` file and put the following data inside, replacing `AUTH` with whichever Identity Provider you chose, such as `discord`, `reddit`, etc. And `CLIENT_ID` and `CLIENT_SECRET` with their respective values. Do not worry, this folder will remain entirely private, even to users with full access.
 
@@ -63,16 +64,16 @@ $ ./andesite
 > `packr2 build` is used here over `go build` so that `packr2` can generate the resources necessary to embed the static resources into the resulting binary. This will allow the Andesite program to be run from anywhere.
 
 ### Options
-- --root **Required**
-    - A relative or absolute path to the directory you wish for Andesite to serve
-- --port
-    - The port Andesite will broadcast on. (Default `8000`)
-- --admin
-    - The ID of a user to add as an admin. Only required once. Admin priviledge allows this user to change the path access of other users. The User ID can be obtained from `/files/` once logged in.
-- --theme
-    - The name of the theme you want andesite to use for custom HTML and Handlebars templates.
-- --base
-    - Used when serving andesite from an HTTP root that is not `/`. See [`deployment.md`](docs/deployment.md) for more info. (Default: `/`)
+There are a number of options that are also required and can be used to configure your Andesite instance from within your `config.json`. They are listed here.
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `"root"` | `string` | **Required.** | A relative or absolute path to where the data root Andesite should serve from is. |
+| `"port"` | `uint` | `8000` | The port to bind to. A webserver will be launched accessible from `localhost:{port}`. |
+| `"theme"` | `[]string` | ` ` | A array of names to load themes from. Read more about themes below. |
+| `"base"` | `string` | `/` | The root path Andesite will be served from. See [`deployment.md`](docs/deployment.md) for more info. |
+| `"providers"` | `[]Provider` | ` ` | An array of custom OAuth2 providers that you may use as your `"auth"`. |
+| `"custom"` | `[]OA2Config` | ` ` | An array of OA2 app configs, that can be used with providers created in `"providers"`. See [`providers.md`](docs/providers.md) for more info. |
 
 ## Themes
 Andesite supports making custom themes for the splash page and the various HTML templates throughout the program. Those are:
