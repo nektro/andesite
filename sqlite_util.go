@@ -8,6 +8,12 @@ import (
 	. "github.com/nektro/go-util/util"
 )
 
+func scanUser(rows *sql.Rows) UserRow {
+	var v UserRow
+	rows.Scan(&v.id, &v.snowflake, &v.admin, &v.name)
+	return v
+}
+
 func scanAccessRow(rows *sql.Rows) UserAccessRow {
 	var v UserAccessRow
 	rows.Scan(&v.id, &v.user, &v.path)
@@ -33,7 +39,7 @@ func queryUserBySnowflake(snowflake string) (UserRow, bool) {
 	if !rows.Next() {
 		return ur, false
 	}
-	rows.Scan(&ur.id, &ur.snowflake, &ur.admin, &ur.name)
+	ur = scanUser(rows)
 	rows.Close()
 	ur.snowflake = ur.snowflake[len(oauth2Provider.dbp):]
 	return ur, true
