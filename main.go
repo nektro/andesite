@@ -206,8 +206,10 @@ func main() {
 		Log(F("Caught signal '%+v'", sig))
 		Log("Gracefully shutting down...")
 
+		Log("Saving database to disk")
 		database.Close()
-		Log("Saved database to disk")
+		Log("Closing filesystem watcher")
+		watcher.Close()
 
 		Log("Done!")
 		os.Exit(0)
