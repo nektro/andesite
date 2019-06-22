@@ -216,7 +216,7 @@ func main() {
 	//
 	// http server pre-setup
 
-	etc.SetSessionName("session_andesite_test")
+	etc.SetSessionName("session_andesite")
 	p := strconv.Itoa(opPort)
 	dirs := []http.FileSystem{}
 
