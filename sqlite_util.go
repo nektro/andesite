@@ -1,19 +1,27 @@
 package main
 
 import (
+	"database/sql"
 	"strconv"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
 )
 
+func scanAccessRow(rows *sql.Rows) UserAccessRow {
+	var v UserAccessRow
+	rows.Scan(&v.id, &v.user, &v.path)
+	return v
+}
+
+//
+//
+
 func queryAccess(user UserRow) []string {
 	result := []string{}
 	rows := database.Query(false, F("select * from access where user = '%d'", user.id))
 	for rows.Next() {
-		var rau UserAccessRow
-		rows.Scan(&rau.id, &rau.user, &rau.path)
-		result = append(result, rau.path)
+		result = append(result, scanAccessRow(rows).path)
 	}
 	rows.Close()
 	return result
