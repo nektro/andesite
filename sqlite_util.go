@@ -60,10 +60,13 @@ func queryUserByID(id int) (UserRow, bool) {
 func queryAllAccess() []map[string]string {
 	var result []map[string]string
 	rows := database.Query(false, "select * from access")
-	ids := map[int][]string{}
+	accs := []UserAccessRow{}
 	for rows.Next() {
-		var uar UserAccessRow
-		rows.Scan(&uar.id, &uar.user, &uar.path)
+		accs = append(accs, scanAccessRow(rows))
+	}
+	rows.Close()
+	ids := map[int][]string{}
+	for _, uar := range accs {
 		if _, ok := ids[uar.user]; !ok {
 			uu, _ := queryUserByID(uar.user)
 			ids[uar.user] = []string{uu.snowflake, uu.name}
@@ -76,7 +79,6 @@ func queryAllAccess() []map[string]string {
 			"path":      uar.path,
 		})
 	}
-	rows.Close()
 	return result
 }
 
