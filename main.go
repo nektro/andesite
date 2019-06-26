@@ -94,10 +94,11 @@ func main() {
 		if !DoesFileExist(metaDir) {
 			dir, _ := homedir.Dir()
 			metaDir = dir + "/.config/andesite"
-		}
-		if !DoesFileExist(metaDir) {
-			Log("Configuration directory does not exist, creating!")
-			os.Mkdir(metaDir, os.ModeDir)
+
+			if !DoesFileExist(metaDir) {
+				Log("Configuration directory does not exist, creating!")
+				os.Mkdir(metaDir, os.ModeDir)
+			}
 		}
 	// case RootTypeHttp:
 	// 	rootDir = HttpRoot{opRoot}
