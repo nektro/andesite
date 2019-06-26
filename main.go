@@ -99,8 +99,8 @@ func main() {
 		DieOnError(Assert(opRoot != "", "Please pass a directory as a root parameter!"))
 		s, _ := filepath.Abs(opRoot)
 		log.Log(logger.LevelDEBUG, "Trying root dir:", s)
+		DieOnError(Assert(DoesDirectoryExist(s), "Please pass a valid directory as a root parameter!"))
 		rootDir = FsRoot{s}
-		DieOnError(Assert(DoesFileExist(s), "Please pass a valid directory as a root parameter!"))
 
 		metaDir = s + "/.andesite"
 		if !DoesFileExist(metaDir) {
