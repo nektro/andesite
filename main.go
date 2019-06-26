@@ -59,7 +59,6 @@ func main() {
 	flagTheme := flag.StringArray("theme", []string{}, "Name of the custom theme to use for the HTML pages")
 	flagBase := flag.String("base", "", "")
 	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
-	// flagMeta := flag.String("meta", "", "")
 	flagLLevel := flag.Int("log-level", int(logger.LevelINFO), "Logging level to be used for github.com/nektro/go-util/logger")
 	flag.Parse()
 
