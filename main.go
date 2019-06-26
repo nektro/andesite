@@ -70,6 +70,9 @@ func main() {
 		cf := md + "/config.json"
 		if DoesFileExist(md) {
 			etc.InitConfig(cf, &cff)
+		} else {
+			c := Config{}
+			cff = &c
 		}
 	}
 
