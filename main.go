@@ -96,7 +96,7 @@ func main() {
 	switch RootDirType(*flagRType) {
 	case RootTypeDir:
 		DieOnError(Assert(opRoot != "", "Please pass a directory as a root parameter!"))
-		s, _ := filepath.Abs(opRoot)
+		s, _ := filepath.Abs(filepath.Clean(strings.Replace(opRoot, "~", homedir, -1)))
 		log.Log(logger.LevelDEBUG, "Trying root dir:", s)
 		DieOnError(Assert(DoesDirectoryExist(s), "Please pass a valid directory as a root parameter!"))
 		rootDir = FsRoot{s}
