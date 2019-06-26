@@ -76,9 +76,11 @@ func main() {
 		log.Log(logger.LevelDEBUG, "Trying to read initial configuration from arguments and", cf)
 		if DoesFileExist(md) {
 			etc.InitConfig(cf, &cff)
+			log.Log(logger.LeveLTRACE, "Found!", cff)
 		} else {
 			c := Config{}
 			cff = &c
+			log.Log(logger.LeveLTRACE, "Falling back!", cff)
 		}
 	}
 
