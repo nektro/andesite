@@ -42,10 +42,10 @@
         <div class="ui main menu">
             <div class="header item">Welcome, {{name}}</div>
             <div class="item">{{user}}</div>
-                {{#if admin}}
-                <div class="item"><a href="{{base}}admin">Admin Panel</a></div>
-                {{/if}}
             <div class="item"><a href="{{base}}search"><i class="search icon"></i> Search</a></div>
+            {{#if admin}}
+            <div class="item"><a href="{{base}}admin">Admin Panel</a></div>
+            {{/if}}
             <div class="right item">Powered by&nbsp;<a href="https://github.com/nektro/andesite" target="_blank">Andesite</a></div>
         </div>
         <div>
