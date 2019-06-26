@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -216,6 +217,10 @@ func main() {
 	}()
 
 	//
+	// initialize filesystem watching
+	go initFsWatcher()
+
+	//
 	// http server pre-setup
 
 	etc.SetSessionName("session_andesite")
@@ -258,6 +263,8 @@ func main() {
 	http.HandleFunc("/api/share/update", mw(handleShareUpdate))
 	http.HandleFunc("/api/share/delete", mw(handleShareDelete))
 	http.HandleFunc("/logout", mw(handleLogout))
+	http.HandleFunc("/search", mw(handleSearch))
+	http.HandleFunc("/api/search", mw(handleSearchAPI))
 
 	Log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
@@ -486,4 +493,10 @@ func findFirstNonZero(values ...int) int {
 		}
 	}
 	return 0
+}
+
+func writeJSON(w http.ResponseWriter, data map[string]interface{}) {
+	w.Header().Add("content-type", "application/json")
+	bytes, _ := json.Marshal(data)
+	w.Write(bytes)
 }

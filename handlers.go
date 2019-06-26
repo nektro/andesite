@@ -365,3 +365,67 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	sess.Save(r, w)
 	writeResponse(r, w, "Success", "Successfully logged out.", "")
 }
+
+func handleSearch(w http.ResponseWriter, r *http.Request) {
+	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	if errr != nil {
+		return
+	}
+	//
+	writeHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
+		"user": user.snowflake,
+		"base": httpBase,
+		"name": oauth2Provider.idp.NamePrefix + user.name,
+	})
+}
+
+func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
+	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	if errr != nil {
+		writeJSON(w, map[string]interface{}{
+			"response": "bad",
+			"message":  errr.Error(),
+		})
+		return
+	}
+	p := r.URL.Query()["q"]
+	if len(p) == 0 || len(p[0]) == 0 {
+		writeJSON(w, map[string]interface{}{
+			"response": "bad",
+			"message":  "'q' parameter is required",
+		})
+		return
+	}
+	//
+	v0 := p[0]
+	v1 := strings.Replace(v0, "!", "!!", -1)
+	v2 := strings.Replace(v1, "%", "!%", -1)
+	v3 := strings.Replace(v2, "_", "!_", -1)
+	v4 := strings.Replace(v3, "[", "![", -1)
+	a := []WatchedFile{}
+	ua := queryAccess(user)
+	q := database.QueryPrepared(false, "select * from files where path like ? escape '!'", "%"+v4+"%")
+	for q.Next() {
+		wf := scanFile(q)
+		wf.URL = httpBase + "files" + wf.Path
+		//
+		if strings.Contains(wf.Path, "/.") {
+			continue
+		}
+		for _, item := range ua {
+			if strings.HasPrefix(wf.Path, item) {
+				a = append(a, wf)
+				break
+			}
+		}
+		if len(a) == 25 {
+			break
+		}
+	}
+	q.Close()
+	writeJSON(w, map[string]interface{}{
+		"response": "good",
+		"count":    len(a),
+		"results":  a,
+	})
+}
