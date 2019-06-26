@@ -68,6 +68,7 @@ func main() {
 		dir, _ := homedir.Dir()
 		md := dir + "/.config/andesite"
 		cf := md + "/config.json"
+		Log("Trying to read initial configuration from", cf)
 		if DoesFileExist(md) {
 			etc.InitConfig(cf, &cff)
 		} else {
