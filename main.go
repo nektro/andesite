@@ -66,11 +66,11 @@ func main() {
 	// parse options and find config
 
 	log.Level = logger.LogLevel(*flagLLevel)
+	homedir, _ := homedir.Dir()
 
 	var cff *Config
 	if *flagRoot == "" {
-		dir, _ := homedir.Dir()
-		md := dir + "/.config/andesite"
+		md := homedir + "/.config/andesite"
 		cf := md + "/config.json"
 		log.Log(logger.LevelDEBUG, "Trying to read initial configuration from arguments and", cf)
 		if DoesFileExist(md) {
@@ -103,8 +103,7 @@ func main() {
 
 		metaDir = s + "/.andesite"
 		if !DoesFileExist(metaDir) {
-			dir, _ := homedir.Dir()
-			metaDir = dir + "/.config/andesite"
+			metaDir = homedir + "/.config/andesite"
 
 			if !DoesFileExist(metaDir) {
 				log.Log(logger.LevelINFO, "Configuration directory does not exist, creating!")
