@@ -60,10 +60,13 @@ func main() {
 	flagBase := flag.String("base", "", "")
 	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
 	// flagMeta := flag.String("meta", "", "")
+	flagLLevel := flag.Int("log-level", int(logger.LevelINFO), "Logging level to be used for github.com/nektro/go-util/logger")
 	flag.Parse()
 
 	//
 	// parse options and find config
+
+	log.Level = logger.LogLevel(*flagLLevel)
 
 	var cff *Config
 	if *flagRoot == "" {
