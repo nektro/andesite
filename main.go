@@ -19,6 +19,7 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/mitchellh/go-homedir"
+	"github.com/nektro/go-util/logger"
 	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/types"
 	"github.com/nektro/go.etc"
@@ -46,10 +47,11 @@ var (
 	metaDir         string
 	randomKey       = securecookie.GenerateRandomKey(32)
 	store           = sessions.NewCookieStore(randomKey)
+	log             = logger.New()
 )
 
 func main() {
-	Log("Initializing Andesite...")
+	log.Log(logger.LevelINFO, "Initializing Andesite...")
 
 	flagRoot := flag.String("root", "", "Path of root directory for files")
 	flagPort := flag.Int("port", 0, "Port to open server on")
@@ -68,7 +70,7 @@ func main() {
 		dir, _ := homedir.Dir()
 		md := dir + "/.config/andesite"
 		cf := md + "/config.json"
-		Log("Trying to read initial configuration from", cf)
+		log.Log(logger.LevelDEBUG, "Trying to read initial configuration from arguments and", cf)
 		if DoesFileExist(md) {
 			etc.InitConfig(cf, &cff)
 		} else {
@@ -78,8 +80,11 @@ func main() {
 	}
 
 	opRoot := findFirstNonEmpty(*flagRoot, cff.Root)
+	log.Log(logger.LevelDEBUG, "Discovered option:", "--root", opRoot)
 	opPort := findFirstNonZero(*flagPort, cff.Port, 8000)
+	log.Log(logger.LevelDEBUG, "Discovered option:", "--port", opPort)
 	opBase := findFirstNonEmpty(*flagBase, cff.HTTPBase, "/")
+	log.Log(logger.LevelDEBUG, "Discovered option:", "--base", opBase)
 
 	//
 	// configure root dir
@@ -97,7 +102,7 @@ func main() {
 			metaDir = dir + "/.config/andesite"
 
 			if !DoesFileExist(metaDir) {
-				Log("Configuration directory does not exist, creating!")
+				log.Log(logger.LevelINFO, "Configuration directory does not exist, creating!")
 				os.Mkdir(metaDir, os.ModeDir)
 			}
 		}
@@ -109,8 +114,8 @@ func main() {
 		DieOnError(E("Invalid root type"))
 	}
 
-	Log("Reading configuration info from", metaDir)
-	Log("Starting in " + rootDir.Base())
+	log.Log(logger.LevelINFO, "Reading configuration info from", metaDir)
+	log.Log(logger.LevelINFO, "Starting in "+rootDir.Base())
 
 	//
 	// discover OAuth2 config info
@@ -181,18 +186,18 @@ func main() {
 		if !ok {
 			uid := database.QueryNextID("users")
 			queryDoAddUser(uid, *flagAdmin, true, "")
-			Log(F("Added user %s as an admin", *flagAdmin))
+			log.Log(logger.LevelINFO, F("Added user %s as an admin", *flagAdmin))
 		} else {
 			if !uu.admin {
 				database.QueryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.id), 10))
-				Log(F("Set user '%s's status to admin", uu.snowflake))
+				log.Log(logger.LevelINFO, F("Set user '%s's status to admin", uu.snowflake))
 			}
 		}
 		nu, _ := queryUserBySnowflake(*flagAdmin)
 		if !Contains(queryAccess(nu), "/") {
 			aid := database.QueryNextID("access")
 			database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, nu.id))
-			Log(F("Gave %s root folder access", nu.name))
+			log.Log(logger.LevelINFO, F("Gave %s root folder access", nu.name))
 		}
 	}
 
@@ -209,15 +214,15 @@ func main() {
 
 	go func() {
 		sig := <-gracefulStop
-		Log(F("Caught signal '%+v'", sig))
-		Log("Gracefully shutting down...")
+		log.Log(logger.LevelINFO, F("Caught signal '%+v'", sig))
+		log.Log(logger.LevelINFO, "Gracefully shutting down...")
 
-		Log("Saving database to disk")
+		log.Log(logger.LevelINFO, "Saving database to disk")
 		database.Close()
-		Log("Closing filesystem watcher")
+		log.Log(logger.LevelINFO, "Closing filesystem watcher")
 		watcher.Close()
 
-		Log("Done!")
+		log.Log(logger.LevelINFO, "Done!")
 		os.Exit(0)
 	}()
 
@@ -271,7 +276,7 @@ func main() {
 	http.HandleFunc("/search", mw(handleSearch))
 	http.HandleFunc("/api/search", mw(handleSearchAPI))
 
-	Log("Initialization complete. Starting server on port " + p)
+	log.Log(logger.LevelINFO, "Initialization complete. Starting server on port "+p)
 	http.ListenAndServe(":"+p, nil)
 }
 
