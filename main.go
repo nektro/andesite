@@ -117,6 +117,7 @@ func main() {
 	}
 	if cfp, ok := Oauth2Providers[config.Auth]; ok {
 		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*ConfigIDP)
+		DieOnError(Assert(cidp != nil, F("Authorization keys not set for identity prodvider '%s' in config.json!", config.Auth)))
 		DieOnError(Assert(cidp.ID != "", F("App ID not set for identity prodvider '%s' in config.json!", config.Auth)))
 		DieOnError(Assert(cidp.Secret != "", F("App Secret not set for identity prodvider '%s' in config.json!", config.Auth)))
 		oauth2AppConfig = cidp
