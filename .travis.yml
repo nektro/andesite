@@ -1,0 +1,10 @@
+language: go
+
+go:
+- 1.12.x
+
+go_import_path: github.com/nektro/andesite
+
+before_install:
+- cp .netrc ~/.netrc
+- chmod 600 ~/.netrc
