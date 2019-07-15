@@ -48,20 +48,15 @@ In the `.andesite` folder make a `config.json` file and put the following data i
 
 Run
 ```
-$ go get -u github.com/gobuffalo/packr/v2/packr2
 $ go get -u github.com/nektro/andesite
 ```
 and then make your way to `$GOPATH/src/github.com/nektro/andesite/`.
 
 Once there, run:
 ```
-$ packr2 build
+$ go build
 $ ./andesite
 ```
-
-> `packr2 build`, and by proxy `go build` is used here instead of `go run main.go` because `go run` creates a new binary every time which, since this program is a server, will request a firewall exception on every run. Using `go build` overwrites the same binary `./andesite` over and over again as changes are made.
-
-> `packr2 build` is used here over `go build` so that `packr2` can generate the resources necessary to embed the static resources into the resulting binary. This will allow the Andesite program to be run from anywhere.
 
 ### Options
 There are a number of options that are also required and can be used to configure your Andesite instance from within your `config.json`. They are listed here.
