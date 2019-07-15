@@ -13,9 +13,9 @@ andesite.example.com {
 ### Serving from an HTTP base that is not `/`
 ```caddy
 example.com {
-    proxy /andesite http://localhost:8000/
-    transparent
-    header_upstream Host {host}
+    proxy /andesite http://localhost:8000/ {
+        transparent
+    }
 }
 ```
 Notes:
