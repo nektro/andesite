@@ -133,8 +133,8 @@ func main() {
 	}
 	if cfp, ok := Oauth2Providers[config.Auth]; ok {
 		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*ConfigIDP)
-		DieOnError(Assert(cidp.ID != "", F("config.json[%s][id] must not be empty!", config.Auth)))
-		DieOnError(Assert(cidp.Secret != "", F("config.json[%s][secret] must not be empty!", config.Auth)))
+		DieOnError(Assert(cidp.ID != "", F("App ID not set for identity prodvider '%s' in config.json!", config.Auth)))
+		DieOnError(Assert(cidp.Secret != "", F("App Secret not set for identity prodvider '%s' in config.json!", config.Auth)))
 		oauth2AppConfig = cidp
 		oauth2Provider = cfp
 	} else {
