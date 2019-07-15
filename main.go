@@ -260,7 +260,7 @@ func main() {
 	// http server setup and launch
 
 	mw := chainMiddleware(mwAddAttribution)
-	dirs = append(dirs, http.Dir("www"))
+	dirs = append(dirs, http.Dir("./www/"))
 	dirs = append(dirs, packr.New("", "./www/"))
 	wwFFS = types.MultiplexFileSystem{dirs}
 
