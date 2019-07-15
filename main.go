@@ -69,26 +69,21 @@ func main() {
 	log.Level = logger.LogLevel(*flagLLevel)
 	homedir, _ := homedir.Dir()
 
-	var cff *Config
-	if *flagRoot == "" {
-		md := homedir + "/.config/andesite"
-		cf := md + "/config.json"
-		log.Log(logger.LevelDEBUG, "Trying to read initial configuration from arguments and", cf)
-		if DoesFileExist(md) {
-			etc.InitConfig(cf, &cff)
-			log.Log(logger.LeveLTRACE, "Found!", cff)
-		} else {
-			c := Config{}
-			cff = &c
-			log.Log(logger.LeveLTRACE, "Falling back!", cff)
-		}
-	}
+	metaDir := homedir + "/.config/andesite"
+	configPath := metaDir + "/config.json"
 
-	opRoot := findFirstNonEmpty(*flagRoot, cff.Root)
+	if !DoesFileExist(configPath) {
+		log.Log(logger.LevelDEBUG, "Configuration file does not exist, creating blank!")
+		os.MkdirAll(metaDir, os.ModePerm)
+		ioutil.WriteFile(configPath, []byte("{}"), os.ModePerm)
+	}
+	etc.InitConfig(configPath, &config)
+
+	opRoot := findFirstNonEmpty(*flagRoot, config.Root)
 	log.Log(logger.LevelDEBUG, "Discovered option:", "--root", opRoot)
-	opPort := findFirstNonZero(*flagPort, cff.Port, 8000)
+	opPort := findFirstNonZero(*flagPort, config.Port, 8000)
 	log.Log(logger.LevelDEBUG, "Discovered option:", "--port", opPort)
-	opBase := findFirstNonEmpty(*flagBase, cff.HTTPBase, "/")
+	opBase := findFirstNonEmpty(*flagBase, config.HTTPBase, "/")
 	log.Log(logger.LevelDEBUG, "Discovered option:", "--base", opBase)
 
 	//
@@ -101,16 +96,6 @@ func main() {
 		log.Log(logger.LevelDEBUG, "Trying root dir:", s)
 		DieOnError(Assert(DoesDirectoryExist(s), "Please pass a valid directory as a root parameter!"))
 		rootDir = FsRoot{s}
-
-		metaDir = s + "/.andesite"
-		if !DoesFileExist(metaDir) {
-			metaDir = homedir + "/.config/andesite"
-
-			if !DoesFileExist(metaDir) {
-				log.Log(logger.LevelINFO, "Configuration directory does not exist, creating!")
-				os.Mkdir(metaDir, os.ModeDir)
-			}
-		}
 	// case RootTypeHttp:
 	// 	rootDir = HttpRoot{opRoot}
 	// 	s, _ := filepath.Abs(*flagMeta)
@@ -125,7 +110,6 @@ func main() {
 	//
 	// discover OAuth2 config info
 
-	configPath := metaDir + "/config.json"
 	etc.InitConfig(configPath, &config)
 
 	if len(config.Auth) == 0 {
@@ -250,7 +234,7 @@ func main() {
 		DieOnError(Assert(DoesDirectoryExist(loc), F("'%s' does not exist!", loc)))
 		dirs = append(dirs, http.Dir(loc))
 	}
-	for _, item := range cff.Themes {
+	for _, item := range config.Themes {
 		loc := metaDir + "/themes/" + item
 		DieOnError(Assert(DoesDirectoryExist(loc), F("'%s' does not exist!", loc)))
 		dirs = append(dirs, http.Dir(loc))
