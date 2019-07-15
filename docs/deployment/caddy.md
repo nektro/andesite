@@ -10,12 +10,20 @@ andesite.example.com {
     transparent
 }
 ```
+
+### Using HTTPS
+Modify your proxy setting to a block and add
+```caddy
+proxy / http://localhost:8000/ {
+    header_upstream X-TLS-Enabled true
+}
+```
+
 ### Serving from an HTTP base that is not `/`
 ```caddy
 example.com {
     proxy /andesite http://localhost:8000/
     transparent
-    header_upstream Host {host}
 }
 ```
 Notes:
