@@ -13,4 +13,4 @@ travis:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make build-template
 
 build-template:
-	go build -ldflags="-s -w" -o ./dist/andesite-$(TRAVIS_TAG)-$(GOOS)-$(GOARCH)
+	go build -ldflags="-s -w" -o ./dist/andesite-v$(TRAVIS_TAG)-$(GOOS)-$(GOARCH)
