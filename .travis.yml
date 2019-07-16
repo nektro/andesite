@@ -5,6 +5,8 @@ go:
 
 go_import_path: github.com/nektro/andesite
 
+install: skip
+
 before_deploy:
 - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y.%m.%d')-$(git log --format=%h -1)}
 - git tag $TRAVIS_TAG
