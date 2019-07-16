@@ -7,7 +7,7 @@ build:
 	go build
 
 packages:
-    go get -u -v .
+	go get -u -v .
 
 travis:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make build-template
