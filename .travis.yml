@@ -11,6 +11,11 @@ before_deploy:
 - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y.%m.%d')-$(git log --format=%h -1)}
 - git tag $TRAVIS_TAG
 
+cache:
+  directories:
+  - $HOME/.cache/go-build
+  - $GOPATH
+
 deploy:
   provider: releases
   script:
