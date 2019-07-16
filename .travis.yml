@@ -13,7 +13,9 @@ before_deploy:
 
 deploy:
   provider: releases
-  script: make travis
+  script:
+    - make packages
+    - make travis
   api_key: "${GH_TOKEN}"
   file: dist/*
   skip_cleanup: true
