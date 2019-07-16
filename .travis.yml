@@ -13,11 +13,6 @@ before_deploy:
 - go get -u -v .
 - ./scripts/build_all.sh
 
-cache:
-  directories:
-  - $HOME/.cache/go-build
-  - $GOPATH
-
 deploy:
   provider: releases
   api_key: "${GH_TOKEN}"
