@@ -19,8 +19,8 @@ cache:
 deploy:
   provider: releases
   script:
-    - make packages
-    - make travis
+  - make packages
+  - make travis
   api_key: "${GH_TOKEN}"
   file: dist/*
   skip_cleanup: true
