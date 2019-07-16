@@ -11,10 +11,11 @@ before_deploy:
 - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y.%m.%d')-$(git log --format=%h -1)}
 - git tag $TRAVIS_TAG
 - go get -u -v .
-- ./scripts/build_all.sh
 
 deploy:
   provider: releases
   api_key: "${GH_TOKEN}"
+  script:
+  - bash scripts/build_all.sh
   file: dist/*
   skip_cleanup: true
