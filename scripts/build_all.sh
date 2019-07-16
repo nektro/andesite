@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function build_template() {
+build_template() {
     CGO_ENABLED=0
     GOOS=$1
     GOARCH=$2
