@@ -10,7 +10,6 @@ before_deploy:
 - git config --local user.email "${GIT_EMAIL}"
 - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y.%m.%d')-$(git log --format=%h -1)}
 - git tag $TRAVIS_TAG
-- go get -u -v .
 
 deploy:
   provider: releases
