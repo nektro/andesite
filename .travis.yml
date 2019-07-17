@@ -18,3 +18,6 @@ deploy:
   - bash scripts/build_all.sh
   file: dist/*
   skip_cleanup: true
+  on:
+    branch: master
+    tags: true
