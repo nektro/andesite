@@ -79,25 +79,25 @@ func main() {
 	}
 	etc.InitConfig(configPath, &config)
 
-	opRoot := findFirstNonEmpty(*flagRoot, config.Root)
-	log.Log(logger.LevelDEBUG, "Discovered option:", "--root", opRoot)
-	opPort := findFirstNonZero(*flagPort, config.Port, 8000)
-	log.Log(logger.LevelDEBUG, "Discovered option:", "--port", opPort)
-	opBase := findFirstNonEmpty(*flagBase, config.HTTPBase, "/")
-	log.Log(logger.LevelDEBUG, "Discovered option:", "--base", opBase)
+	config.Root = findFirstNonEmpty(*flagRoot, config.Root)
+	log.Log(logger.LevelDEBUG, "Discovered option:", "--root", config.Root)
+	config.Port = findFirstNonZero(*flagPort, config.Port, 8000)
+	log.Log(logger.LevelDEBUG, "Discovered option:", "--port", config.Port)
+	config.HTTPBase = findFirstNonEmpty(*flagBase, config.HTTPBase, "/")
+	log.Log(logger.LevelDEBUG, "Discovered option:", "--base", config.HTTPBase)
 
 	//
 	// configure root dir
 
 	switch RootDirType(*flagRType) {
 	case RootTypeDir:
-		DieOnError(Assert(opRoot != "", "Please pass a directory as a root parameter!"))
-		s, _ := filepath.Abs(filepath.Clean(strings.Replace(opRoot, "~", homedir, -1)))
+		DieOnError(Assert(config.Root != "", "Please pass a directory as a root parameter!"))
+		s, _ := filepath.Abs(filepath.Clean(strings.Replace(config.Root, "~", homedir, -1)))
 		log.Log(logger.LevelDEBUG, "Trying root dir:", s)
 		DieOnError(Assert(DoesDirectoryExist(s), "Please pass a valid directory as a root parameter!"))
 		rootDir = FsRoot{s}
 	// case RootTypeHttp:
-	// 	rootDir = HttpRoot{opRoot}
+	// 	rootDir = HttpRoot{config.Root}
 	// 	s, _ := filepath.Abs(*flagMeta)
 	// 	metaDir = s
 	default:
@@ -193,7 +193,7 @@ func main() {
 
 	//
 	// set HTTP base dir
-	httpBase = opBase
+	httpBase = config.HTTPBase
 
 	//
 	// graceful stop
@@ -224,7 +224,7 @@ func main() {
 	// http server pre-setup
 
 	etc.SetSessionName("session_andesite")
-	p := strconv.Itoa(opPort)
+	p := strconv.Itoa(config.Port)
 	dirs := []http.FileSystem{}
 
 	//
