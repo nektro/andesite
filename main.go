@@ -110,8 +110,6 @@ func main() {
 	//
 	// discover OAuth2 config info
 
-	etc.InitConfig(configPath, &config)
-
 	if len(config.Auth) == 0 {
 		config.Auth = "discord"
 	}
