@@ -43,7 +43,6 @@ var (
 	oauth2Provider  Oauth2Provider
 	database        *sqlite.DB
 	wwFFS           types.MultiplexFileSystem
-	httpBase        string
 	rootDir         RootDir
 	metaDir         string
 	randomKey       = securecookie.GenerateRandomKey(32)
@@ -184,10 +183,6 @@ func main() {
 			log.Log(logger.LevelINFO, F("Gave %s root folder access", nu.name))
 		}
 	}
-
-	//
-	// set HTTP base dir
-	httpBase = config.HTTPBase
 
 	//
 	// graceful stop
@@ -334,7 +329,7 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 
 	linkmsg := ""
 	if showLogin {
-		linkmsg = "Please <a href='" + httpBase + "login'>Log In</a>."
+		linkmsg = "Please <a href='" + config.HTTPBase + "login'>Log In</a>."
 		w.WriteHeader(http.StatusForbidden)
 		writeResponse(r, w, "Forbidden", message, linkmsg)
 	} else {
@@ -360,7 +355,7 @@ func writeAPIResponse(r *http.Request, w http.ResponseWriter, good bool, message
 	} else {
 		titlemsg = "Update Failed"
 	}
-	writeResponse(r, w, titlemsg, message, "Return to <a href='"+httpBase+"admin'>the dashboard</a>.")
+	writeResponse(r, w, titlemsg, message, "Return to <a href='"+config.HTTPBase+"admin'>the dashboard</a>.")
 }
 
 func fixID(id interface{}) string {
@@ -383,7 +378,7 @@ func writeResponse(r *http.Request, w http.ResponseWriter, title string, message
 		"title":   title,
 		"message": message,
 		"link":    link,
-		"base":    httpBase,
+		"base":    config.HTTPBase,
 	})
 }
 

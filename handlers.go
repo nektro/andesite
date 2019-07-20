@@ -140,12 +140,12 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			}
 
 			writeHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
-				"user":  uID,
-				"path":  qpath,
-				"files": data,
-				"admin": isAdmin,
-				"base":  httpBase,
-				"name":  oauth2Provider.idp.NamePrefix + uName,
+				"user":      uID,
+				"path":      qpath,
+				"files":     data,
+				"admin":     isAdmin,
+				"base":      config.HTTPBase,
+				"name":      oauth2Provider.idp.NamePrefix + uName,
 			})
 		} else {
 			// access check
@@ -198,7 +198,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	writeHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
 		"user":     user.snowflake,
 		"accesses": accesses,
-		"base":     httpBase,
+		"base":     config.HTTPBase,
 		"name":     oauth2Provider.idp.NamePrefix + user.name,
 		"shares":   shares,
 	})
@@ -374,7 +374,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	//
 	writeHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
 		"user": user.snowflake,
-		"base": httpBase,
+		"base": config.HTTPBase,
 		"name": oauth2Provider.idp.NamePrefix + user.name,
 	})
 }
@@ -407,7 +407,7 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 	q := database.QueryPrepared(false, "select * from files where path like ? escape '!'", "%"+v4+"%")
 	for q.Next() {
 		wf := scanFile(q)
-		wf.URL = httpBase + "files" + wf.Path
+		wf.URL = config.HTTPBase + "files" + wf.Path
 		//
 		if strings.Contains(wf.Path, "/.") {
 			continue
