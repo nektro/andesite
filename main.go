@@ -255,6 +255,11 @@ func main() {
 	http.HandleFunc("/search", mw(handleSearch))
 	http.HandleFunc("/api/search", mw(handleSearchAPI))
 
+	if !IsPortAvailable(config.Port) {
+		log.Log(logger.LevelFATAL, "Binding to port", config.Port, "failed. It may be taken or you may not have permission to. Aborting!")
+		return
+	}
+
 	log.Log(logger.LevelINFO, "Initialization complete. Starting server on port "+p)
 	http.ListenAndServe(":"+p, nil)
 }
