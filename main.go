@@ -58,8 +58,8 @@ func main() {
 	flagPort := flag.Int("port", 0, "Port to open server on")
 	flagAdmin := flag.String("admin", "", "Discord User ID of the user that is distinguished as a site owner")
 	flagTheme := flag.StringArray("theme", []string{}, "Name of the custom theme to use for the HTML pages")
-	flagBase := flag.String("base", "", "")
 	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
+	flagBase := flag.String("base", "", "Http Origin Path")
 	flagLLevel := flag.Int("log-level", int(logger.LevelINFO), "Logging level to be used for github.com/nektro/go-util/logger")
 	flag.Parse()
 
