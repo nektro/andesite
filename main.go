@@ -60,6 +60,7 @@ func main() {
 	flagBase := flag.String("base", "", "Http Origin Path")
 	flagLLevel := flag.Int("log-level", int(logger.LevelINFO), "Logging level to be used for github.com/nektro/go-util/logger")
 	flagPublic := flag.String("public", "", "Public root of files to serve")
+	flagSearch := flag.Bool("enable-search", false, "Set to true to enable search database")
 	flag.Parse()
 
 	//
@@ -87,6 +88,10 @@ func main() {
 	log.Log(logger.LevelDEBUG, "Discovered option:", "--base", config.HTTPBase)
 	config.Public = findFirstNonEmpty(*flagPublic, config.Public)
 	log.Log(logger.LevelDEBUG, "Discovered option:", "--public", config.Public)
+
+	if *flagSearch {
+		config.SearchOn = true
+	}
 
 	//
 	// configure root dir
@@ -197,8 +202,11 @@ func main() {
 
 		log.Log(logger.LevelINFO, "Saving database to disk")
 		database.Close()
-		log.Log(logger.LevelINFO, "Closing filesystem watcher")
-		watcher.Close()
+
+		if config.SearchOn {
+			log.Log(logger.LevelINFO, "Closing filesystem watcher")
+			watcher.Close()
+		}
 
 		log.Log(logger.LevelINFO, "Done!")
 		os.Exit(0)
@@ -206,7 +214,10 @@ func main() {
 
 	//
 	// initialize filesystem watching
-	go initFsWatcher()
+
+	if config.SearchOn {
+		go initFsWatcher()
+	}
 
 	//
 	// http server pre-setup

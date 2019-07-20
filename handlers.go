@@ -147,6 +147,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"admin":     isAdmin,
 				"base":      config.HTTPBase,
 				"name":      oauth2Provider.idp.NamePrefix + uName,
+				"search_on": config.SearchOn,
 			})
 		} else {
 			// access check

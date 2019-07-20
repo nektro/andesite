@@ -65,6 +65,7 @@ type Config struct {
 	Port      int               `json:"port"`
 	Themes    []string          `json:"themes"`
 	HTTPBase  string            `json:"base"`
+	SearchOn  bool              `json:"search_on"`
 	Auth      string            `json:"auth"`
 	Discord   *ConfigIDP        `json:"discord"`
 	Reddit    *ConfigIDP        `json:"reddit"`
