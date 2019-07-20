@@ -71,6 +71,7 @@ func main() {
 
 	metaDir := homedir + "/.config/andesite"
 	configPath := metaDir + "/config.json"
+	log.Log(logger.LevelINFO, "Reading configuration info from", configPath)
 
 	if !DoesFileExist(configPath) {
 		log.Log(logger.LevelDEBUG, "Configuration file does not exist, creating blank!")
@@ -100,7 +101,6 @@ func main() {
 		DieOnError(E("Invalid root type"))
 	}
 
-	log.Log(logger.LevelINFO, "Reading configuration info from", metaDir)
 	log.Log(logger.LevelINFO, "Starting in "+rootDir.Base())
 
 	//
