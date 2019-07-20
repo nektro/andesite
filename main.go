@@ -46,7 +46,6 @@ var (
 	database        *sqlite.DB
 	wwFFS           types.MultiplexFileSystem
 	rootDir         RootDir
-	metaDir         string
 	randomKey       = securecookie.GenerateRandomKey(32)
 	store           = sessions.NewCookieStore(randomKey)
 	log             = logger.New()
