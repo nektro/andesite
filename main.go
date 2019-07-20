@@ -96,10 +96,6 @@ func main() {
 		log.Log(logger.LevelDEBUG, "Trying root dir:", s)
 		DieOnError(Assert(DoesDirectoryExist(s), "Please pass a valid directory as a root parameter!"))
 		rootDir = FsRoot{s}
-	// case RootTypeHttp:
-	// 	rootDir = HttpRoot{config.Root}
-	// 	s, _ := filepath.Abs(*flagMeta)
-	// 	metaDir = s
 	default:
 		DieOnError(E("Invalid root type"))
 	}
