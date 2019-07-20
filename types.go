@@ -61,6 +61,7 @@ const (
 
 type Config struct {
 	Root      string            `json:"root"`
+	Public    string            `json:"public"`
 	Port      int               `json:"port"`
 	Themes    []string          `json:"themes"`
 	HTTPBase  string            `json:"base"`

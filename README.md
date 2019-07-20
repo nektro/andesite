@@ -69,6 +69,7 @@ There are a number of options that are also required and can be used to configur
 | `"base"` | `string` | `/` | The root path Andesite will be served from. See [`deployment.md`](docs/deployment.md) for more info. |
 | `"providers"` | `[]Provider` | ` ` | An array of custom OAuth2 providers that you may use as your `"auth"`. |
 | `"custom"` | `[]OA2Config` | ` ` | An array of OA2 app configs, that can be used with providers created in `"providers"`. See [`providers.md`](docs/providers.md) for more info. |
+| `"public"` | `string` | None. | Similar to `--root`, but served from `/public/` and no authorization is required to see files listings or download. Like a regular OD. |
 
 ## Themes
 Andesite supports making custom themes for the splash page and the various HTML templates throughout the program. Those are:

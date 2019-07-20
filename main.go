@@ -59,6 +59,7 @@ func main() {
 	flagTheme := flag.StringArray("theme", []string{}, "Name of the custom theme to use for the HTML pages")
 	flagBase := flag.String("base", "", "Http Origin Path")
 	flagLLevel := flag.Int("log-level", int(logger.LevelINFO), "Logging level to be used for github.com/nektro/go-util/logger")
+	flagPublic := flag.String("public", "", "Public root of files to serve")
 	flag.Parse()
 
 	//
@@ -84,6 +85,8 @@ func main() {
 	log.Log(logger.LevelDEBUG, "Discovered option:", "--port", config.Port)
 	config.HTTPBase = findFirstNonEmpty(*flagBase, config.HTTPBase, "/")
 	log.Log(logger.LevelDEBUG, "Discovered option:", "--base", config.HTTPBase)
+	config.Public = findFirstNonEmpty(*flagPublic, config.Public)
+	log.Log(logger.LevelDEBUG, "Discovered option:", "--public", config.Public)
 
 	//
 	// configure root dir
@@ -92,6 +95,11 @@ func main() {
 	log.Log(logger.LevelINFO, "Sharing private files from "+config.Root)
 	DieOnError(Assert(DoesDirectoryExist(config.Root), "Please pass a valid directory as a root parameter!"))
 
+	if len(config.Public) > 0 {
+		config.Public, _ = filepath.Abs(config.Public)
+		log.Log(logger.LevelINFO, "Sharing public files from", config.Public)
+		DieOnError(Assert(DoesDirectoryExist(config.Public), "Public root directory does not exist. Aborting!"))
+	}
 
 	//
 	// discover OAuth2 config info
@@ -251,6 +259,7 @@ func main() {
 	http.HandleFunc("/logout", mw(handleLogout))
 	http.HandleFunc("/search", mw(handleSearch))
 	http.HandleFunc("/api/search", mw(handleSearchAPI))
+	http.HandleFunc("/public/", mw(handleDirectoryListing(handlePublicListing)))
 
 	if !IsPortAvailable(config.Port) {
 		log.Log(logger.LevelFATAL, "Binding to port", config.Port, "failed. It may be taken or you may not have permission to. Aborting!")

@@ -186,6 +186,18 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	return config.Root, qpath, userAccess, user.snowflake, user.name, userUser.admin, nil
 }
 
+// handler for http://andesite/public/*
+func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, error) {
+	// remove /public
+	qpath := string(r.URL.Path[7:])
+	qaccess := []string{}
+
+	if len(config.Public) == 0 {
+		return config.Public, qpath, qaccess, "", "new member!", false, nil
+	}
+	return config.Public, qpath, []string{"/"}, "", "new member", false, nil
+}
+
 // handler for http://andesite/admin
 func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, true)
