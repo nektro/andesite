@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"mime"
 	"net/http"
 	"os"
@@ -50,9 +51,9 @@ func handleTest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, strconv.Itoa(j))
 }
 
-func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, []string, string, string, bool, error)) func(http.ResponseWriter, *http.Request) {
+func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, string, string, bool, error)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		qpath, uAccess, uID, uName, isAdmin, err := getAccess(w, r)
+		fileRoot, qpath, uAccess, uID, uName, isAdmin, err := getAccess(w, r)
 
 		// if getAccess errored, response has already been written
 		if err != nil {
@@ -71,7 +72,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 		}
 
 		// valid path check
-		stat, err := rootDir.Stat(qpath)
+		stat, err := os.Stat(fileRoot + qpath)
 		if os.IsNotExist(err) {
 			// 404
 			writeUserDenied(r, w, true, false)
@@ -83,7 +84,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			w.Header().Add("Content-Type", "text/html")
 
 			// get list of all files
-			files, _ := rootDir.ReadDir(qpath)
+			files, _ := ioutil.ReadDir(fileRoot + qpath)
 
 			// hide dot files
 			files = filter(files, func(x os.FileInfo) bool {
@@ -161,18 +162,18 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			}
 
 			w.Header().Add("Content-Type", mime.TypeByExtension(path.Ext(qpath)))
-			file, _ := rootDir.ReadFile(qpath)
-			info, _ := rootDir.Stat(qpath)
+			file, _ := os.Open(fileRoot + qpath)
+			info, _ := os.Stat(fileRoot + qpath)
 			http.ServeContent(w, r, info.Name(), info.ModTime(), file)
 		}
 	}
 }
 
 // handler for http://andesite/files/*
-func handleFileListing(w http.ResponseWriter, r *http.Request) (string, []string, string, string, bool, error) {
+func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, error) {
 	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if errr != nil {
-		return "", []string{}, "", "", false, errors.New("")
+		return "", "", []string{}, "", "", false, errors.New("")
 	}
 
 	// get path
@@ -182,7 +183,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, []string
 	userUser, _ := queryUserBySnowflake(user.snowflake)
 	userAccess := queryAccess(user)
 
-	return qpath, userAccess, user.snowflake, user.name, userUser.admin, nil
+	return config.Root, qpath, userAccess, user.snowflake, user.name, userUser.admin, nil
 }
 
 // handler for http://andesite/admin
@@ -299,7 +300,7 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	writeAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ahs2, fpath))
 }
 
-func handleShareListing(w http.ResponseWriter, r *http.Request) (string, []string, string, string, bool, error) {
+func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, error) {
 	u := r.URL.Path[6:]
 	if len(u) == 0 {
 		w.Header().Add("Location", "../")
@@ -307,17 +308,17 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, []strin
 	}
 	if match, _ := regexp.MatchString("^[0-9a-f]{32}/.*", u); !match {
 		writeResponse(r, w, "Invalid Share Link", "Invalid format for share code.", "")
-		return "", []string{}, "", "", false, errors.New("")
+		return "", "", []string{}, "", "", false, errors.New("")
 	}
 
 	h := u[:32]
 	s := queryAccessByShare(h)
 	if len(s) == 0 {
 		writeResponse(r, w, "Not Found", "Public share code not found.", "")
-		return "", []string{}, "", "", false, errors.New("")
+		return "", "", []string{}, "", "", false, errors.New("")
 	}
 
-	return u[32:], s, h, "", false, nil
+	return config.Root, u[32:], s, h, "", false, nil
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
