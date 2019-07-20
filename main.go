@@ -45,7 +45,6 @@ var (
 	oauth2Provider  Oauth2Provider
 	database        *sqlite.DB
 	wwFFS           types.MultiplexFileSystem
-	rootDir         RootDir
 	randomKey       = securecookie.GenerateRandomKey(32)
 	store           = sessions.NewCookieStore(randomKey)
 	log             = logger.New()
@@ -58,7 +57,6 @@ func main() {
 	flagPort := flag.Int("port", 0, "Port to open server on")
 	flagAdmin := flag.String("admin", "", "Discord User ID of the user that is distinguished as a site owner")
 	flagTheme := flag.StringArray("theme", []string{}, "Name of the custom theme to use for the HTML pages")
-	flagRType := flag.String("root-type", "dir", "Type of path --root points to. One of 'dir', 'http'")
 	flagBase := flag.String("base", "", "Http Origin Path")
 	flagLLevel := flag.Int("log-level", int(logger.LevelINFO), "Logging level to be used for github.com/nektro/go-util/logger")
 	flag.Parse()
@@ -90,18 +88,10 @@ func main() {
 	//
 	// configure root dir
 
-	switch RootDirType(*flagRType) {
-	case RootTypeDir:
-		DieOnError(Assert(config.Root != "", "Please pass a directory as a root parameter!"))
-		s, _ := filepath.Abs(filepath.Clean(strings.Replace(config.Root, "~", homedir, -1)))
-		log.Log(logger.LevelDEBUG, "Trying root dir:", s)
-		DieOnError(Assert(DoesDirectoryExist(s), "Please pass a valid directory as a root parameter!"))
-		rootDir = FsRoot{s}
-	default:
-		DieOnError(E("Invalid root type"))
-	}
+	config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(config.Root, "~", homedir, -1)))
+	log.Log(logger.LevelINFO, "Sharing private files from "+config.Root)
+	DieOnError(Assert(DoesDirectoryExist(config.Root), "Please pass a valid directory as a root parameter!"))
 
-	log.Log(logger.LevelINFO, "Starting in "+rootDir.Base())
 
 	//
 	// discover OAuth2 config info
