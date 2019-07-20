@@ -32,16 +32,14 @@ func scanFile(rows *sql.Rows) WatchedFile {
 
 var (
 	watcher *fsnotify.Watcher
-	wRoot   string
 )
 
 func initFsWatcher() {
 	// creates a new file watcher
 	watcher, _ = fsnotify.NewWatcher()
-	wRoot = rootDir.Base()
 	database.CreateTableStruct("files", WatchedFile{})
 
-	if err := filepath.Walk(wRoot, wWatchDir); err != nil {
+	if err := filepath.Walk(config.Root, wWatchDir); err != nil {
 		util.LogError(err)
 	}
 
@@ -50,7 +48,7 @@ func initFsWatcher() {
 			select {
 			case event := <-watcher.Events:
 				// util.Log("fsnotify", "event", event.Name, event.Op.String())
-				r0 := strings.TrimPrefix(event.Name, wRoot)
+				r0 := strings.TrimPrefix(event.Name, config.Root)
 				r1 := strings.Replace(r0, string(filepath.Separator), "/", -1)
 				switch event.Op {
 				case fsnotify.Rename, fsnotify.Remove:
@@ -85,7 +83,7 @@ func wWatchDir(path string, fi os.FileInfo, err error) error {
 	if fi.IsDir() {
 		return watcher.Add(path)
 	}
-	wAddFile(strings.TrimPrefix(path, wRoot), fi.Name())
+	wAddFile(strings.TrimPrefix(path, config.Root), fi.Name())
 	return nil
 }
 
