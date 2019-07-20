@@ -16,7 +16,6 @@ import (
 	"syscall"
 
 	"github.com/aymerick/raymond"
-	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/mitchellh/go-homedir"
@@ -25,11 +24,14 @@ import (
 	"github.com/nektro/go-util/types"
 	"github.com/nektro/go.etc"
 	"github.com/nektro/go.oauth2"
+	"github.com/rakyll/statik/fs"
 
 	flag "github.com/spf13/pflag"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
+
+	_ "github.com/nektro/andesite/statik"
 )
 
 const (
@@ -233,9 +235,15 @@ func main() {
 	//
 	// http server setup and launch
 
+	statikFS, err := fs.New()
+	if err != nil {
+		log.Log(logger.LevelFATAL, err.Error())
+		return
+	}
+
 	mw := chainMiddleware(mwAddAttribution)
 	dirs = append(dirs, http.Dir("./www/"))
-	dirs = append(dirs, packr.New("", "./www/"))
+	dirs = append(dirs, http.FileSystem(statikFS))
 	wwFFS = types.MultiplexFileSystem{dirs}
 
 	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))

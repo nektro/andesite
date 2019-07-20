@@ -9,4 +9,7 @@ build_template() {
     go build -ldflags="-s -w" -o ./dist/andesite-v$TAG-$GOOS-$GOARCH
 }
 
+go get github.com/rakyll/statik
+~/go/bin/statik -src="./www/"
+
 build_template linux amd64
