@@ -83,7 +83,7 @@ Andesite supports making custom themes for the splash page and the various HTML 
     - The admin dashboard that allows editing the access of users
 
 ### Using A Theme
-All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `--theme` was `example`. Doing this will tell Andesite to serve files from `/.andesite/themes/example/`.
+All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `--theme` was `example`. Doing this will tell Andesite to serve files from `.andesite/themes/example/`.
 
 ## Deployment
 Check out the [documentation](./docs/deployment/).
