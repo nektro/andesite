@@ -1,0 +1,25 @@
+# Golang CircleCI 2.0 configuration file
+# See https://circleci.com/docs/2.0/language-go/
+version: 2
+jobs:
+  build:
+    working_directory: /go/src/github.com/nektro/nektro
+    docker:
+      - image: circleci/golang:1.9
+    steps:
+      - checkout
+      - run: go get -v -t -d ./...
+      - run: go test -v ./...
+      - run: ./scripts/build_all.sh
+
+  # Publish binaries to GitHub Releases
+  # See https://circleci.com/blog/publishing-to-github-releases-via-circleci/
+  publish-github-release:
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - attach_workspace:
+          at: ./dist/
+      - run: go get github.com/tcnksm/ghr
+      - run: VERSION=$(date +'%Y.%m.%d')-$(git log --format=%h -1)
+      - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/
