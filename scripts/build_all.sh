@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+init() {
+    go get -v -u github.com/rakyll/statik
+    ~/go/bin/statik -src="./www/"
+}
 build_template() {
     CGO_ENABLED=0
     GOOS=$1
@@ -9,7 +13,5 @@ build_template() {
     go build -ldflags="-s -w" -o ./bin/andesite-v$TAG-$GOOS-$GOARCH
 }
 
-go get github.com/rakyll/statik
-~/go/bin/statik -src="./www/"
-
+init
 build_template linux amd64
