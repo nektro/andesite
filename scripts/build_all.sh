@@ -6,7 +6,7 @@ build_template() {
     GOARCH=$2
     TAG=$(date +'%Y.%m.%d')-$(git log --format=%h -1)
     echo $TAG-$GOOS-$GOARCH
-    go build -ldflags="-s -w" -o ./dist/andesite-v$TAG-$GOOS-$GOARCH
+    go build -ldflags="-s -w" -o ./bin/andesite-v$TAG-$GOOS-$GOARCH
 }
 
 go get github.com/rakyll/statik
