@@ -5,7 +5,7 @@ build_template() {
     GOOS=$1
     GOARCH=$2
     TAG=$(date +'%Y.%m.%d')-$(git log --format=%h -1)
-    echo $TRAVIS_TAG
+    echo $TAG-$GOOS-$GOARCH
     go build -ldflags="-s -w" -o ./dist/andesite-v$TAG-$GOOS-$GOARCH
 }
 
