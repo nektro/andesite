@@ -8,9 +8,10 @@ build_template() {
     CGO_ENABLED=0
     GOOS=$1
     GOARCH=$2
+    EXT=$3
     TAG=$(date +'%Y.%m.%d')-$(git log --format=%h -1)
     echo $TAG-$GOOS-$GOARCH
-    go build -ldflags="-s -w" -o ./bin/andesite-v$TAG-$GOOS-$GOARCH
+    go build -ldflags="-s -w" -o ./bin/andesite-v$TAG-$GOOS-$GOARCH$EXT
 }
 
 init
