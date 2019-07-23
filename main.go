@@ -175,16 +175,16 @@ func main() {
 			queryDoAddUser(uid, *flagAdmin, true, "")
 			log.Log(logger.LevelINFO, F("Added user %s as an admin", *flagAdmin))
 		} else {
-			if !uu.admin {
-				database.QueryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.id), 10))
-				log.Log(logger.LevelINFO, F("Set user '%s's status to admin", uu.snowflake))
+			if !uu.Admin {
+				database.QueryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.ID), 10))
+				log.Log(logger.LevelINFO, F("Set user '%s's status to admin", uu.Snowflake))
 			}
 		}
 		nu, _ := queryUserBySnowflake(*flagAdmin)
 		if !Contains(queryAccess(nu), "/") {
 			aid := database.QueryNextID("access")
-			database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, nu.id))
-			log.Log(logger.LevelINFO, F("Gave %s root folder access", nu.name))
+			database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, nu.ID))
+			log.Log(logger.LevelINFO, F("Gave %s root folder access", nu.Name))
 		}
 	}
 
@@ -434,7 +434,7 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 		writeResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+userID+")", "")
 		return nil, UserRow{}, E("")
 	}
-	if requireAdmin && !user.admin {
+	if requireAdmin && !user.Admin {
 		writeAPIResponse(r, w, false, "This action requires being a site administrator. ("+userID+")")
 		return nil, UserRow{}, E("")
 	}

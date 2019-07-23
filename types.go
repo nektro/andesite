@@ -20,10 +20,10 @@ type UserAccessRow struct {
 
 //
 type UserRow struct {
-	id        int
-	snowflake string
-	admin     bool
-	name      string
+	ID        int
+	Snowflake string
+	Admin     bool
+	Name      string
 }
 
 //

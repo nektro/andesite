@@ -10,7 +10,7 @@ import (
 
 func scanUser(rows *sql.Rows) UserRow {
 	var v UserRow
-	rows.Scan(&v.id, &v.snowflake, &v.admin, &v.name)
+	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name)
 	return v
 }
 
@@ -25,7 +25,7 @@ func scanAccessRow(rows *sql.Rows) UserAccessRow {
 
 func queryAccess(user UserRow) []string {
 	result := []string{}
-	rows := database.Query(false, F("select * from access where user = '%d'", user.id))
+	rows := database.Query(false, F("select * from access where user = '%d'", user.ID))
 	for rows.Next() {
 		result = append(result, scanAccessRow(rows).path)
 	}
@@ -41,7 +41,7 @@ func queryUserBySnowflake(snowflake string) (UserRow, bool) {
 	}
 	ur = scanUser(rows)
 	rows.Close()
-	ur.snowflake = ur.snowflake[len(oauth2Provider.DbP):]
+	ur.Snowflake = ur.Snowflake[len(oauth2Provider.DbP):]
 	return ur, true
 }
 
@@ -51,9 +51,9 @@ func queryUserByID(id int) (UserRow, bool) {
 	if !rows.Next() {
 		return ur, false
 	}
-	rows.Scan(&ur.id, &ur.snowflake, &ur.admin, &ur.name)
+	rows.Scan(&ur.ID, &ur.Snowflake, &ur.Admin, &ur.Name)
 	rows.Close()
-	ur.snowflake = ur.snowflake[len(oauth2Provider.DbP):]
+	ur.Snowflake = ur.Snowflake[len(oauth2Provider.DbP):]
 	return ur, true
 }
 

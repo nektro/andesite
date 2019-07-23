@@ -184,7 +184,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	userUser, _ := queryUserBySnowflake(user.snowflake)
 	userAccess := queryAccess(user)
 
-	return config.Root, qpath, userAccess, user.snowflake, user.name, userUser.admin, nil
+	return config.Root, qpath, userAccess, user.Snowflake, user.Name, userUser.Admin, nil
 }
 
 // handler for http://andesite/public/*
@@ -210,7 +210,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	accesses := queryAllAccess()
 	shares := queryAllShares()
 	writeHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
-		"user":     user.snowflake,
+		"user":     user.Snowflake,
 		"accesses": accesses,
 		"base":     config.HTTPBase,
 		"name":     oauth2Provider.IDP.NamePrefix + user.Name,
@@ -283,7 +283,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	u, ok := queryUserBySnowflake(asn)
 	aud := -1
 	if ok {
-		aud = u.id
+		aud = u.ID
 	} else {
 		aud = database.QueryNextID("users")
 		queryDoAddUser(aud, asn, false, "")
@@ -387,9 +387,9 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	writeHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
-		"user": user.snowflake,
+		"user": user.Snowflake,
 		"base": config.HTTPBase,
-		"name": oauth2Provider.IDP.NamePrefix + user.name,
+		"name": oauth2Provider.IDP.NamePrefix + user.Name,
 	})
 }
 
