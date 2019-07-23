@@ -5,9 +5,10 @@ init() {
     $GOPATH/bin/statik -src="./www/"
 }
 build_template() {
-    CGO_ENABLED=0
-    GOOS=$1
-    GOARCH=$2
+    export CGO_ENABLED=0
+    export GOOS=$1
+    export GOARCH=$2
+    export GOARM=7
     EXT=$3
     TAG=$(date +'%Y.%m.%d')-$(git log --format=%h -1)
     echo $TAG-$GOOS-$GOARCH
