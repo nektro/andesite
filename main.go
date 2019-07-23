@@ -16,7 +16,6 @@ import (
 	"syscall"
 
 	"github.com/aymerick/raymond"
-	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/mitchellh/go-homedir"
 	"github.com/nektro/go-util/logger"
@@ -37,17 +36,6 @@ import (
 const (
 	version     = 1
 	accessToken = "access_token"
-)
-
-var (
-	config          *Config
-	oauth2AppConfig *ConfigIDP
-	oauth2Provider  Oauth2Provider
-	database        *sqlite.DB
-	wwFFS           types.MultiplexFileSystem
-	randomKey       = securecookie.GenerateRandomKey(32)
-	store           = sessions.NewCookieStore(randomKey)
-	log             = logger.New()
 )
 
 func main() {
