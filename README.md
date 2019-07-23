@@ -96,13 +96,14 @@ Check out the [documentation](./docs/deployment/).
 - Discord & OAuth2 - https://discordapp.com/ - User Authentication
 - https://handlebarsjs.com/ - HTML templating
 - https://github.com/aymerick/raymond - Handlebars template rendering
-- https://sass-lang.com/ - Cascading CSS styles
-- https://github.com/gobuffalo/packr - Package static assets into single Go binary
-- https://github.com/valyala/fasthttp - Optimized HTTP server backend
+- https://github.com/gorilla/securecookie
 - https://github.com/kataras/go-sessions - HTTP Session manager for fasthttp
+- https://github.com/mitchellh/go-homedir
 - https://github.com/nektro/go-util - Go utilities for simplifying common complex tasks
 - https://github.com/spf13/pflag - Optimized flag handler that makes program flags POSIX compliant
 - https://github.com/nektro/go.oauth2 - OAuth2 Client library for Go
+- https://github.com/nektro/go.etc
+- https://github.com/rakyll/statik/fs
 
 ## Contributing
 We take issues all the time right here on GitHub. We use labels extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it's been answered! Off-topic and '+1' comments will be deleted. Please use post reactions for this purpose.
