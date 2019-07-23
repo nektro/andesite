@@ -106,7 +106,7 @@ Check out the [documentation](./docs/deployment/).
 - https://github.com/rakyll/statik/fs
 
 ## Contributing
-We take issues all the time right here on GitHub. We use labels extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it's been answered! Off-topic and '+1' comments will be deleted. Please use post reactions for this purpose.
+We take issues all the time right here on GitHub. We use labels extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it has been answered! Off-topic and '+1' comments will be deleted. Please use post reactions for this purpose.
 
 [![issues](https://img.shields.io/github/issues/nektro/andesite.svg)](https://github.com/nektro/andesite/issues)
 
