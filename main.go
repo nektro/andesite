@@ -255,8 +255,8 @@ func main() {
 	wwFFS = types.MultiplexFileSystem{dirs}
 
 	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
-	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.idp, oauth2AppConfig.ID)))
-	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider.idp, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
+	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.IDP, oauth2AppConfig.ID)))
+	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider.IDP, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
 	http.HandleFunc("/test", mw(handleTest))
 	http.HandleFunc("/files/", mw(handleDirectoryListing(handleFileListing)))
 	http.HandleFunc("/admin", mw(handleAdmin))
@@ -335,7 +335,7 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	sessName := sess.Values["name"]
 	if sessName != nil {
 		sessID := sess.Values["user"]
-		me += F("%s%s (%s)", oauth2Provider.idp.NamePrefix, sessName.(string), sessID.(string))
+		me += F("%s%s (%s)", oauth2Provider.IDP.NamePrefix, sessName.(string), sessID.(string))
 	}
 
 	message := ""

@@ -146,7 +146,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"files":     data,
 				"admin":     isAdmin,
 				"base":      config.HTTPBase,
-				"name":      oauth2Provider.idp.NamePrefix + uName,
+				"name":      oauth2Provider.IDP.NamePrefix + uName,
 				"search_on": config.SearchOn,
 			})
 		} else {
@@ -213,7 +213,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		"user":     user.snowflake,
 		"accesses": accesses,
 		"base":     config.HTTPBase,
-		"name":     oauth2Provider.idp.NamePrefix + user.name,
+		"name":     oauth2Provider.IDP.NamePrefix + user.Name,
 		"shares":   shares,
 	})
 }
@@ -389,7 +389,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	writeHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
 		"user": user.snowflake,
 		"base": config.HTTPBase,
-		"name": oauth2Provider.idp.NamePrefix + user.name,
+		"name": oauth2Provider.IDP.NamePrefix + user.name,
 	})
 }
 

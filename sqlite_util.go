@@ -35,13 +35,13 @@ func queryAccess(user UserRow) []string {
 
 func queryUserBySnowflake(snowflake string) (UserRow, bool) {
 	var ur UserRow
-	rows := database.Query(false, F("select * from users where snowflake = '%s'", oauth2Provider.dbp+snowflake))
+	rows := database.Query(false, F("select * from users where snowflake = '%s'", oauth2Provider.DbP+snowflake))
 	if !rows.Next() {
 		return ur, false
 	}
 	ur = scanUser(rows)
 	rows.Close()
-	ur.snowflake = ur.snowflake[len(oauth2Provider.dbp):]
+	ur.snowflake = ur.snowflake[len(oauth2Provider.DbP):]
 	return ur, true
 }
 
@@ -53,7 +53,7 @@ func queryUserByID(id int) (UserRow, bool) {
 	}
 	rows.Scan(&ur.id, &ur.snowflake, &ur.admin, &ur.name)
 	rows.Close()
-	ur.snowflake = ur.snowflake[len(oauth2Provider.dbp):]
+	ur.snowflake = ur.snowflake[len(oauth2Provider.DbP):]
 	return ur, true
 }
 
@@ -83,7 +83,7 @@ func queryAllAccess() []map[string]string {
 }
 
 func queryDoAddUser(id int, snowflake string, admin bool, name string) {
-	database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?)", id, oauth2Provider.dbp+snowflake, boolToString(admin)), name)
+	database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?)", id, oauth2Provider.DbP+snowflake, boolToString(admin)), name)
 }
 
 func queryDoUpdate(table string, col string, value string, where string, search string) {
@@ -93,7 +93,7 @@ func queryDoUpdate(table string, col string, value string, where string, search 
 func queryAssertUserName(snowflake string, name string) {
 	_, ok := queryUserBySnowflake(snowflake)
 	if ok {
-		queryDoUpdate("users", "name", name, "snowflake", oauth2Provider.dbp+snowflake)
+		queryDoUpdate("users", "name", name, "snowflake", oauth2Provider.DbP+snowflake)
 	} else {
 		uid := database.QueryNextID("users")
 		queryDoAddUser(uid, snowflake, false, name)
