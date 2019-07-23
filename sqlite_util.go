@@ -16,7 +16,7 @@ func scanUser(rows *sql.Rows) UserRow {
 
 func scanAccessRow(rows *sql.Rows) UserAccessRow {
 	var v UserAccessRow
-	rows.Scan(&v.id, &v.user, &v.path)
+	rows.Scan(&v.ID, &v.User, &v.Path)
 	return v
 }
 
@@ -27,7 +27,7 @@ func queryAccess(user UserRow) []string {
 	result := []string{}
 	rows := database.Query(false, F("select * from access where user = '%d'", user.ID))
 	for rows.Next() {
-		result = append(result, scanAccessRow(rows).path)
+		result = append(result, scanAccessRow(rows).Path)
 	}
 	rows.Close()
 	return result
@@ -67,16 +67,16 @@ func queryAllAccess() []map[string]string {
 	rows.Close()
 	ids := map[int][]string{}
 	for _, uar := range accs {
-		if _, ok := ids[uar.user]; !ok {
-			uu, _ := queryUserByID(uar.user)
-			ids[uar.user] = []string{uu.snowflake, uu.name}
+		if _, ok := ids[uar.User]; !ok {
+			uu, _ := queryUserByID(uar.User)
+			ids[uar.User] = []string{uu.Snowflake, uu.Name}
 		}
 		result = append(result, map[string]string{
-			"id":        strconv.Itoa(uar.id),
-			"user":      strconv.Itoa(uar.user),
-			"snowflake": ids[uar.user][0],
-			"name":      ids[uar.user][1],
-			"path":      uar.path,
+			"id":        strconv.Itoa(uar.ID),
+			"user":      strconv.Itoa(uar.User),
+			"snowflake": ids[uar.User][0],
+			"name":      ids[uar.User][1],
+			"path":      uar.Path,
 		})
 	}
 	return result

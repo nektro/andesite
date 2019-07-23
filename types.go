@@ -13,9 +13,9 @@ type OAuth2CallBackResponse struct {
 
 //
 type UserAccessRow struct {
-	id   int
-	user int
-	path string
+	ID   int
+	User int
+	Path string
 }
 
 //
@@ -72,6 +72,7 @@ type ConfigIDP struct {
 	ID     string `json:"id"`
 	Secret string `json:"secret"`
 }
+
 //
 
 type Oauth2Provider struct {
