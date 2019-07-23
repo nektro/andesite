@@ -12,16 +12,6 @@ type OAuth2CallBackResponse struct {
 }
 
 //
-type PragmaTableInfoRow struct {
-	cid          int
-	name         string
-	rowType      string
-	notnull      bool
-	defaultValue interface{}
-	pk           int
-}
-
-//
 type UserAccessRow struct {
 	id   int
 	user int
