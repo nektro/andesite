@@ -15,4 +15,17 @@ build_template() {
 }
 
 init
+build_template darwin 386
+build_template darwin amd64
+build_template dragonfly amd64
+build_template freebsd 386
+build_template freebsd amd64
+build_template linux 386
 build_template linux amd64
+build_template netbsd 386
+build_template netbsd amd64
+build_template openbsd 386
+build_template openbsd amd64
+build_template solaris amd64
+build_template windows 386 .exe
+build_template windows amd64 .exe
