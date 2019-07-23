@@ -113,11 +113,11 @@ func queryAllShares() []map[string]string {
 	rows := database.Query(false, "select * from shares")
 	for rows.Next() {
 		var sr ShareRow
-		rows.Scan(&sr.id, &sr.hash, &sr.path)
+		rows.Scan(&sr.ID, &sr.Hash, &sr.Path)
 		result = append(result, map[string]string{
-			"id":   strconv.Itoa(sr.id),
-			"hash": sr.hash,
-			"path": sr.path,
+			"id":   strconv.Itoa(sr.ID),
+			"hash": sr.Hash,
+			"path": sr.Path,
 		})
 	}
 	rows.Close()
@@ -129,7 +129,7 @@ func queryAllSharesByCode(code string) []ShareRow {
 	rows := database.QueryPrepared(false, "select * from shares where hash = ?", code)
 	for rows.Next() {
 		var sr ShareRow
-		rows.Scan(&sr.id, &sr.hash, &sr.path)
+		rows.Scan(&sr.ID, &sr.Hash, &sr.Path)
 		shrs = append(shrs, sr)
 	}
 	rows.Close()
@@ -139,7 +139,7 @@ func queryAllSharesByCode(code string) []ShareRow {
 func queryAccessByShare(code string) []string {
 	result := []string{}
 	for _, item := range queryAllSharesByCode(code) {
-		result = append(result, item.path)
+		result = append(result, item.Path)
 	}
 	return result
 }

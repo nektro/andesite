@@ -28,9 +28,9 @@ type UserRow struct {
 
 //
 type ShareRow struct {
-	id   int
-	hash string
-	path string
+	ID   int
+	Hash string
+	Path string
 }
 
 // Middleware provides a convenient mechanism for augmenting HTTP requests
