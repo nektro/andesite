@@ -3,7 +3,7 @@
 version: 2
 jobs:
   build:
-    working_directory: /go/src/github.com/nektro/nektro
+    working_directory: /go/src/github.com/nektro/andesite
     docker:
       - image: circleci/golang:1.9
     steps:
