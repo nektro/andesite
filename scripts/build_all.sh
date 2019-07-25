@@ -5,6 +5,7 @@ init() {
     $GOPATH/bin/statik -src="./www/"
 }
 build_template() {
+    export CGO_ENABLED=1
     export GOOS=$1
     export GOARCH=$2
     export GOARM=7
