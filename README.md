@@ -87,7 +87,16 @@ Andesite supports making custom themes for the splash page and the various HTML 
 All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `--theme` was `example`. Doing this will tell Andesite to serve files from `.andesite/themes/example/`.
 
 ## Deployment
-Check out the [documentation](./docs/deployment/).
+[![CircleCI](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
+
+Pre-compiled binaries are published on Circle CI at https://circleci.com/gh/nektro/andesite. To download a binary, navigate to the most recent build and click on 'Artifacts'. Here there will be a list of files. Click on the one appropriate for your system.
+
+Once downloaded, run the following with the values applicable to you.
+```
+$ ./andesite-{date}-{tag}-{os}-{arch}
+```
+
+If you decide to pass Anesite through a reverse proxy, be sure to check out the [documentation](./docs/deployment/) for more info.
 
 ## Built With
 - The Go Programming Lanuage - https://golang.org/
