@@ -143,3 +143,15 @@ func queryAccessByShare(code string) []string {
 	}
 	return result
 }
+
+func queryAllDiscordRoleAccess() []DiscordRoleAccessRow {
+	var result []DiscordRoleAccessRow
+	rows := database.QueryPrepared(false, "select * from shares_discord_role")
+	for rows.Next() {
+		var dar DiscordRoleAccessRow
+		rows.Scan(&dar.ID, &dar.GuildID, &dar.RoleID, &dar.Path)
+		result = append(result, dar)
+	}
+	rows.Close()
+	return result
+}

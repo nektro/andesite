@@ -30,6 +30,9 @@
             table.table input[type=text][name=hash] {
                 min-width: 20em;
             }
+            #tab_discord_access .table tbody tr td input[name="RoleID"] {
+                min-width: 13em;
+            }
         </style>
     </head>
     <body>
@@ -106,6 +109,41 @@
                     </tbody>
                 </table>
             </details>
+            {{#equal auth "discord"}}
+            <details open id="tab_discord_access">
+                <summary>Discord Guild Role Access</summary>
+                <table class="ui compact table">
+                    <thead>
+                        {{!-- <th class="collapsing">Guild ID</th> --}}
+                        <th class="collapsing">Role ID</th>
+                        <th>Path</th>
+                        <th class="collapsing"></th>
+                    </thead>
+                    <tbody>
+                        {{#each discord_shares}}
+                        <tr>
+                            <form method="POST">
+                                <input type="hidden" name="ID" value="{{ID}}">
+                                {{!-- <td><input type="text" name="GuildID" value="{{GuildID}}"></td> --}}
+                                <td><input type="text" name="RoleID" value="{{RoleID}}"></td>
+                                <td><input type="text" name="Path" placeholder="Path" value="{{Path}}"></td>
+                                <td><button class="ui button" formaction="./api/access_discord_role/update">Update</button></td>
+                                <td><button class="ui button" formaction="./api/access_discord_role/delete">Delete</button></td>
+                            </form>
+                        </tr>
+                        {{/each}}
+                        <tr>
+                            <form method="POST">
+                                {{!-- <td><input type="text" name="GuildID" placeholder="Guild ID"></td> --}}
+                                <td><input type="text" name="RoleID" placeholder="Role ID"></td>
+                                <td><input type="text" name="Path" placeholder="Path"></td>
+                                <td><button class="ui button" formaction="./api/access_discord_role/create">Add Access</button></td>
+                            </form>
+                        </tr>
+                    </tbody>
+                </table>
+            </details>
+            {{/equal}}
         </div>
     </body>
 </html>

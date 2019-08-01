@@ -35,6 +35,7 @@ import (
 const (
 	version     = 1
 	accessToken = "access_token"
+	discordAPI  = "https://discordapp.com/api/v6"
 )
 
 func main() {
@@ -232,6 +233,8 @@ func main() {
 	dirs = append(dirs, http.FileSystem(statikFS))
 	wwFFS = types.MultiplexFileSystem{dirs}
 
+	oauth2.ProviderDiscord.Scope += " guilds"
+
 	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
 	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.IDP, oauth2AppConfig.ID)))
 	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider.IDP, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
@@ -249,6 +252,9 @@ func main() {
 	http.HandleFunc("/search", mw(handleSearch))
 	http.HandleFunc("/api/search", mw(handleSearchAPI))
 	http.HandleFunc("/public/", mw(handleDirectoryListing(handlePublicListing)))
+	http.HandleFunc("/api/access_discord_role/create", mw(handleDiscordRoleAccessCreate))
+	http.HandleFunc("/api/access_discord_role/update", mw(handleDiscordRoleAccessUpdate))
+	http.HandleFunc("/api/access_discord_role/delete", mw(handleDiscordRoleAccessDelete))
 
 	if !IsPortAvailable(config.Port) {
 		log.Log(logger.LevelFATAL, "Binding to port", config.Port, "failed. It may be taken or you may not have permission to. Aborting!")

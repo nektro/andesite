@@ -28,6 +28,14 @@ type ShareRow struct {
 	Path string `json:"path" sqlite:"text"`
 }
 
+//
+type DiscordRoleAccessRow struct {
+	ID      int    `json:"id"`
+	GuildID string `json:"guild_snowflake" sqlite:"text"`
+	RoleID  string `json:"role_snowflake" sqlite:"text"`
+	Path    string `json:"path" sqlite:"text"`
+}
+
 // Middleware provides a convenient mechanism for augmenting HTTP requests
 // entering the application. It returns a new handler which may perform various
 // operations and should finish by calling the next HTTP handler.
@@ -66,6 +74,8 @@ type ConfigIDP struct {
 	Auth   string `json:"auth"`
 	ID     string `json:"id"`
 	Secret string `json:"secret"`
+	Extra1 string `json:"extra_1"`
+	Extra2 string `json:"extra_2"`
 }
 
 //

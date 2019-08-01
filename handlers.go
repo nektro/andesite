@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/nektro/go.etc"
+	"github.com/valyala/fastjson"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
@@ -191,6 +192,32 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	userUser, _ := queryUserBySnowflake(user.Snowflake)
 	userAccess := queryAccess(user)
 
+	if oauth2Provider.IDP.ID == "discord" {
+		dra := queryAllDiscordRoleAccess()
+		var p fastjson.Parser
+
+		rurl := F("%s/guilds/%s/members/%s", discordAPI, config.Discord.Extra1, user.Snowflake)
+		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
+		req.Header.Set("User-Agent", "nektro/andesite")
+		// req.Header.Set("Authorization", "Bearer "+sess.Values[accessToken].(string))
+		req.Header.Set("Authorization", "Bot "+config.Discord.Extra2)
+		bys := doHttpRequest(req)
+		v, err := p.Parse(string(bys))
+		if err != nil {
+			fmt.Println(2, "err", err.Error())
+		}
+		if v != nil {
+			for _, item := range dra {
+				for _, i := range v.GetArray("roles") {
+					s, _ := i.StringBytes()
+					if string(s) == item.RoleID {
+						userAccess = append(userAccess, item.Path)
+					}
+				}
+			}
+		}
+	}
+
 	return config.Root, qpath, userAccess, user.Snowflake, user.Name, userUser.Admin, nil
 }
 
@@ -217,11 +244,13 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	accesses := queryAllAccess()
 	shares := queryAllShares()
 	writeHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
-		"user":     user.Snowflake,
-		"accesses": accesses,
-		"base":     config.HTTPBase,
-		"name":     oauth2Provider.IDP.NamePrefix + user.Name,
-		"shares":   shares,
+		"user":           user.Snowflake,
+		"accesses":       accesses,
+		"base":           config.HTTPBase,
+		"name":           oauth2Provider.IDP.NamePrefix + user.Name,
+		"shares":         shares,
+		"auth":           oauth2Provider.IDP.ID,
+		"discord_shares": queryAllDiscordRoleAccess(),
 	})
 }
 
@@ -449,4 +478,65 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 		"count":    len(a),
 		"results":  a,
 	})
+}
+
+func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
+	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if errr != nil {
+		return
+	}
+	//
+	if !containsAll(r.PostForm, "RoleID", "Path") {
+		writeAPIResponse(r, w, false, "Missing POST values")
+		return
+	}
+	//
+	aid := database.QueryNextID("shares_discord_role")
+	// ags := r.PostForm.Get("GuildID")
+	ags := config.Discord.Extra1
+	agr := r.PostForm.Get("RoleID")
+	apt := r.PostForm.Get("Path")
+	//
+	database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?)", aid, ags, agr, apt)
+	writeAPIResponse(r, w, true, F("Created access for %s / %s.", ags, agr))
+}
+
+func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
+	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if errr != nil {
+		return
+	}
+	//
+	if !containsAll(r.PostForm, "ID", "RoleID", "Path") {
+		writeAPIResponse(r, w, false, "Missing POST values")
+		return
+	}
+	//
+	qid := r.PostForm.Get("ID")
+	// qgs := r.PostForm.Get("GuildID")
+	qgs := config.Discord.Extra1
+	qgr := r.PostForm.Get("RoleID")
+	qpt := r.PostForm.Get("Path")
+	// //
+	queryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
+	queryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)
+	queryDoUpdate("shares_discord_role", "path", qpt, "id", qid)
+	writeAPIResponse(r, w, true, "Successfully updated share path.")
+}
+
+func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
+	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if errr != nil {
+		return
+	}
+	//
+	if !containsAll(r.PostForm, "ID") {
+		writeAPIResponse(r, w, false, "Missing POST values")
+		return
+	}
+	//
+	qID := r.PostForm.Get("ID")
+	//
+	database.QueryPrepared(true, "delete from shares_discord_role where id = ?", qID)
+	writeAPIResponse(r, w, true, "Successfully deleted share link.")
 }
