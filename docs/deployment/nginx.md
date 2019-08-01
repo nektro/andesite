@@ -14,7 +14,7 @@ location / {
 ### Using HTTPS
 Modify your location block and add
 ```
-proxy_set_header X-TLS-Enabled true
+proxy_set_header X-TLS-Enabled true;
 ```
 
 ### Serving from an HTTP base that is not `/`
