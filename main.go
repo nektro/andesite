@@ -138,19 +138,10 @@ func main() {
 	database = sqlite.Connect(metaDir)
 	checkErr(database.Ping())
 
-	database.CreateTable("users", []string{"id", "int primary key"}, [][]string{
-		{"snowflake", "text"},
-		{"admin", "tinyint(1)"},
-		{"name", "text"},
-	})
-	database.CreateTable("access", []string{"id", "int primary key"}, [][]string{
-		{"user", "int"},
-		{"path", "text"},
-	})
-	database.CreateTable("shares", []string{"id", "int primary key"}, [][]string{
-		{"hash", "text"}, // character(32)
-		{"path", "text"},
-	})
+	database.CreateTableStruct("users", UserRow{})
+	database.CreateTableStruct("access", UserAccessRow{})
+	database.CreateTableStruct("shares", ShareRow{})
+	database.CreateTableStruct("shares_discord_role", DiscordRoleAccessRow{})
 
 	//
 	// admin creation from (optional) CLI argument
