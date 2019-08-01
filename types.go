@@ -7,18 +7,18 @@ import (
 )
 
 //
-type UserAccessRow struct {
-	ID   int
-	User int
-	Path string
-}
-
-//
 type UserRow struct {
 	ID        int
 	Snowflake string
 	Admin     bool
 	Name      string
+}
+
+//
+type UserAccessRow struct {
+	ID   int
+	User int
+	Path string
 }
 
 //
