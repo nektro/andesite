@@ -7,11 +7,6 @@ import (
 )
 
 //
-type OAuth2CallBackResponse struct {
-	AccessToken string `json:"access_token"`
-}
-
-//
 type UserAccessRow struct {
 	ID   int
 	User int
