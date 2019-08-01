@@ -27,7 +27,7 @@ func helperIsLoggedIn(r *http.Request) bool {
 	return ok
 }
 
-func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string) {
+func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
 	sess := etc.GetSession(r)
 	sess.Values["user"] = id
 	sess.Values["name"] = name
