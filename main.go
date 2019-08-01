@@ -24,7 +24,6 @@ import (
 	"github.com/nektro/go.etc"
 	"github.com/nektro/go.oauth2"
 	"github.com/rakyll/statik/fs"
-
 	flag "github.com/spf13/pflag"
 
 	. "github.com/nektro/go-util/alias"
