@@ -8,24 +8,24 @@ import (
 
 //
 type UserRow struct {
-	ID        int
-	Snowflake string
-	Admin     bool
-	Name      string
+	ID        int    `json:"id"`
+	Snowflake string `json:"snowflake" sqlite:"text"`
+	Admin     bool   `json:"admin" sqlite:"tinyint(1)"`
+	Name      string `json:"name" sqlite:"text"`
 }
 
 //
 type UserAccessRow struct {
-	ID   int
-	User int
-	Path string
+	ID   int    `json:"id"`
+	User int    `json:"user" sqlite:"int"`
+	Path string `json:"path" sqlite:"text"`
 }
 
 //
 type ShareRow struct {
-	ID   int
-	Hash string
-	Path string
+	ID   int    `json:"id"`
+	Hash string `json:"hash" sqlite:"text"`
+	Path string `json:"path" sqlite:"text"`
 }
 
 // Middleware provides a convenient mechanism for augmenting HTTP requests
