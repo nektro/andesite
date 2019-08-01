@@ -7,6 +7,7 @@
 ```
 location / {
     proxy_pass http://localhost:8000/;
+    proxy_set_header Host $host;
 }
 ```
 
@@ -17,13 +18,6 @@ proxy_set_header X-TLS-Enabled true
 ```
 
 ### Serving from an HTTP base that is not `/`
-```
-location /andesite/ {
-    proxy_pass http://localhost:8000/;
-    proxy_set_header Host $host;
-}
-```
-Notes:
 - The leading slash at the end of `proxy_pass` is critical, particularly if you are serving Andesite from a `location` that isn't `/`.
 - The `--base` option must be sent with the exact text of the nginx location. Ie: `./andesite --root ROOT --base /andesite/`.
 - If the exposed port is not `80` or `443`, then the `proxy_set_header` value must be `Host $host:$server_port`.
