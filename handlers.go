@@ -31,6 +31,9 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 	sess := etc.GetSession(r)
 	sess.Values["user"] = id
 	sess.Values["name"] = name
+	sess.Values[provider+"_access_token"] = resp["access_token"]
+	sess.Values[provider+"_expires_in"] = resp["expires_in"]
+	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
 	sess.Save(r, w)
 	queryAssertUserName(id, name)
 	Log("[user-login]", provider, id, name)
