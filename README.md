@@ -72,6 +72,22 @@ There are a number of options that are also required and can be used to configur
 | `"custom"` | `[]OA2Config` | ` ` | An array of OA2 app configs, that can be used with providers created in `"providers"`. See [`providers.md`](docs/providers.md) for more info. |
 | `"public"` | `string` | None. | Similar to `--root`, but served from `/public/` and no authorization is required to see files listings or download. Like a regular OD. |
 
+### Discord Guild/Role Access Grant
+Due to a limitation in the Discord API, in order to determine if a user has a role on a specific server, you must use a bot. To get started, go to https://discordapp.com/developers/applications/ and add a Bot user to your app and copy down the Bot Token. Now, to be able to give file/folder access to entire roles, add the to your config like this:
+
+```json
+"discord": {
+    "id": "{CLIENT_ID}",
+    "secret": "{CLIENT_SECRET}",
+    "extra_1": "{GUILD_SNOWFLAKE}",
+    "extra_2": "{BOT_TOKEN}"
+}
+```
+
+The value for `{GUILD_SNOWFLAKE}` can be obtained from the URL of the server. So if the server you want to add access for is `https://discordapp.com/channels/184315303323238400/184315303323238400`, then the first ID, `184315303323238400`, is the snowflake you need. The other is for the channel you are currently in. This value is not needed.
+
+Enabling these values will add a section to `http://andesite/admin` that you can input the role snowflakes and the path you are granting.
+
 ## Themes
 Andesite supports making custom themes for the splash page and the various HTML templates throughout the program. Those are:
 - `index.html` - [Default Source](./www/index.html)
