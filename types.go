@@ -12,6 +12,8 @@ type UserRow struct {
 	Snowflake string `json:"snowflake" sqlite:"text"`
 	Admin     bool   `json:"admin" sqlite:"tinyint(1)"`
 	Name      string `json:"name" sqlite:"text"`
+	JoinedOn  string `json:"joined_on" sqlite:"text"`
+	PassKey   string `json:"passkey" sqlite:"text"`
 }
 
 //

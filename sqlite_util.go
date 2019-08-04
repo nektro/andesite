@@ -10,7 +10,7 @@ import (
 
 func scanUser(rows *sql.Rows) UserRow {
 	var v UserRow
-	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name)
+	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey)
 	return v
 }
 
@@ -83,7 +83,7 @@ func queryAllAccess() []map[string]string {
 }
 
 func queryDoAddUser(id int, snowflake string, admin bool, name string) {
-	database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?)", id, oauth2Provider.DbP+snowflake, boolToString(admin)), name)
+	database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '')", id, oauth2Provider.DbP+snowflake, boolToString(admin), T()), name)
 }
 
 func queryDoUpdate(table string, col string, value string, where string, search string) {
