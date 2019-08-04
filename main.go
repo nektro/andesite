@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -407,8 +409,19 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 	sessID := sess.Values["user"]
 
 	if sessID == nil {
-		writeUserDenied(r, w, true, true)
-		return nil, UserRow{}, E("")
+		pk := r.Header.Get("x-passkey")
+		if len(pk) == 0 {
+			writeUserDenied(r, w, true, true)
+			return nil, UserRow{}, E("not logged in and no passkey found")
+		}
+		kq := database.QueryDoSelect("users", "passkey", pk)
+		if !kq.Next() {
+			kq.Close()
+			writeUserDenied(r, w, true, true)
+			return nil, UserRow{}, E("invalid passkey")
+		}
+		sessID = scanUser(kq).Snowflake
+		kq.Close()
 	}
 
 	userID := sessID.(string)
@@ -494,4 +507,10 @@ func writeJSON(w http.ResponseWriter, data map[string]interface{}) {
 	w.Header().Add("content-type", "application/json")
 	bytes, _ := json.Marshal(data)
 	w.Write(bytes)
+}
+
+func generateNewUserPasskey(snowflake string) string {
+	hash1 := md5.Sum([]byte(F("astheno.andesite.passkey.%s.%s", snowflake, T())))
+	hash2 := hex.EncodeToString(hash1[:])
+	return hash2[0:10]
 }

@@ -59,9 +59,9 @@ func handleTest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, fullHost(r))
 }
 
-func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, string, string, bool, error)) func(http.ResponseWriter, *http.Request) {
+func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fileRoot, qpath, uAccess, uID, uName, isAdmin, err := getAccess(w, r)
+		fileRoot, qpath, uAccess, uID, uName, isAdmin, extras, err := getAccess(w, r)
 
 		// if getAccess errored, response has already been written
 		if err != nil {
@@ -156,6 +156,8 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"base":      config.HTTPBase,
 				"name":      oauth2Provider.IDP.NamePrefix + uName,
 				"search_on": config.SearchOn,
+				"host":      FullHost(r),
+				"extras":    extras,
 			})
 		} else {
 			// access check
@@ -179,10 +181,10 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 }
 
 // handler for http://andesite/files/*
-func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, error) {
+func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error) {
 	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if errr != nil {
-		return "", "", []string{}, "", "", false, errors.New("")
+		return "", "", []string{}, "", "", false, map[string]interface{}{}, errr
 	}
 
 	// get path
@@ -218,19 +220,21 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		}
 	}
 
-	return config.Root, qpath, userAccess, user.Snowflake, user.Name, userUser.Admin, nil
+	return config.Root, qpath, userAccess, user.Snowflake, user.Name, userUser.Admin, map[string]interface{}{
+		"user": user,
+	}, nil
 }
 
 // handler for http://andesite/public/*
-func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, error) {
+func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error) {
 	// remove /public
 	qpath := string(r.URL.Path[7:])
 	qaccess := []string{}
 
 	if len(config.Public) == 0 {
-		return config.Public, qpath, qaccess, "", "new member!", false, nil
+		return config.Public, qpath, qaccess, "", "new member!", false, map[string]interface{}{}, nil
 	}
-	return config.Public, qpath, []string{"/"}, "", "new member", false, nil
+	return config.Public, qpath, []string{"/"}, "", "new member", false, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/admin
@@ -349,7 +353,7 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	writeAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ahs2, fpath))
 }
 
-func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, error) {
+func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error) {
 	u := r.URL.Path[6:]
 	if len(u) == 0 {
 		w.Header().Add("Location", "../")
@@ -357,17 +361,17 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 	}
 	if match, _ := regexp.MatchString("^[0-9a-f]{32}/.*", u); !match {
 		writeResponse(r, w, "Invalid Share Link", "Invalid format for share code.", "")
-		return "", "", []string{}, "", "", false, errors.New("")
+		return "", "", []string{}, "", "", false, map[string]interface{}{}, errors.New("")
 	}
 
 	h := u[:32]
 	s := queryAccessByShare(h)
 	if len(s) == 0 {
 		writeResponse(r, w, "Not Found", "Public share code not found.", "")
-		return "", "", []string{}, "", "", false, errors.New("")
+		return "", "", []string{}, "", "", false, map[string]interface{}{}, errors.New("")
 	}
 
-	return config.Root, u[32:], s, h, "", false, nil
+	return config.Root, u[32:], s, h, "", false, map[string]interface{}{}, nil
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
