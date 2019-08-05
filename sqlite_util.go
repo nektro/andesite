@@ -20,6 +20,12 @@ func scanAccessRow(rows *sql.Rows) UserAccessRow {
 	return v
 }
 
+func scanShare(rows *sql.Rows) ShareRow {
+	var v ShareRow
+	rows.Scan(&v.ID, &v.Hash, &v.Path)
+	return v
+}
+
 //
 //
 
@@ -111,8 +117,7 @@ func queryAllShares() []map[string]string {
 	var result []map[string]string
 	rows := database.QueryDoSelectAll("shares")
 	for rows.Next() {
-		var sr ShareRow
-		rows.Scan(&sr.ID, &sr.Hash, &sr.Path)
+		sr := scanShare(rows)
 		result = append(result, map[string]string{
 			"id":   strconv.Itoa(sr.ID),
 			"hash": sr.Hash,
@@ -127,9 +132,7 @@ func queryAllSharesByCode(code string) []ShareRow {
 	shrs := []ShareRow{}
 	rows := database.QueryDoSelect("shares", "hash", code)
 	for rows.Next() {
-		var sr ShareRow
-		rows.Scan(&sr.ID, &sr.Hash, &sr.Path)
-		shrs = append(shrs, sr)
+		shrs = append(shrs, scanShare(rows))
 	}
 	rows.Close()
 	return shrs
