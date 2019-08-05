@@ -408,7 +408,6 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 		}
 		kq := database.QueryDoSelect("users", "passkey", pk)
 		if !kq.Next() {
-			kq.Close()
 			writeUserDenied(r, w, true, true)
 			return nil, UserRow{}, E("invalid passkey")
 		}
