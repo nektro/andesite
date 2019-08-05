@@ -109,7 +109,7 @@ func queryAssertUserName(snowflake string, name string) {
 
 func queryAllShares() []map[string]string {
 	var result []map[string]string
-	rows := database.Query(false, "select * from shares")
+	rows := database.QueryDoSelectAll("shares")
 	for rows.Next() {
 		var sr ShareRow
 		rows.Scan(&sr.ID, &sr.Hash, &sr.Path)
@@ -125,7 +125,7 @@ func queryAllShares() []map[string]string {
 
 func queryAllSharesByCode(code string) []ShareRow {
 	shrs := []ShareRow{}
-	rows := database.QueryPrepared(false, "select * from shares where hash = ?", code)
+	rows := database.QueryDoSelect("shares", "hash", code)
 	for rows.Next() {
 		var sr ShareRow
 		rows.Scan(&sr.ID, &sr.Hash, &sr.Path)
@@ -145,7 +145,7 @@ func queryAccessByShare(code string) []string {
 
 func queryAllDiscordRoleAccess() []DiscordRoleAccessRow {
 	var result []DiscordRoleAccessRow
-	rows := database.QueryPrepared(false, "select * from shares_discord_role")
+	rows := database.QueryDoSelectAll("shares_discord_role")
 	for rows.Next() {
 		var dar DiscordRoleAccessRow
 		rows.Scan(&dar.ID, &dar.GuildID, &dar.RoleID, &dar.Path)
