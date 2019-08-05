@@ -289,14 +289,6 @@ func byteCountIEC(b int64) string {
 	return reduceNumber(b, 1024, "B", "KMGTPEZY")
 }
 
-func fullHost(r *http.Request) string {
-	urL := "http"
-	if r.TLS != nil {
-		urL += "s"
-	}
-	return urL + "://" + r.Host
-}
-
 func filter(stack []os.FileInfo, cb func(os.FileInfo) bool) []os.FileInfo {
 	result := []os.FileInfo{}
 	for _, item := range stack {
