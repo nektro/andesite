@@ -34,24 +34,22 @@ func queryAccess(user UserRow) []string {
 }
 
 func queryUserBySnowflake(snowflake string) (UserRow, bool) {
-	var ur UserRow
 	rows := database.Query(false, F("select * from users where snowflake = '%s'", oauth2Provider.DbP+snowflake))
 	if !rows.Next() {
-		return ur, false
+		return UserRow{}, false
 	}
-	ur = scanUser(rows)
+	ur := scanUser(rows)
 	rows.Close()
 	ur.Snowflake = ur.Snowflake[len(oauth2Provider.DbP):]
 	return ur, true
 }
 
 func queryUserByID(id int) (UserRow, bool) {
-	var ur UserRow
 	rows := database.Query(false, F("select * from users where id = '%d'", id))
 	if !rows.Next() {
-		return ur, false
+		return UserRow{}, false
 	}
-	rows.Scan(&ur.ID, &ur.Snowflake, &ur.Admin, &ur.Name)
+	ur := scanUser(rows)
 	rows.Close()
 	ur.Snowflake = ur.Snowflake[len(oauth2Provider.DbP):]
 	return ur, true
