@@ -56,7 +56,7 @@ func handleTest(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, "~~ Host ~~")
-	fmt.Fprintln(w, fullHost(r))
+	fmt.Fprintln(w, FullHost(r))
 }
 
 func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
