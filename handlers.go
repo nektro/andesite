@@ -243,16 +243,12 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	if errr != nil {
 		return
 	}
-
-	//
-	accesses := queryAllAccess()
-	shares := queryAllShares()
 	writeHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
 		"user":           user.Snowflake,
-		"accesses":       accesses,
+		"accesses":       queryAllAccess(),
 		"base":           config.HTTPBase,
 		"name":           oauth2Provider.IDP.NamePrefix + user.Name,
-		"shares":         shares,
+		"shares":         queryAllShares(),
 		"auth":           oauth2Provider.IDP.ID,
 		"discord_shares": queryAllDiscordRoleAccess(),
 	})
