@@ -26,7 +26,7 @@ type UserAccessRow struct {
 //
 type ShareRow struct {
 	ID   int    `json:"id"`
-	Hash string `json:"hash" sqlite:"text"`
+	Hash string `json:"hash" sqlite:"text"` // character(32)
 	Path string `json:"path" sqlite:"text"`
 }
 
