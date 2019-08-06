@@ -88,7 +88,7 @@ func queryAllAccess() []map[string]string {
 
 func queryDoAddUser(id int, snowflake string, admin bool, name string) {
 	database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '')", id, oauth2Provider.DbP+snowflake, boolToString(admin), T()), name)
-	database.QueryDoUpdate("userS", "passkey", generateNewUserPasskey(snowflake), "snowflake", snowflake)
+	database.QueryDoUpdate("users", "passkey", generateNewUserPasskey(snowflake), "snowflake", snowflake)
 }
 
 func queryDoUpdate(table string, col string, value string, where string, search string) {
