@@ -540,3 +540,14 @@ func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	database.QueryPrepared(true, "delete from shares_discord_role where id = ?", qID)
 	writeAPIResponse(r, w, true, "Successfully deleted share link.")
 }
+
+//
+func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
+	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	if errr != nil {
+		return
+	}
+	database.QueryDoUpdate("userS", "passkey", generateNewUserPasskey(user.Snowflake), "snowflake", user.Snowflake)
+	w.Header().Add("Location", "./files/")
+	w.WriteHeader(http.StatusMovedPermanently)
+}

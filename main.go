@@ -257,6 +257,7 @@ func main() {
 	http.HandleFunc("/api/access_discord_role/create", mw(handleDiscordRoleAccessCreate))
 	http.HandleFunc("/api/access_discord_role/update", mw(handleDiscordRoleAccessUpdate))
 	http.HandleFunc("/api/access_discord_role/delete", mw(handleDiscordRoleAccessDelete))
+	http.HandleFunc("/regen_passkey", mw(handleRegenPasskey))
 
 	if !IsPortAvailable(config.Port) {
 		log.Log(logger.LevelFATAL, "Binding to port", config.Port, "failed. It may be taken or you may not have permission to. Aborting!")
