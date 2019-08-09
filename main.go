@@ -398,6 +398,8 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 	w.Header().Add("Expires", "0")                                         // Proxies.
 
 	if r.Method != method {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Header().Add("Allow", "HEAD, "+method)
 		writeAPIResponse(r, w, false, "This action requires using HTTP "+method)
 		return nil, UserRow{}, E("")
 	}
