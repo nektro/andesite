@@ -353,7 +353,7 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 	u := r.URL.Path[6:]
 	if len(u) == 0 {
 		w.Header().Add("Location", "../")
-		w.WriteHeader(http.StatusMovedPermanently)
+		w.WriteHeader(http.StatusFound)
 	}
 	if match, _ := regexp.MatchString("^[0-9a-f]{32}/.*", u); !match {
 		writeResponse(r, w, "Invalid Share Link", "Invalid format for share code.", "")
@@ -546,5 +546,5 @@ func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
 	}
 	database.QueryDoUpdate("users", "passkey", generateNewUserPasskey(user.Snowflake), "snowflake", user.Snowflake)
 	w.Header().Add("Location", "./files/")
-	w.WriteHeader(http.StatusMovedPermanently)
+	w.WriteHeader(http.StatusFound)
 }
