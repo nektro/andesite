@@ -544,7 +544,7 @@ func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	database.QueryDoUpdate("userS", "passkey", generateNewUserPasskey(user.Snowflake), "snowflake", user.Snowflake)
+	database.QueryDoUpdate("users", "passkey", generateNewUserPasskey(user.Snowflake), "snowflake", user.Snowflake)
 	w.Header().Add("Location", "./files/")
 	w.WriteHeader(http.StatusMovedPermanently)
 }
