@@ -383,6 +383,10 @@ func writeResponse(r *http.Request, w http.ResponseWriter, title string, message
 	})
 }
 
+func writeLinkResponse(r *http.Request, w http.ResponseWriter, title string, message string, linkText string, href string) {
+	writeResponse(r, w, title, message, "<a href=\""+linkText+"\">"+href+"</a>")
+}
+
 func containsAll(mp url.Values, keys ...string) bool {
 	for _, item := range keys {
 		if _, ok := mp[item]; !ok {
