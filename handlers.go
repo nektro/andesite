@@ -182,9 +182,9 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 // handler for http://andesite/files/*
 func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error) {
-	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
-	if errr != nil {
-		return "", "", []string{}, "", "", false, map[string]interface{}{}, errr
+	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	if err != nil {
+		return "", "", []string{}, "", "", false, map[string]interface{}{}, err
 	}
 
 	// get path
@@ -239,8 +239,8 @@ func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 
 // handler for http://andesite/admin
 func handleAdmin(w http.ResponseWriter, r *http.Request) {
-	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, true)
-	if errr != nil {
+	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, true)
+	if err != nil {
 		return
 	}
 	writeHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
@@ -256,8 +256,8 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/delete
 func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
-	if errr != nil {
+	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if err != nil {
 		return
 	}
 	//
@@ -279,8 +279,8 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/update
 func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
-	if errr != nil {
+	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if err != nil {
 		return
 	}
 	//
@@ -302,8 +302,8 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/create
 func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
-	if errr != nil {
+	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if err != nil {
 		return
 	}
 	//
@@ -330,8 +330,8 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleShareCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
-	if errr != nil {
+	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if err != nil {
 		return
 	}
 	//
@@ -371,8 +371,8 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
-	if errr != nil {
+	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if err != nil {
 		return
 	}
 	//
@@ -389,8 +389,8 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleShareDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
-	if errr != nil {
+	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if err != nil {
 		return
 	}
 	//
@@ -406,8 +406,8 @@ func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
-	sess, _, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
-	if errr != nil {
+	sess, _, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	if err != nil {
 		return
 	}
 	//
@@ -417,8 +417,8 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
-	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
-	if errr != nil {
+	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	if err != nil {
 		return
 	}
 	//
@@ -430,11 +430,11 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
-	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
-	if errr != nil {
+	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	if err != nil {
 		writeJSON(w, map[string]interface{}{
 			"response": "bad",
-			"message":  errr.Error(),
+			"message":  err.Error(),
 		})
 		return
 	}
@@ -481,8 +481,8 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
-	if errr != nil {
+	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if err != nil {
 		return
 	}
 	//
@@ -502,8 +502,8 @@ func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
-	if errr != nil {
+	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if err != nil {
 		return
 	}
 	//
@@ -525,26 +525,23 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, errr := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
-	if errr != nil {
+	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	if err != nil {
 		return
 	}
-	//
 	if !containsAll(r.PostForm, "ID") {
 		writeAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
-	//
 	qID := r.PostForm.Get("ID")
-	//
 	database.QueryPrepared(true, "delete from shares_discord_role where id = ?", qID)
 	writeAPIResponse(r, w, true, "Successfully deleted share link.")
 }
 
 //
 func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
-	_, user, errr := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
-	if errr != nil {
+	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	if err != nil {
 		return
 	}
 	database.QueryDoUpdate("userS", "passkey", generateNewUserPasskey(user.Snowflake), "snowflake", user.Snowflake)
