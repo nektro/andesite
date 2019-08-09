@@ -64,7 +64,7 @@
         </div>
         {{#if extras.user}}
         <div id="dlbox">
-            <p>Download the contents of the entire folder using your passkey: <code>{{extras.user.PassKey}}</code> (<a href="{{base}}/regen_passkey">Regenerate Key</a>)</p>
+            <p>Download the contents of the entire folder using your passkey: <code>{{extras.user.PassKey}}</code> (<a href="{{base}}regen_passkey">Regenerate Key</a>)</p>
             <p><code>wget -m -np -c -R "index.html*" --header "x-passkey: {{extras.user.PassKey}}" "{{host}}/files{{path}}"</code></p>
         </div>
         {{/if}}
