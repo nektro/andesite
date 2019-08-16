@@ -9,13 +9,11 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"reflect"
 	"runtime/debug"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/aymerick/raymond"
 	"github.com/gorilla/sessions"
@@ -172,13 +170,7 @@ func main() {
 	//
 	// graceful stop
 
-	gracefulStop := make(chan os.Signal)
-	signal.Notify(gracefulStop, syscall.SIGTERM)
-	signal.Notify(gracefulStop, syscall.SIGINT)
-
-	go func() {
-		sig := <-gracefulStop
-		log.Log(logger.LevelINFO, F("Caught signal '%+v'", sig))
+	etc.RunOnClose(func() {
 		log.Log(logger.LevelINFO, "Gracefully shutting down...")
 
 		log.Log(logger.LevelINFO, "Saving database to disk")
@@ -190,8 +182,7 @@ func main() {
 		}
 
 		log.Log(logger.LevelINFO, "Done!")
-		os.Exit(0)
-	}()
+	})
 
 	//
 	// initialize filesystem watching
