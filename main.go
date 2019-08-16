@@ -388,10 +388,6 @@ func containsAll(mp url.Values, keys ...string) bool {
 }
 
 func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method string, requireAdmin bool) (*sessions.Session, UserRow, error) {
-	w.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1.
-	w.Header().Add("Pragma", "no-cache")                                   // HTTP 1.0.
-	w.Header().Add("Expires", "0")                                         // Proxies.
-
 	if r.Method != method {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Add("Allow", "HEAD, "+method)
