@@ -26,6 +26,8 @@ import (
 	"github.com/rakyll/statik/fs"
 	flag "github.com/spf13/pflag"
 
+	"github.com/nektro/andesite/internal/itypes"
+
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
 
@@ -100,8 +102,8 @@ func main() {
 	if len(config.Auth) == 0 {
 		config.Auth = "discord"
 	}
-	if cfp, ok := Oauth2Providers[config.Auth]; ok {
-		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*ConfigIDP)
+	if cfp, ok := itypes.Oauth2Providers[config.Auth]; ok {
+		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*itypes.ConfigIDP)
 		DieOnError(Assert(cidp != nil, F("Authorization keys not set for identity prodvider '%s' in config.json!", config.Auth)))
 		DieOnError(Assert(cidp.ID != "", F("App ID not set for identity prodvider '%s' in config.json!", config.Auth)))
 		DieOnError(Assert(cidp.Secret != "", F("App Secret not set for identity prodvider '%s' in config.json!", config.Auth)))
@@ -111,7 +113,7 @@ func main() {
 		foundP := false
 		for _, item := range config.Providers {
 			if item.ID == config.Auth {
-				oauth2Provider = Oauth2Provider{item, config.Auth}
+				oauth2Provider = itypes.Oauth2Provider{item, config.Auth}
 				foundP = true
 				break
 			}
@@ -139,10 +141,10 @@ func main() {
 	database = sqlite.Connect(metaDir)
 	checkErr(database.Ping())
 
-	database.CreateTableStruct("users", UserRow{})
-	database.CreateTableStruct("access", UserAccessRow{})
-	database.CreateTableStruct("shares", ShareRow{})
-	database.CreateTableStruct("shares_discord_role", DiscordRoleAccessRow{})
+	database.CreateTableStruct("users", itypes.UserRow{})
+	database.CreateTableStruct("access", itypes.UserAccessRow{})
+	database.CreateTableStruct("shares", itypes.ShareRow{})
+	database.CreateTableStruct("shares_discord_role", itypes.DiscordRoleAccessRow{})
 
 	//
 	// admin creation from (optional) CLI argument
@@ -387,12 +389,12 @@ func containsAll(mp url.Values, keys ...string) bool {
 	return true
 }
 
-func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method string, requireAdmin bool) (*sessions.Session, UserRow, error) {
+func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method string, requireAdmin bool) (*sessions.Session, itypes.UserRow, error) {
 	if r.Method != method {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Add("Allow", "HEAD, "+method)
 		writeAPIResponse(r, w, false, "This action requires using HTTP "+method)
-		return nil, UserRow{}, E("")
+		return nil, itypes.UserRow{}, E("")
 	}
 
 	sess := etc.GetSession(r)
@@ -402,12 +404,12 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 		pk := r.Header.Get("x-passkey")
 		if len(pk) == 0 {
 			writeUserDenied(r, w, true, true)
-			return nil, UserRow{}, E("not logged in and no passkey found")
+			return nil, itypes.UserRow{}, E("not logged in and no passkey found")
 		}
 		kq := database.QueryDoSelect("users", "passkey", pk)
 		if !kq.Next() {
 			writeUserDenied(r, w, true, true)
-			return nil, UserRow{}, E("invalid passkey")
+			return nil, itypes.UserRow{}, E("invalid passkey")
 		}
 		sessID = scanUser(kq).Snowflake
 		kq.Close()
@@ -418,17 +420,17 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 
 	if !ok {
 		writeResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+userID+")", "")
-		return nil, UserRow{}, E("")
+		return nil, itypes.UserRow{}, E("")
 	}
 	if requireAdmin && !user.Admin {
 		writeAPIResponse(r, w, false, "This action requires being a site administrator. ("+userID+")")
-		return nil, UserRow{}, E("")
+		return nil, itypes.UserRow{}, E("")
 	}
 
 	err := r.ParseForm()
 	if err != nil {
 		writeAPIResponse(r, w, false, "Error parsing form data")
-		return nil, UserRow{}, E("")
+		return nil, itypes.UserRow{}, E("")
 	}
 
 	return sess, user, nil
@@ -443,7 +445,7 @@ func doHttpRequest(req *http.Request) []byte {
 }
 
 // @from https://gist.github.com/gbbr/fa652db0bab132976620bcb7809fd89a
-func chainMiddleware(mw ...Middleware) Middleware {
+func chainMiddleware(mw ...itypes.Middleware) itypes.Middleware {
 	return func(final http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			last := final

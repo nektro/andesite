@@ -4,24 +4,26 @@ import (
 	"database/sql"
 	"strconv"
 
+	"github.com/nektro/andesite/internal/itypes"
+
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
 )
 
-func scanUser(rows *sql.Rows) UserRow {
-	var v UserRow
+func scanUser(rows *sql.Rows) itypes.UserRow {
+	var v itypes.UserRow
 	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey)
 	return v
 }
 
-func scanAccessRow(rows *sql.Rows) UserAccessRow {
-	var v UserAccessRow
+func scanAccessRow(rows *sql.Rows) itypes.UserAccessRow {
+	var v itypes.UserAccessRow
 	rows.Scan(&v.ID, &v.User, &v.Path)
 	return v
 }
 
-func scanShare(rows *sql.Rows) ShareRow {
-	var v ShareRow
+func scanShare(rows *sql.Rows) itypes.ShareRow {
+	var v itypes.ShareRow
 	rows.Scan(&v.ID, &v.Hash, &v.Path)
 	return v
 }
@@ -29,7 +31,7 @@ func scanShare(rows *sql.Rows) ShareRow {
 //
 //
 
-func queryAccess(user UserRow) []string {
+func queryAccess(user itypes.UserRow) []string {
 	result := []string{}
 	rows := database.Query(false, F("select * from access where user = '%d'", user.ID))
 	for rows.Next() {
@@ -39,10 +41,10 @@ func queryAccess(user UserRow) []string {
 	return result
 }
 
-func queryUserBySnowflake(snowflake string) (UserRow, bool) {
+func queryUserBySnowflake(snowflake string) (itypes.UserRow, bool) {
 	rows := database.Query(false, F("select * from users where snowflake = '%s'", oauth2Provider.DbP+snowflake))
 	if !rows.Next() {
-		return UserRow{}, false
+		return itypes.UserRow{}, false
 	}
 	ur := scanUser(rows)
 	rows.Close()
@@ -50,10 +52,10 @@ func queryUserBySnowflake(snowflake string) (UserRow, bool) {
 	return ur, true
 }
 
-func queryUserByID(id int) (UserRow, bool) {
+func queryUserByID(id int) (itypes.UserRow, bool) {
 	rows := database.Query(false, F("select * from users where id = '%d'", id))
 	if !rows.Next() {
-		return UserRow{}, false
+		return itypes.UserRow{}, false
 	}
 	ur := scanUser(rows)
 	rows.Close()
@@ -64,7 +66,7 @@ func queryUserByID(id int) (UserRow, bool) {
 func queryAllAccess() []map[string]string {
 	var result []map[string]string
 	rows := database.Query(false, "select * from access")
-	accs := []UserAccessRow{}
+	accs := []itypes.UserAccessRow{}
 	for rows.Next() {
 		accs = append(accs, scanAccessRow(rows))
 	}
@@ -128,8 +130,8 @@ func queryAllShares() []map[string]string {
 	return result
 }
 
-func queryAllSharesByCode(code string) []ShareRow {
-	shrs := []ShareRow{}
+func queryAllSharesByCode(code string) []itypes.ShareRow {
+	shrs := []itypes.ShareRow{}
 	rows := database.QueryDoSelect("shares", "hash", code)
 	for rows.Next() {
 		shrs = append(shrs, scanShare(rows))
@@ -146,11 +148,11 @@ func queryAccessByShare(code string) []string {
 	return result
 }
 
-func queryAllDiscordRoleAccess() []DiscordRoleAccessRow {
-	var result []DiscordRoleAccessRow
+func queryAllDiscordRoleAccess() []itypes.DiscordRoleAccessRow {
+	var result []itypes.DiscordRoleAccessRow
 	rows := database.QueryDoSelectAll("shares_discord_role")
 	for rows.Next() {
-		var dar DiscordRoleAccessRow
+		var dar itypes.DiscordRoleAccessRow
 		rows.Scan(&dar.ID, &dar.GuildID, &dar.RoleID, &dar.Path)
 		result = append(result, dar)
 	}

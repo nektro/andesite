@@ -1,9 +1,9 @@
-package main
+package itypes
 
 import (
 	"net/http"
 
-	"github.com/nektro/go.oauth2"
+	oauth2 "github.com/nektro/go.oauth2"
 )
 
 //
@@ -113,6 +113,5 @@ var (
 			oauth2.ProviderMicrosoft,
 			"5:",
 		},
-
 	}
 )

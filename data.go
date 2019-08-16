@@ -6,12 +6,14 @@ import (
 	"github.com/nektro/go-util/logger"
 	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/types"
+
+	"github.com/nektro/andesite/internal/itypes"
 )
 
 var (
-	config          *Config
-	oauth2AppConfig *ConfigIDP
-	oauth2Provider  Oauth2Provider
+	config          *itypes.Config
+	oauth2AppConfig *itypes.ConfigIDP
+	oauth2Provider  itypes.Oauth2Provider
 	database        *sqlite.DB
 	wwFFS           types.MultiplexFileSystem
 	randomKey       = securecookie.GenerateRandomKey(32)
