@@ -215,6 +215,13 @@ func main() {
 	}
 
 	//
+	// handlebars helpers
+
+	raymond.RegisterHelper("url_name", func(x string) string {
+		return strings.ReplaceAll(url.PathEscape(x), "%2F", "/")
+	})
+
+	//
 	// http server setup and launch
 
 	statikFS, err := fs.New()
