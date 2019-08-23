@@ -42,7 +42,7 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 
 // handler for http://andesite/test
 func handleTest(w http.ResponseWriter, r *http.Request) {
-	// sessions test
+	// sessions test and debug info
 	// increment number every refresh
 	sess := etc.GetSession(r)
 	i := sess.Values["int"]
