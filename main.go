@@ -265,12 +265,6 @@ func main() {
 	http.ListenAndServe(":"+p, nil)
 }
 
-func readServerFile(path string) []byte {
-	reader, _ := wwFFS.Open(path)
-	bytes, _ := ioutil.ReadAll(reader)
-	return bytes
-}
-
 func reduceNumber(input int64, unit int64, base string, prefixes string) string {
 	if input < unit {
 		return F("%d "+base, input)
@@ -336,13 +330,6 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	}
 }
 
-func writeHandlebarsFile(r *http.Request, w http.ResponseWriter, file string, context map[string]interface{}) {
-	template := string(readServerFile(file))
-	result, _ := raymond.Render(template, context)
-	w.Header().Add("Content-Type", "text/html")
-	fmt.Fprintln(w, result)
-}
-
 func writeAPIResponse(r *http.Request, w http.ResponseWriter, good bool, message string) {
 	if !good {
 		w.WriteHeader(http.StatusForbidden)
@@ -372,7 +359,7 @@ func boolToString(x bool) string {
 }
 
 func writeResponse(r *http.Request, w http.ResponseWriter, title string, message string, link string) {
-	writeHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
+	etc.WriteHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
 		"title":   title,
 		"message": message,
 		"link":    link,

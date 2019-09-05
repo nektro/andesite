@@ -148,7 +148,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				gi++
 			}
 
-			writeHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
+			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
 				"user":      uID,
 				"path":      qpath,
 				"files":     data,
@@ -243,7 +243,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	writeHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
+	etc.WriteHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
 		"user":           user.Snowflake,
 		"accesses":       queryAllAccess(),
 		"base":           config.HTTPBase,
@@ -422,7 +422,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	writeHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
+	etc.WriteHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
 		"user": user.Snowflake,
 		"base": config.HTTPBase,
 		"name": oauth2Provider.IDP.NamePrefix + user.Name,
