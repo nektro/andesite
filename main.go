@@ -232,8 +232,6 @@ func main() {
 	etc.MFS.Add(http.Dir("./www/"))
 	etc.MFS.Add(http.FileSystem(statikFS))
 
-	oauth2.ProviderDiscord.Scope += " guilds"
-
 	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
 	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.IDP, oauth2AppConfig.ID)))
 	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider.IDP, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
