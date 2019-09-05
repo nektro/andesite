@@ -20,7 +20,6 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/nektro/go-util/logger"
 	"github.com/nektro/go-util/sqlite"
-	"github.com/nektro/go-util/types"
 	"github.com/nektro/go.etc"
 	"github.com/nektro/go.oauth2"
 	"github.com/rakyll/statik/fs"
@@ -198,7 +197,6 @@ func main() {
 
 	etc.SetSessionName("session_andesite")
 	p := strconv.Itoa(config.Port)
-	dirs := []http.FileSystem{}
 
 	//
 	// theme setup
@@ -206,12 +204,12 @@ func main() {
 	for _, item := range *flagTheme {
 		loc := metaDir + "/themes/" + item
 		DieOnError(Assert(DoesDirectoryExist(loc), F("'%s' does not exist!", loc)))
-		dirs = append(dirs, http.Dir(loc))
+		etc.MFS.Add(http.Dir(loc))
 	}
 	for _, item := range config.Themes {
 		loc := metaDir + "/themes/" + item
 		DieOnError(Assert(DoesDirectoryExist(loc), F("'%s' does not exist!", loc)))
-		dirs = append(dirs, http.Dir(loc))
+		etc.MFS.Add(http.Dir(loc))
 	}
 
 	//
@@ -231,13 +229,12 @@ func main() {
 	}
 
 	mw := chainMiddleware(mwAddAttribution)
-	dirs = append(dirs, http.Dir("./www/"))
-	dirs = append(dirs, http.FileSystem(statikFS))
-	wwFFS = types.MultiplexFileSystem{dirs}
+	etc.MFS.Add(http.Dir("./www/"))
+	etc.MFS.Add(http.FileSystem(statikFS))
 
 	oauth2.ProviderDiscord.Scope += " guilds"
 
-	http.HandleFunc("/", mw(http.FileServer(wwFFS).ServeHTTP))
+	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
 	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.IDP, oauth2AppConfig.ID)))
 	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider.IDP, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
 	http.HandleFunc("/test", mw(handleTest))

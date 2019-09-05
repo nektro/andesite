@@ -5,7 +5,6 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/nektro/go-util/logger"
 	"github.com/nektro/go-util/sqlite"
-	"github.com/nektro/go-util/types"
 
 	"github.com/nektro/andesite/internal/itypes"
 )
@@ -15,7 +14,6 @@ var (
 	oauth2AppConfig *itypes.ConfigIDP
 	oauth2Provider  itypes.Oauth2Provider
 	database        *sqlite.DB
-	wwFFS           types.MultiplexFileSystem
 	randomKey       = securecookie.GenerateRandomKey(32)
 	store           = sessions.NewCookieStore(randomKey)
 	log             = logger.New()
