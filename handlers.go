@@ -517,7 +517,7 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	qgs := config.Discord.Extra1
 	qgr := r.PostForm.Get("RoleID")
 	qpt := r.PostForm.Get("Path")
-	// //
+	//
 	queryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
 	queryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)
 	queryDoUpdate("shares_discord_role", "path", qpt, "id", qid)
