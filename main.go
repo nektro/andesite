@@ -18,7 +18,6 @@ import (
 	"github.com/aymerick/raymond"
 	"github.com/gorilla/sessions"
 	"github.com/mitchellh/go-homedir"
-	"github.com/nektro/go-util/logger"
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
 	"github.com/rakyll/statik/fs"
@@ -39,13 +38,12 @@ const (
 )
 
 func main() {
-	log.Log(logger.LevelINFO, "Initializing Andesite...")
+	Log("Initializing Andesite...")
 
 	flagRoot := flag.String("root", "", "Path of root directory for files")
 	flagPort := flag.Int("port", 0, "Port to open server on")
 	flagAdmin := flag.String("admin", "", "Discord User ID of the user that is distinguished as a site owner")
 	flagBase := flag.String("base", "", "Http Origin Path")
-	flagLLevel := flag.Int("log-level", int(logger.LevelINFO), "Logging level to be used for github.com/nektro/go-util/logger")
 	flagPublic := flag.String("public", "", "Public root of files to serve")
 	flagSearch := flag.Bool("enable-search", false, "Set to true to enable search database")
 	flag.Parse()
@@ -53,7 +51,6 @@ func main() {
 	//
 	// parse options and find config
 
-	log.Level = logger.LogLevel(*flagLLevel)
 	homedir, _ := homedir.Dir()
 
 	etc.Init("andesite", &config)
@@ -65,13 +62,13 @@ func main() {
 	etc.MFS.Add(http.FileSystem(statikFS))
 
 	config.Root = findFirstNonEmpty(*flagRoot, config.Root)
-	log.Log(logger.LevelDEBUG, "Discovered option:", "--root", config.Root)
+	Log("Discovered option:", "--root", config.Root)
 	config.Port = findFirstNonZero(*flagPort, config.Port, 8000)
-	log.Log(logger.LevelDEBUG, "Discovered option:", "--port", config.Port)
+	Log("Discovered option:", "--port", config.Port)
 	config.HTTPBase = findFirstNonEmpty(*flagBase, config.HTTPBase, "/")
-	log.Log(logger.LevelDEBUG, "Discovered option:", "--base", config.HTTPBase)
+	Log("Discovered option:", "--base", config.HTTPBase)
 	config.Public = findFirstNonEmpty(*flagPublic, config.Public)
-	log.Log(logger.LevelDEBUG, "Discovered option:", "--public", config.Public)
+	Log("Discovered option:", "--public", config.Public)
 
 	if *flagSearch {
 		config.SearchOn = true
@@ -81,12 +78,12 @@ func main() {
 	// configure root dir
 
 	config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(config.Root, "~", homedir, -1)))
-	log.Log(logger.LevelINFO, "Sharing private files from "+config.Root)
+	Log("Sharing private files from " + config.Root)
 	DieOnError(Assert(DoesDirectoryExist(config.Root), "Please pass a valid directory as a root parameter!"))
 
 	if len(config.Public) > 0 {
 		config.Public, _ = filepath.Abs(config.Public)
-		log.Log(logger.LevelINFO, "Sharing public files from", config.Public)
+		Log("Sharing public files from", config.Public)
 		DieOnError(Assert(DoesDirectoryExist(config.Public), "Public root directory does not exist. Aborting!"))
 	}
 
@@ -145,18 +142,18 @@ func main() {
 		if !ok {
 			uid := etc.Database.QueryNextID("users")
 			queryDoAddUser(uid, *flagAdmin, true, "")
-			log.Log(logger.LevelINFO, F("Added user %s as an admin", *flagAdmin))
+			Log(F("Added user %s as an admin", *flagAdmin))
 		} else {
 			if !uu.Admin {
 				etc.Database.QueryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.ID), 10))
-				log.Log(logger.LevelINFO, F("Set user '%s's status to admin", uu.Snowflake))
+				Log(F("Set user '%s's status to admin", uu.Snowflake))
 			}
 		}
 		nu, _ := queryUserBySnowflake(*flagAdmin)
 		if !Contains(queryAccess(nu), "/") {
 			aid := etc.Database.QueryNextID("access")
 			etc.Database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, nu.ID))
-			log.Log(logger.LevelINFO, F("Gave %s root folder access", nu.Name))
+			Log(F("Gave %s root folder access", nu.Name))
 		}
 	}
 
@@ -164,17 +161,17 @@ func main() {
 	// graceful stop
 
 	etc.RunOnClose(func() {
-		log.Log(logger.LevelINFO, "Gracefully shutting down...")
+		Log("Gracefully shutting down...")
 
-		log.Log(logger.LevelINFO, "Saving database to disk")
+		Log("Saving database to disk")
 		etc.Database.Close()
 
 		if config.SearchOn {
-			log.Log(logger.LevelINFO, "Closing filesystem watcher")
+			Log("Closing filesystem watcher")
 			watcher.Close()
 		}
 
-		log.Log(logger.LevelINFO, "Done!")
+		Log("Done!")
 	})
 
 	//
@@ -224,11 +221,11 @@ func main() {
 	http.HandleFunc("/regen_passkey", mw(handleRegenPasskey))
 
 	if !IsPortAvailable(config.Port) {
-		log.Log(logger.LevelFATAL, "Binding to port", config.Port, "failed. It may be taken or you may not have permission to. Aborting!")
+		LogError("Binding to port", config.Port, "failed. It may be taken or you may not have permission to. Aborting!")
 		return
 	}
 
-	log.Log(logger.LevelINFO, "Initialization complete. Starting server on port "+p)
+	Log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
 }
 
