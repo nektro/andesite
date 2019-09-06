@@ -45,7 +45,6 @@ func main() {
 	flagRoot := flag.String("root", "", "Path of root directory for files")
 	flagPort := flag.Int("port", 0, "Port to open server on")
 	flagAdmin := flag.String("admin", "", "Discord User ID of the user that is distinguished as a site owner")
-	flagTheme := flag.StringArray("theme", []string{}, "Name of the custom theme to use for the HTML pages")
 	flagBase := flag.String("base", "", "Http Origin Path")
 	flagLLevel := flag.Int("log-level", int(logger.LevelINFO), "Logging level to be used for github.com/nektro/go-util/logger")
 	flagPublic := flag.String("public", "", "Public root of files to serve")
@@ -57,17 +56,15 @@ func main() {
 
 	log.Level = logger.LogLevel(*flagLLevel)
 	homedir, _ := homedir.Dir()
-
 	metaDir := homedir + "/.config/andesite"
-	configPath := metaDir + "/config.json"
-	log.Log(logger.LevelINFO, "Reading configuration info from", configPath)
 
-	if !DoesFileExist(configPath) {
-		log.Log(logger.LevelDEBUG, "Configuration file does not exist, creating blank!")
-		os.MkdirAll(metaDir, os.ModePerm)
-		ioutil.WriteFile(configPath, []byte("{}"), os.ModePerm)
-	}
-	etc.InitConfig(configPath, &config)
+	etc.Init("andesite", &config)
+
+	etc.MFS.Add(http.Dir("./www/"))
+
+	statikFS, err := fs.New()
+	DieOnError(err)
+	etc.MFS.Add(http.FileSystem(statikFS))
 
 	config.Root = findFirstNonEmpty(*flagRoot, config.Root)
 	log.Log(logger.LevelDEBUG, "Discovered option:", "--root", config.Root)
@@ -195,22 +192,7 @@ func main() {
 	//
 	// http server pre-setup
 
-	etc.SetSessionName("session_andesite")
 	p := strconv.Itoa(config.Port)
-
-	//
-	// theme setup
-
-	for _, item := range *flagTheme {
-		loc := metaDir + "/themes/" + item
-		DieOnError(Assert(DoesDirectoryExist(loc), F("'%s' does not exist!", loc)))
-		etc.MFS.Add(http.Dir(loc))
-	}
-	for _, item := range config.Themes {
-		loc := metaDir + "/themes/" + item
-		DieOnError(Assert(DoesDirectoryExist(loc), F("'%s' does not exist!", loc)))
-		etc.MFS.Add(http.Dir(loc))
-	}
 
 	//
 	// handlebars helpers
@@ -222,15 +204,7 @@ func main() {
 	//
 	// http server setup and launch
 
-	statikFS, err := fs.New()
-	if err != nil {
-		log.Log(logger.LevelFATAL, err.Error())
-		return
-	}
-
 	mw := chainMiddleware(mwAddAttribution)
-	etc.MFS.Add(http.Dir("./www/"))
-	etc.MFS.Add(http.FileSystem(statikFS))
 
 	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
 	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.IDP, oauth2AppConfig.ID)))
