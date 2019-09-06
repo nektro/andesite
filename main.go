@@ -309,7 +309,7 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	message := ""
 	if fileOrAdmin {
 		if showLogin {
-			message = "You" + me + " do not have access to this resource."
+			message = "You " + me + " do not have access to this resource."
 		} else {
 			message = "Unable to find the requested resource for you " + me + "."
 		}
