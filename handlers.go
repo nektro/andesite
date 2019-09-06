@@ -518,9 +518,13 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	qgr := r.PostForm.Get("RoleID")
 	qpt := r.PostForm.Get("Path")
 	//
+	rn := fetchDiscordRole(config.Discord.Extra1, qgr).Name
+	//
 	queryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
 	queryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)
 	queryDoUpdate("shares_discord_role", "path", qpt, "id", qid)
+	queryDoUpdate("shares_discord_role", "guild_name", "_", "id", qid)
+	queryDoUpdate("shares_discord_role", "role_name", rn, "id", qid)
 	writeAPIResponse(r, w, true, "Successfully updated share path.")
 }
 

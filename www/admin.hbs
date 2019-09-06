@@ -99,7 +99,9 @@
                 <table class="ui compact table">
                     <thead>
                         {{!-- <th class="collapsing">Guild ID</th> --}}
+                        {{!-- <th class="collapsing">Guild Name</th> --}}
                         <th class="collapsing">Role ID</th>
+                        <th class="collapsing">Role Name</th>
                         <th>Path</th>
                         <th class="collapsing"></th>
                     </thead>
@@ -109,7 +111,9 @@
                             <form method="POST">
                                 <input type="hidden" name="ID" value="{{ID}}">
                                 {{!-- <td><input type="text" name="GuildID" class="snowflake" value="{{GuildID}}"></td> --}}
+                                {{!-- <td><input type="text" name="GuildName" class="name" value="{{GuildName}}" readonly></td> --}}
                                 <td><input type="text" name="RoleID" class="snowflake" value="{{RoleID}}"></td>
+                                <td><input type="text" name="RoleName" class="name" value="{{RoleName}}" readonly></td>
                                 <td><input type="text" name="Path" placeholder="Path" value="{{Path}}"></td>
                                 <td><button class="ui button" formaction="./api/access_discord_role/update">Update</button></td>
                                 <td><button class="ui button" formaction="./api/access_discord_role/delete">Delete</button></td>

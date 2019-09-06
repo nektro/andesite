@@ -18,6 +18,7 @@ import (
 	"github.com/aymerick/raymond"
 	"github.com/gorilla/sessions"
 	"github.com/mitchellh/go-homedir"
+	discord "github.com/nektro/go.discord"
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
 	"github.com/rakyll/statik/fs"
@@ -459,4 +460,28 @@ func generateNewUserPasskey(snowflake string) string {
 	hash1 := md5.Sum([]byte(F("astheno.andesite.passkey.%s.%s", snowflake, T())))
 	hash2 := hex.EncodeToString(hash1[:])
 	return hash2[0:10]
+}
+
+func makeDiscordRequest(endpoint string, body url.Values) []byte {
+	req, _ := http.NewRequest(http.MethodGet, discordAPI+endpoint, strings.NewReader(body.Encode()))
+	req.Header.Set("User-Agent", "nektro/andesite")
+	// req.Header.Set("Authorization", "Bearer "+sess.Values[accessToken].(string))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", "Bot "+config.Discord.Extra2)
+	req.Header.Set("Accept", "application/json")
+	res, _ := http.DefaultClient.Do(req)
+	bys, _ := ioutil.ReadAll(res.Body)
+	return bys
+}
+
+func fetchDiscordRole(guild string, role string) discord.GuildRole {
+	bys := makeDiscordRequest("/guilds/"+guild+"/roles", url.Values{})
+	roles := []discord.GuildRole{}
+	json.Unmarshal(bys, &roles)
+	for i, item := range roles {
+		if item.ID == role {
+			return roles[i]
+		}
+	}
+	return discord.GuildRole{}
 }
