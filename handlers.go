@@ -542,8 +542,9 @@ func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	qID := r.PostForm.Get("ID")
+	dra := queryDiscordRoleAccess(qID)
 	etc.Database.QueryPrepared(true, "delete from shares_discord_role where id = ?", qID)
-	writeAPIResponse(r, w, true, "Successfully deleted share link.")
+	writeAPIResponse(r, w, true, F("Successfully deleted access for %s / %s to %s.", dra.GuildName, dra.RoleName, dra.Path))
 }
 
 //
