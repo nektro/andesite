@@ -161,3 +161,13 @@ func queryAllDiscordRoleAccess() []itypes.DiscordRoleAccessRow {
 	rows.Close()
 	return result
 }
+
+func queryDiscordRoleAccess(id string) *itypes.DiscordRoleAccessRow {
+	sid, _ := strconv.Atoi(id)
+	for _, item := range queryAllDiscordRoleAccess() {
+		if item.ID == sid {
+			return &item
+		}
+	}
+	return nil
+}

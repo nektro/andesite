@@ -497,10 +497,11 @@ func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	agr := r.PostForm.Get("RoleID")
 	apt := r.PostForm.Get("Path")
 	//
+	gn := fetchDiscordGuild(config.Discord.Extra1).Name
 	rn := fetchDiscordRole(config.Discord.Extra1, agr).Name
 	//
-	etc.Database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?, ?, ?)", aid, ags, agr, apt, "", rn)
-	writeAPIResponse(r, w, true, F("Created access for %s / %s.", ags, rn))
+	etc.Database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?, ?, ?)", aid, ags, agr, apt, gn, rn)
+	writeAPIResponse(r, w, true, F("Created access for %s / %s.", gn, rn))
 }
 
 func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
@@ -520,14 +521,15 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	qgr := r.PostForm.Get("RoleID")
 	qpt := r.PostForm.Get("Path")
 	//
+	gn := fetchDiscordGuild(config.Discord.Extra1).Name
 	rn := fetchDiscordRole(config.Discord.Extra1, qgr).Name
 	//
 	queryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
 	queryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)
 	queryDoUpdate("shares_discord_role", "path", qpt, "id", qid)
-	queryDoUpdate("shares_discord_role", "guild_name", "_", "id", qid)
+	queryDoUpdate("shares_discord_role", "guild_name", gn, "id", qid)
 	queryDoUpdate("shares_discord_role", "role_name", rn, "id", qid)
-	writeAPIResponse(r, w, true, "Successfully updated share path.")
+	writeAPIResponse(r, w, true, F("Successfully updated share path for %s / %s to %s.", gn, rn, qpt))
 }
 
 func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
