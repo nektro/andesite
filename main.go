@@ -485,3 +485,15 @@ func fetchDiscordRole(guild string, role string) discord.GuildRole {
 	}
 	return discord.GuildRole{}
 }
+
+type DiscordGuild struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func fetchDiscordGuild(guild string) DiscordGuild {
+	bys := makeDiscordRequest("/guilds/"+guild, url.Values{})
+	var dg DiscordGuild
+	json.Unmarshal(bys, &dg)
+	return dg
+}
