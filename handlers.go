@@ -501,7 +501,7 @@ func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	rn := fetchDiscordRole(config.Discord.Extra1, agr).Name
 	//
 	etc.Database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?, ?, ?)", aid, ags, agr, apt, gn, rn)
-	writeAPIResponse(r, w, true, F("Created access for %s / %s.", gn, rn))
+	writeAPIResponse(r, w, true, F("Created access for %s / %s to %s.", gn, rn, apt))
 }
 
 func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
