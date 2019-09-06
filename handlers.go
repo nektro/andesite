@@ -15,7 +15,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nektro/go.etc"
+	etc "github.com/nektro/go.etc"
 	"github.com/valyala/fastjson"
 
 	. "github.com/nektro/go-util/alias"

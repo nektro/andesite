@@ -20,8 +20,8 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/nektro/go-util/logger"
 	"github.com/nektro/go-util/sqlite"
-	"github.com/nektro/go.etc"
-	"github.com/nektro/go.oauth2"
+	etc "github.com/nektro/go.etc"
+	oauth2 "github.com/nektro/go.oauth2"
 	"github.com/rakyll/statik/fs"
 	flag "github.com/spf13/pflag"
 
