@@ -153,9 +153,9 @@ func queryAllDiscordRoleAccess() []itypes.DiscordRoleAccessRow {
 	var result []itypes.DiscordRoleAccessRow
 	rows := etc.Database.QueryDoSelectAll("shares_discord_role")
 	for rows.Next() {
-		var dar itypes.DiscordRoleAccessRow
-		rows.Scan(&dar.ID, &dar.GuildID, &dar.RoleID, &dar.Path, &dar.GuildName, &dar.RoleName)
-		result = append(result, dar)
+		var v itypes.DiscordRoleAccessRow
+		rows.Scan(&v.ID, &v.GuildID, &v.RoleID, &v.Path, &v.GuildName, &v.RoleName)
+		result = append(result, v)
 	}
 	rows.Close()
 	return result
