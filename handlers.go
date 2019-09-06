@@ -273,7 +273,7 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	database.Query(true, F("delete from access where id = '%d'", iid))
+	etc.Database.Query(true, F("delete from access where id = '%d'", iid))
 	writeAPIResponse(r, w, true, F("Removed access from %s.", r.PostForm.Get("snowflake")))
 }
 
@@ -312,7 +312,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := database.QueryNextID("access")
+	aid := etc.Database.QueryNextID("access")
 	asn := r.PostForm.Get("snowflake")
 	apt := r.PostForm.Get("path")
 	//
@@ -321,11 +321,11 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		aud = u.ID
 	} else {
-		aud = database.QueryNextID("users")
+		aud = etc.Database.QueryNextID("users")
 		queryDoAddUser(aud, asn, false, "")
 	}
 	//
-	database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, aud, apt)
+	etc.Database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, aud, apt)
 	writeAPIResponse(r, w, true, F("Created access for %s.", asn))
 }
 
@@ -340,12 +340,12 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := database.QueryNextID("shares")
+	aid := etc.Database.QueryNextID("shares")
 	ahs1 := md5.Sum([]byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(int64(aid), 10), GetIsoDateTime())))
 	ahs2 := hex.EncodeToString(ahs1[:])
 	fpath := r.PostForm.Get("path")
 	//
-	database.QueryPrepared(true, "insert into shares values (?, ?, ?)", aid, ahs2, fpath)
+	etc.Database.QueryPrepared(true, "insert into shares values (?, ?, ?)", aid, ahs2, fpath)
 	writeAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ahs2, fpath))
 }
 
@@ -401,7 +401,7 @@ func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 	//
 	ahs := r.PostForm.Get("hash")
 	//
-	database.QueryPrepared(true, "delete from shares where hash = ?", ahs)
+	etc.Database.QueryPrepared(true, "delete from shares where hash = ?", ahs)
 	writeAPIResponse(r, w, true, "Successfully deleted share link.")
 }
 
@@ -454,7 +454,7 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 	v4 := strings.Replace(v3, "[", "![", -1)
 	a := []WatchedFile{}
 	ua := queryAccess(user)
-	q := database.QueryPrepared(false, "select * from files where path like ? escape '!'", "%"+v4+"%")
+	q := etc.Database.QueryPrepared(false, "select * from files where path like ? escape '!'", "%"+v4+"%")
 	for q.Next() {
 		wf := scanFile(q)
 		wf.URL = config.HTTPBase + "files" + wf.Path
@@ -491,13 +491,13 @@ func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := database.QueryNextID("shares_discord_role")
+	aid := etc.Database.QueryNextID("shares_discord_role")
 	// ags := r.PostForm.Get("GuildID")
 	ags := config.Discord.Extra1
 	agr := r.PostForm.Get("RoleID")
 	apt := r.PostForm.Get("Path")
 	//
-	database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?)", aid, ags, agr, apt)
+	etc.Database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?)", aid, ags, agr, apt)
 	writeAPIResponse(r, w, true, F("Created access for %s / %s.", ags, agr))
 }
 
@@ -534,7 +534,7 @@ func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	qID := r.PostForm.Get("ID")
-	database.QueryPrepared(true, "delete from shares_discord_role where id = ?", qID)
+	etc.Database.QueryPrepared(true, "delete from shares_discord_role where id = ?", qID)
 	writeAPIResponse(r, w, true, "Successfully deleted share link.")
 }
 
@@ -545,6 +545,6 @@ func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pk := generateNewUserPasskey(user.Snowflake)
-	database.QueryDoUpdate("users", "passkey", pk, "snowflake", user.Snowflake)
+	etc.Database.QueryDoUpdate("users", "passkey", pk, "snowflake", user.Snowflake)
 	writeLinkResponse(r, w, "Passkey Updated", "It is now: "+pk, "Return", "./files/")
 }
