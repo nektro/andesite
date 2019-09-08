@@ -202,7 +202,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
 		req.Header.Set("User-Agent", "nektro/andesite")
 		req.Header.Set("Authorization", "Bot "+config.Discord.Extra2)
-		bys := doHttpRequest(req)
+		bys := DoHttpRequest(req)
 		v, err := p.Parse(string(bys))
 		if err != nil {
 			fmt.Println(2, "err", err.Error())

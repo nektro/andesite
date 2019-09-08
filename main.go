@@ -392,14 +392,6 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 	return sess, user, nil
 }
 
-func doHttpRequest(req *http.Request) []byte {
-	client := &http.Client{}
-	resp, _ := client.Do(req)
-	body, _ := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-	return body
-}
-
 // @from https://gist.github.com/gbbr/fa652db0bab132976620bcb7809fd89a
 func chainMiddleware(mw ...itypes.Middleware) itypes.Middleware {
 	return func(final http.HandlerFunc) http.HandlerFunc {
