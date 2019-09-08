@@ -201,7 +201,6 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		rurl := F("%s/guilds/%s/members/%s", discordAPI, config.Discord.Extra1, user.Snowflake)
 		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
 		req.Header.Set("User-Agent", "nektro/andesite")
-		// req.Header.Set("Authorization", "Bearer "+sess.Values[accessToken].(string))
 		req.Header.Set("Authorization", "Bot "+config.Discord.Extra2)
 		bys := doHttpRequest(req)
 		v, err := p.Parse(string(bys))
