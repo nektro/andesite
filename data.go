@@ -9,6 +9,9 @@ import (
 	"github.com/nektro/andesite/internal/itypes"
 )
 
+const (
+)
+
 var (
 	config          *itypes.Config
 	oauth2AppConfig *oauth2.AppConf

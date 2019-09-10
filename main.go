@@ -31,8 +31,6 @@ import (
 	_ "github.com/nektro/andesite/statik"
 )
 
-const (
-)
 
 func main() {
 	Log("Initializing Andesite...")
