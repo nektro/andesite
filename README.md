@@ -122,7 +122,7 @@ All or none of the files may be replaced when using a theme. To enable use of a 
 - https://github.com/spf13/pflag - Optimized flag handler that makes program flags POSIX compliant
 
 ## Contributing
-We take issues all the time right here on GitHub. We use labels extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it has been answered! Off-topic and '+1' comments will be deleted. Please use post reactions for this purpose.
+We listen to issues all the time right here on GitHub. Labels are extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it has been answered! Off-topic and '+1' comments will be deleted. Please use post/comment reactions for this purpose.
 
 [![issues](https://img.shields.io/github/issues/nektro/andesite.svg)](https://github.com/nektro/andesite/issues)
 
