@@ -206,7 +206,10 @@ func main() {
 	http.HandleFunc("/regen_passkey", mw(handleRegenPasskey))
 
 	if !IsPortAvailable(config.Port) {
-		LogError("Binding to port", config.Port, "failed. It may be taken or you may not have permission to. Aborting!")
+		DieOnError(
+			E(F("Binding to port %d failed.", config.Port)),
+			"It may be taken or you may not have permission to. Aborting!",
+		)
 		return
 	}
 
