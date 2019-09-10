@@ -47,15 +47,6 @@ type DiscordRoleAccessRow struct {
 // @from https://gist.github.com/gbbr/dc731df098276f1a135b343bf5f2534a
 type Middleware func(next http.HandlerFunc) http.HandlerFunc
 
-//
-type RootDirType string
-
-//
-const (
-	RootTypeDir  RootDirType = "dir"
-	RootTypeHttp             = "http"
-)
-
 type Config struct {
 	Root      string            `json:"root"`
 	Public    string            `json:"public"`
