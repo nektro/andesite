@@ -53,11 +53,15 @@ func main() {
 
 	etc.Init("andesite", &config)
 
+	//
+
 	etc.MFS.Add(http.Dir("./www/"))
 
 	statikFS, err := fs.New()
 	DieOnError(err)
 	etc.MFS.Add(http.FileSystem(statikFS))
+
+	//
 
 	config.Root = findFirstNonEmpty(*flagRoot, config.Root)
 	Log("Discovered option:", "--root", config.Root)
