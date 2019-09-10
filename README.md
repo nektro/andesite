@@ -80,7 +80,7 @@ $ ./andesite-{date}-{tag}-{os}-{arch}
 If you decide to pass Andesite through a reverse proxy, be sure to check out the [documentation](./docs/deployment/) for more info.
 
 ### Discord Guild/Role Access Grant
-Due to a limitation in the Discord API, in order to determine if a user has a role on a specific server, you must use a bot. To get started, go to https://discordapp.com/developers/applications/ and add a Bot user to your app and copy down the Bot Token. Now, to be able to give file/folder access to entire roles, add the to your config like this:
+Due to a limitation in the Discord API, in order to determine if a user has a role on a specific server, you must use a bot. To get started, go to https://discordapp.com/developers/applications/ and add a Bot user to your app and copy down the Bot Token. Now, to be able to give file/folder access to entire roles, we are going to be using the "Extra" fields of our app conf for Discord, so go ahead and addto your Discord config like so:
 
 ```json
 "discord": {
