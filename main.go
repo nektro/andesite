@@ -37,7 +37,6 @@ func main() {
 
 	flagRoot := flag.String("root", "", "Path of root directory for files")
 	flagPort := flag.Int("port", 0, "Port to open server on")
-	flagAdmin := flag.String("admin", "", "Discord User ID of the user that is distinguished as a site owner")
 	flagBase := flag.String("base", "", "Http Origin Path")
 	flagPublic := flag.String("public", "", "Public root of files to serve")
 	flagSearch := flag.Bool("enable-search", false, "Set to true to enable search database")
@@ -142,29 +141,6 @@ func main() {
 	etc.Database.CreateTableStruct("access", itypes.UserAccessRow{})
 	etc.Database.CreateTableStruct("shares", itypes.ShareRow{})
 	etc.Database.CreateTableStruct("shares_discord_role", itypes.DiscordRoleAccessRow{})
-
-	//
-	// admin creation from (optional) CLI argument
-
-	if *flagAdmin != "" {
-		uu, ok := queryUserBySnowflake(*flagAdmin)
-		if !ok {
-			uid := etc.Database.QueryNextID("users")
-			queryDoAddUser(uid, *flagAdmin, true, "")
-			Log(F("Added user %s as an admin", *flagAdmin))
-		} else {
-			if !uu.Admin {
-				etc.Database.QueryDoUpdate("users", "admin", "1", "id", strconv.FormatInt(int64(uu.ID), 10))
-				Log(F("Set user '%s's status to admin", uu.Snowflake))
-			}
-		}
-		nu, _ := queryUserBySnowflake(*flagAdmin)
-		if !Contains(queryAccess(nu), "/") {
-			aid := etc.Database.QueryNextID("access")
-			etc.Database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, nu.ID))
-			Log(F("Gave %s root folder access", nu.Name))
-		}
-	}
 
 	//
 	// graceful stop
