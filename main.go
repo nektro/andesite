@@ -32,9 +32,6 @@ import (
 )
 
 const (
-	version     = 1
-	accessToken = "access_token"
-	discordAPI  = "https://discordapp.com/api/v6"
 )
 
 func main() {
