@@ -113,7 +113,7 @@ func main() {
 		foundP := false
 		for _, item := range config.Providers {
 			if item.ID == config.Auth {
-				oauth2Provider = itypes.Oauth2Provider{item, config.Auth}
+				oauth2Provider = itypes.Oauth2Provider{item, ""}
 				foundP = true
 				break
 			}
