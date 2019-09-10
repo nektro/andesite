@@ -66,32 +66,3 @@ type Config struct {
 	Providers []oauth2.Provider `json:"providers"`
 	CustomIds []oauth2.AppConf  `json:"custom"`
 }
-
-//
-
-type Oauth2Provider struct {
-	IDP oauth2.Provider
-}
-
-var (
-	Oauth2Providers = map[string]Oauth2Provider{
-		"discord": Oauth2Provider{
-			oauth2.ProviderDiscord,
-		},
-		"reddit": Oauth2Provider{
-			oauth2.ProviderReddit,
-		},
-		"github": Oauth2Provider{
-			oauth2.ProviderGitHub,
-		},
-		"google": Oauth2Provider{
-			oauth2.ProviderGoogle,
-		},
-		"facebook": Oauth2Provider{
-			oauth2.ProviderFacebook,
-		},
-		"microsoft": Oauth2Provider{
-			oauth2.ProviderMicrosoft,
-		},
-	}
-)

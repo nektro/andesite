@@ -15,6 +15,6 @@ const (
 var (
 	config          *itypes.Config
 	oauth2AppConfig *oauth2.AppConf
-	oauth2Provider  itypes.Oauth2Provider
+	oauth2Provider  oauth2.Provider
 	homedirPath, _  = homedir.Dir()
 )

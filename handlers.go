@@ -154,7 +154,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"files":     data,
 				"admin":     isAdmin,
 				"base":      config.HTTPBase,
-				"name":      oauth2Provider.IDP.NamePrefix + uName,
+				"name":      oauth2Provider.NamePrefix + uName,
 				"search_on": config.SearchOn,
 				"host":      FullHost(r),
 				"extras":    extras,
@@ -194,7 +194,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	userUser, _ := queryUserBySnowflake(user.Snowflake)
 	userAccess := queryAccess(user)
 
-	if oauth2Provider.IDP.ID == "discord" {
+	if oauth2Provider.ID == "discord" {
 		dra := queryAllDiscordRoleAccess()
 		var p fastjson.Parser
 
@@ -246,9 +246,9 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		"user":           user.Snowflake,
 		"accesses":       queryAllAccess(),
 		"base":           config.HTTPBase,
-		"name":           oauth2Provider.IDP.NamePrefix + user.Name,
+		"name":           oauth2Provider.NamePrefix + user.Name,
 		"shares":         queryAllShares(),
-		"auth":           oauth2Provider.IDP.ID,
+		"auth":           oauth2Provider.ID,
 		"discord_shares": queryAllDiscordRoleAccess(),
 	})
 }
@@ -321,7 +321,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		aud = u.ID
 	} else {
 		aud = etc.Database.QueryNextID("users")
-		queryDoAddUser(aud, oauth2Provider.IDP.ID, asn, false, "")
+		queryDoAddUser(aud, oauth2Provider.ID, asn, false, "")
 	}
 	//
 	etc.Database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, aud, apt)
@@ -424,7 +424,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	etc.WriteHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
 		"user": user.Snowflake,
 		"base": config.HTTPBase,
-		"name": oauth2Provider.IDP.NamePrefix + user.Name,
+		"name": oauth2Provider.NamePrefix + user.Name,
 	})
 }
 

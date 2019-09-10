@@ -101,7 +101,7 @@ func main() {
 	if len(config.Auth) == 0 {
 		config.Auth = "discord"
 	}
-	if cfp, ok := itypes.Oauth2Providers[config.Auth]; ok {
+	if cfp, ok := oauth2.ProviderIDMap[config.Auth]; ok {
 		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*oauth2.AppConf)
 		DieOnError(Assert(cidp != nil, F("Authorization keys not set for identity prodvider '%s' in config.json!", config.Auth)))
 		DieOnError(Assert(cidp.ID != "", F("App ID not set for identity prodvider '%s' in config.json!", config.Auth)))
@@ -112,7 +112,7 @@ func main() {
 		foundP := false
 		for _, item := range config.Providers {
 			if item.ID == config.Auth {
-				oauth2Provider = itypes.Oauth2Provider{item}
+				oauth2Provider = item
 				foundP = true
 				break
 			}
@@ -206,8 +206,8 @@ func main() {
 	mw := chainMiddleware(mwAddAttribution)
 
 	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
-	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider.IDP, oauth2AppConfig.ID)))
-	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider.IDP, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
+	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider, oauth2AppConfig.ID)))
+	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
 	http.HandleFunc("/test", mw(handleTest))
 	http.HandleFunc("/files/", mw(handleDirectoryListing(handleFileListing)))
 	http.HandleFunc("/admin", mw(handleAdmin))
@@ -279,7 +279,7 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	sessName := sess.Values["name"]
 	if sessName != nil {
 		sessID := sess.Values["user"]
-		me += F("%s%s (%s)", oauth2Provider.IDP.NamePrefix, sessName.(string), sessID.(string))
+		me += F("%s%s (%s)", oauth2Provider.NamePrefix, sessName.(string), sessID.(string))
 	}
 
 	message := ""
