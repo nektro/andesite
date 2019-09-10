@@ -230,10 +230,10 @@ func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 	qpath := string(r.URL.Path[7:])
 	qaccess := []string{}
 
-	if len(config.Public) == 0 {
-		return config.Public, qpath, qaccess, "", "new member!", false, map[string]interface{}{}, nil
+	if len(config.Public) > 0 {
+		qaccess = append(qaccess, "/")
 	}
-	return config.Public, qpath, []string{"/"}, "", "new member", false, map[string]interface{}{}, nil
+	return config.Public, qpath, qaccess, "", "Guest!", false, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/admin
