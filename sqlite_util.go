@@ -12,6 +12,9 @@ import (
 	. "github.com/nektro/go-util/util"
 )
 
+//
+//
+
 func scanUser(rows *sql.Rows) itypes.UserRow {
 	var v itypes.UserRow
 	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey)
