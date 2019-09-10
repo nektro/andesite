@@ -17,7 +17,7 @@ import (
 
 func scanUser(rows *sql.Rows) itypes.UserRow {
 	var v itypes.UserRow
-	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey)
+	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey, &v.Provider)
 	return v
 }
 
@@ -93,18 +93,19 @@ func queryAllAccess() []map[string]string {
 	return result
 }
 
-func queryDoAddUser(id int, snowflake string, admin bool, name string) {
-	etc.Database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '')", id, oauth2Provider.DbP+snowflake, boolToString(admin), T()), name)
+func queryDoAddUser(id int, provider string, snowflake string, admin bool, name string) {
+	etc.Database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '', ?)", id, oauth2Provider.DbP+snowflake, boolToString(admin), T()), name, provider)
 	etc.Database.QueryDoUpdate("users", "passkey", generateNewUserPasskey(snowflake), "snowflake", snowflake)
 }
 
-func queryAssertUserName(snowflake string, name string) {
+func queryAssertUserName(provider string, snowflake string, name string) {
 	_, ok := queryUserBySnowflake(snowflake)
 	if ok {
+		etc.Database.QueryDoUpdate("users", "provider", provider, "snowflake", oauth2Provider.DbP+snowflake)
 		etc.Database.QueryDoUpdate("users", "name", name, "snowflake", oauth2Provider.DbP+snowflake)
 	} else {
 		uid := etc.Database.QueryNextID("users")
-		queryDoAddUser(uid, snowflake, false, name)
+		queryDoAddUser(uid, provider, snowflake, false, name)
 
 		if uid == 0 {
 			// always admin first user

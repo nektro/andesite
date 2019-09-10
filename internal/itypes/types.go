@@ -14,6 +14,7 @@ type UserRow struct {
 	Name      string `json:"name" sqlite:"text"`
 	JoinedOn  string `json:"joined_on" sqlite:"text"`
 	PassKey   string `json:"passkey" sqlite:"text"`
+	Provider  string `json:"provider" sqlite:"text"`
 }
 
 //

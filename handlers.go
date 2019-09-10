@@ -36,7 +36,7 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 	sess.Values[provider+"_expires_in"] = resp["expires_in"]
 	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
 	sess.Save(r, w)
-	queryAssertUserName(id, name)
+	queryAssertUserName(provider, id, name)
 	Log("[user-login]", provider, id, name)
 }
 
@@ -321,7 +321,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		aud = u.ID
 	} else {
 		aud = etc.Database.QueryNextID("users")
-		queryDoAddUser(aud, asn, false, "")
+		queryDoAddUser(aud, oauth2Provider.IDP.ID, asn, false, "")
 	}
 	//
 	etc.Database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, aud, apt)
