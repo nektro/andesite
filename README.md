@@ -9,27 +9,12 @@ Share folders in an Open Directory without making your entire server public. Man
 [![buymeacoffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/nektro)
 
 ## Getting Started
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will help you get the project up and running. After completing these steps, follow the [Development](#development) or [Deployment](#deployment) sections for futher direction.
 
-### Prerequisites
-- A directory you wish to proxy through Andesite
-- The Go Language 1.7+ (https://golang.org/dl/)
-- GCC on your PATH (for the https://github.com/mattn/go-sqlite3 installation)
+### Creating Credentials
+In order to create a "closed directory" with Andesite, you will need to create an app on your IDP(s) of choice. See the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) docs for more detailed info on this process on where to go and what data you'll need.
 
-### Installing
-Go to the developers dashboard of your choosing for the authentication platform you wish to use from the list below.
-
-| Identity Provider | Short Code | Developer Dashboard |
-| --- | --- | --- |
-| Discord | `discord` | https://discordapp.com/developers/applications/ |
-| Reddit | `reddit` | https://www.reddit.com/prefs/apps |
-| GitHub | `github` | https://github.com/settings/developers |
-| Google | `google` | https://console.developers.google.com |
-| Facebook | `facebook` | https://developers.facebook.com/apps/ |
-| Microsoft | `microsoft` | https://apps.dev.microsoft.com/ |
-
-
-Once there, create an application and obtain the Client ID and Client Secret. Here you can also fill out a picture and description that will be displayed during the authorization of users on your chosen Identity Provider. When prompted for the "Redirect URI" during the app setup process, the URL to use will be `http://andesite/callback`, replacing `andesite` with any origins you wish Andesite to be usable from, such as `example.com` or `localhost:800`.
+Here you can also fill out a picture and description that will be displayed during the authorization of users on your chosen Identity Provider. When prompted for the "Redirect URI" during the app setup process, the URL to use will be `http://andesite/callback`, replacing `andesite` with any origins you wish Andesite to be usable from, such as `example.com` or `localhost:800`.
 
 Once you have finished the app creation process and obtained the Client ID and Client Secret, create a folder in your home directory at the path of `~/.config/andesite/`. All of Andesite's config and local save files will go here. This directory will be referred to as `.andesite` going forward.
 
@@ -47,18 +32,6 @@ In the `.andesite` folder make a `config.json` file and put the following data i
 
 > Note: You may currently only use one Identity Provider at a time!
 
-Run
-```
-$ go get -u github.com/nektro/andesite
-```
-and then make your way to `$GOPATH/src/github.com/nektro/andesite/`.
-
-Once there, run:
-```
-$ go build
-$ ./andesite
-```
-
 ### Options
 There are a number of options that are also required and can be used to configure your Andesite instance from within your `config.json`. They are listed here.
 
@@ -71,6 +44,28 @@ There are a number of options that are also required and can be used to configur
 | `"providers"` | `[]Provider` | ` ` | An array of custom OAuth2 providers that you may use as your `"auth"`. See [`provider.go`](https://github.com/nektro/go.oauth2#provider-schema) for more info. |
 | `"custom"` | `[]AppConf` | ` ` | An array of OA2 app configs, that can be used with providers created in `"providers"`. See [`appconf.go`](https://github.com/nektro/go.oauth2#appconf-schema) for more info. |
 | `"public"` | `string` | None. | Similar to `--root`, but served from `/public/` and no authorization is required to see files listings or download. Like a regular OD. |
+
+Once fully configured, you're ready to obtain a binary to run Andesite from either the [Development](#development) or [Deployment](#deployment) sections depending on your needs.
+
+## Development
+
+### Prerequisites
+- A directory you wish to proxy through Andesite
+- The Go Language 1.7+ (https://golang.org/dl/)
+- GCC on your PATH (for the https://github.com/mattn/go-sqlite3 installation)
+
+### Installing
+Run
+```
+$ go get -u github.com/nektro/andesite
+```
+and then make your way to `$GOPATH/src/github.com/nektro/andesite/`.
+
+Once there, run:
+```
+$ go build
+$ ./andesite
+```
 
 ### Discord Guild/Role Access Grant
 Due to a limitation in the Discord API, in order to determine if a user has a role on a specific server, you must use a bot. To get started, go to https://discordapp.com/developers/applications/ and add a Bot user to your app and copy down the Bot Token. Now, to be able to give file/folder access to entire roles, add the to your config like this:
