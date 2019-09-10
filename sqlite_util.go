@@ -98,14 +98,10 @@ func queryDoAddUser(id int, snowflake string, admin bool, name string) {
 	etc.Database.QueryDoUpdate("users", "passkey", generateNewUserPasskey(snowflake), "snowflake", snowflake)
 }
 
-func queryDoUpdate(table string, col string, value string, where string, search string) {
-	etc.Database.QueryPrepared(true, F("update %s set %s = ? where %s = ?", table, col, where), value, search)
-}
-
 func queryAssertUserName(snowflake string, name string) {
 	_, ok := queryUserBySnowflake(snowflake)
 	if ok {
-		queryDoUpdate("users", "name", name, "snowflake", oauth2Provider.DbP+snowflake)
+		etc.Database.QueryDoUpdate("users", "name", name, "snowflake", oauth2Provider.DbP+snowflake)
 	} else {
 		uid := etc.Database.QueryNextID("users")
 		queryDoAddUser(uid, snowflake, false, name)

@@ -295,7 +295,7 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	queryDoUpdate("access", "path", r.PostForm.Get("path"), "id", strconv.FormatInt(iid, 10))
+	etc.Database.QueryDoUpdate("access", "path", r.PostForm.Get("path"), "id", strconv.FormatInt(iid, 10))
 	writeAPIResponse(r, w, true, F("Updated access for %s.", r.PostForm.Get("snowflake")))
 }
 
@@ -383,7 +383,7 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	ahs := r.PostForm.Get("hash")
 	aph := r.PostForm.Get("path")
 	// //
-	queryDoUpdate("shares", "path", aph, "hash", ahs)
+	etc.Database.QueryDoUpdate("shares", "path", aph, "hash", ahs)
 	writeAPIResponse(r, w, true, "Successfully updated share path.")
 }
 
@@ -523,11 +523,11 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	gn := fetchDiscordGuild(config.Discord.Extra1).Name
 	rn := fetchDiscordRole(config.Discord.Extra1, qgr).Name
 	//
-	queryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
-	queryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)
-	queryDoUpdate("shares_discord_role", "path", qpt, "id", qid)
-	queryDoUpdate("shares_discord_role", "guild_name", gn, "id", qid)
-	queryDoUpdate("shares_discord_role", "role_name", rn, "id", qid)
+	etc.Database.QueryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
+	etc.Database.QueryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)
+	etc.Database.QueryDoUpdate("shares_discord_role", "path", qpt, "id", qid)
+	etc.Database.QueryDoUpdate("shares_discord_role", "guild_name", gn, "id", qid)
+	etc.Database.QueryDoUpdate("shares_discord_role", "role_name", rn, "id", qid)
 	writeAPIResponse(r, w, true, F("Successfully updated share path for %s / %s to %s.", gn, rn, qpt))
 }
 
