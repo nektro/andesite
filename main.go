@@ -17,7 +17,6 @@ import (
 
 	"github.com/aymerick/raymond"
 	"github.com/gorilla/sessions"
-	"github.com/mitchellh/go-homedir"
 	discord "github.com/nektro/go.discord"
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
@@ -52,8 +51,6 @@ func main() {
 	//
 	// parse options and find config
 
-	homedir, _ := homedir.Dir()
-
 	etc.Init("andesite", &config)
 
 	etc.MFS.Add(http.Dir("./www/"))
@@ -78,7 +75,7 @@ func main() {
 	//
 	// configure root dir
 
-	config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(config.Root, "~", homedir, -1)))
+	config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(config.Root, "~", homedirPath, -1)))
 	Log("Sharing private files from " + config.Root)
 	DieOnError(Assert(DoesDirectoryExist(config.Root), "Please pass a valid directory as a root parameter!"))
 
