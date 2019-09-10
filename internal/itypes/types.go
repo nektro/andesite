@@ -55,14 +55,13 @@ type Config struct {
 	HTTPBase  string            `json:"base"`
 	SearchOn  bool              `json:"search_on"`
 	Auth      string            `json:"auth"`
-	Discord   *ConfigIDP        `json:"discord"`
-	Reddit    *ConfigIDP        `json:"reddit"`
-	GitHub    *ConfigIDP        `json:"github"`
-	Google    *ConfigIDP        `json:"google"`
-	Facebook  *ConfigIDP        `json:"facebook"`
-	Microsoft *ConfigIDP        `json:"microsoft"`
+	Discord   *oauth2.AppConf   `json:"discord"`
+	Reddit    *oauth2.AppConf   `json:"reddit"`
+	GitHub    *oauth2.AppConf   `json:"github"`
+	Google    *oauth2.AppConf   `json:"google"`
+	Facebook  *oauth2.AppConf   `json:"facebook"`
+	Microsoft *oauth2.AppConf   `json:"microsoft"`
 	Providers []oauth2.Provider `json:"providers"`
-	CustomIds []ConfigIDP       `json:"custom"`
 }
 
 type ConfigIDP struct {
@@ -71,6 +70,7 @@ type ConfigIDP struct {
 	Secret string `json:"secret"`
 	Extra1 string `json:"extra_1"`
 	Extra2 string `json:"extra_2"`
+	CustomIds []oauth2.AppConf  `json:"custom"`
 }
 
 //
