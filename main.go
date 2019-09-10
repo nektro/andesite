@@ -48,6 +48,18 @@ func main() {
 
 	etc.Init("andesite", &config)
 
+	if config.Version == 0 {
+		config.Version = 1
+	}
+	Log("Using config version:", config.Version)
+
+	if config.Version != RequiredConfigVersion {
+		DieOnError(
+			E(F("Current config.json version '%d' does not match required version '%d'.", config.Version, RequiredConfigVersion)),
+			F("Visit https://github.com/nektro/andesite/blob/master/docs/config/v%d.md for more info.", RequiredConfigVersion),
+		)
+	}
+
 	//
 
 	etc.MFS.Add(http.Dir("./www/"))

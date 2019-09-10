@@ -48,6 +48,7 @@ type DiscordRoleAccessRow struct {
 type Middleware func(next http.HandlerFunc) http.HandlerFunc
 
 type Config struct {
+	Version   int               `json:"version"`
 	Root      string            `json:"root"`
 	Public    string            `json:"public"`
 	Port      int               `json:"port"`
