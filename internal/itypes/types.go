@@ -62,14 +62,6 @@ type Config struct {
 	Facebook  *oauth2.AppConf   `json:"facebook"`
 	Microsoft *oauth2.AppConf   `json:"microsoft"`
 	Providers []oauth2.Provider `json:"providers"`
-}
-
-type ConfigIDP struct {
-	Auth   string `json:"auth"`
-	ID     string `json:"id"`
-	Secret string `json:"secret"`
-	Extra1 string `json:"extra_1"`
-	Extra2 string `json:"extra_2"`
 	CustomIds []oauth2.AppConf  `json:"custom"`
 }
 
