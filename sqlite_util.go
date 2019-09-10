@@ -171,3 +171,12 @@ func queryDiscordRoleAccess(id string) *itypes.DiscordRoleAccessRow {
 	}
 	return nil
 }
+
+func queryAllUsers() []itypes.UserRow {
+	result := []itypes.UserRow{}
+	q := etc.Database.QueryDoSelectAll("users")
+	for q.Next() {
+		result = append(result, scanUser(q))
+	}
+	return result
+}
