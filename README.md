@@ -111,19 +111,15 @@ All or none of the files may be replaced when using a theme. To enable use of a 
 
 ## Built With
 - The Go Programming Lanuage - https://golang.org/
-- https://github.com/gorilla/sessions - Session management
-- https://github.com/mattn/go-sqlite3 - SQLite handler
-- Discord & OAuth2 - https://discordapp.com/ - User Authentication
-- https://handlebarsjs.com/ - HTML templating
 - https://github.com/aymerick/raymond - Handlebars template rendering
-- https://github.com/gorilla/securecookie
-- https://github.com/kataras/go-sessions - HTTP Session manager for fasthttp
-- https://github.com/mitchellh/go-homedir
-- https://github.com/nektro/go-util - Go utilities for simplifying common complex tasks
-- https://github.com/spf13/pflag - Optimized flag handler that makes program flags POSIX compliant
+- https://github.com/fsnotify/fsnotify - Filesystem notifications for Go
+- https://github.com/gorilla/sessions - HTTP Session manager for Go
+- https://github.com/nektro/go.discord - Typings for interacting with the Discord API.
+- https://github.com/nektro/go.etc - Bootstrapping functions for all Astheno group projects
 - https://github.com/nektro/go.oauth2 - OAuth2 Client library for Go
-- https://github.com/nektro/go.etc
-- https://github.com/rakyll/statik/fs
+- https://github.com/nektro/go-util - Go utilities for simplifying common complex tasks
+- https://github.com/rakyll/statik - Static asset bundler for Go
+- https://github.com/spf13/pflag - Optimized flag handler that makes program flags POSIX compliant
 
 ## Contributing
 We take issues all the time right here on GitHub. We use labels extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it has been answered! Off-topic and '+1' comments will be deleted. Please use post reactions for this purpose.
