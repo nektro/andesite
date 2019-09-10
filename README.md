@@ -20,30 +20,7 @@ Once you have finished the app creation process and obtained the Client ID and C
 
 In the `.andesite` folder make a `config.json` file and put the following data inside, replacing `AUTH` with whichever Identity Provider you chose, such as `discord`, `reddit`, etc. And `CLIENT_ID` and `CLIENT_SECRET` with their respective values. Do not worry, this folder will remain entirely private, even to users with full access.
 
-```json
-{
-    "auth": "{AUTH}",
-    "{AUTH}": {
-        "id": "{CLIENT_ID}",
-        "secret": "{CLIENT_SECRET}"
-    }
-}
-```
-
-> Note: You may currently only use one Identity Provider at a time!
-
-### Options
-There are a number of options that are also required and can be used to configure your Andesite instance from within your `config.json`. They are listed here.
-
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `"root"` | `string` | **Required.** | A relative or absolute path to where the data root Andesite should serve from is. |
-| `"port"` | `uint` | `8000` | The port to bind to. A webserver will be launched accessible from `localhost:{port}`. |
-| `"themes"` | `[]string` | ` ` | A array of names to load themes from. Read more about themes below. |
-| `"base"` | `string` | `/` | The root path Andesite will be served from. See [`deployment.md`](docs/deployment.md) for more info. |
-| `"providers"` | `[]Provider` | ` ` | An array of custom OAuth2 providers that you may use as your `"auth"`. See [`provider.go`](https://github.com/nektro/go.oauth2#provider-schema) for more info. |
-| `"custom"` | `[]AppConf` | ` ` | An array of OA2 app configs, that can be used with providers created in `"providers"`. See [`appconf.go`](https://github.com/nektro/go.oauth2#appconf-schema) for more info. |
-| `"public"` | `string` | None. | Similar to `--root`, but served from `/public/` and no authorization is required to see files listings or download. Like a regular OD. |
+The current config version is `1`. See [docs/config](./docs/config/) for more info on setting up this info to be read by Andesite.
 
 Once fully configured, you're ready to obtain a binary to run Andesite from either the [Development](#development) or [Deployment](#deployment) sections depending on your needs.
 
