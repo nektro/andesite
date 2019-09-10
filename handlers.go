@@ -198,7 +198,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		dra := queryAllDiscordRoleAccess()
 		var p fastjson.Parser
 
-		rurl := F("%s/guilds/%s/members/%s", discordAPI, config.Discord.Extra1, user.Snowflake)
+		rurl := F("%s/guilds/%s/members/%s", DiscordAPI, config.Discord.Extra1, user.Snowflake)
 		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
 		req.Header.Set("User-Agent", "nektro/andesite")
 		req.Header.Set("Authorization", "Bot "+config.Discord.Extra2)

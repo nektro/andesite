@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	DiscordAPI = "https://discordapp.com/api/v6"
 )
 
 var (

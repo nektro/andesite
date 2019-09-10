@@ -451,7 +451,7 @@ func generateNewUserPasskey(snowflake string) string {
 }
 
 func makeDiscordRequest(endpoint string, body url.Values) []byte {
-	req, _ := http.NewRequest(http.MethodGet, discordAPI+endpoint, strings.NewReader(body.Encode()))
+	req, _ := http.NewRequest(http.MethodGet, DiscordAPI+endpoint, strings.NewReader(body.Encode()))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bot "+config.Discord.Extra2)
