@@ -68,8 +68,8 @@ There are a number of options that are also required and can be used to configur
 | `"port"` | `uint` | `8000` | The port to bind to. A webserver will be launched accessible from `localhost:{port}`. |
 | `"themes"` | `[]string` | ` ` | A array of names to load themes from. Read more about themes below. |
 | `"base"` | `string` | `/` | The root path Andesite will be served from. See [`deployment.md`](docs/deployment.md) for more info. |
-| `"providers"` | `[]Provider` | ` ` | An array of custom OAuth2 providers that you may use as your `"auth"`. See [`provider.go`](https://github.com/nektro/go.oauth2/blob/master/provider.go) for more info. |
-| `"custom"` | `[]OA2Config` | ` ` | An array of OA2 app configs, that can be used with providers created in `"providers"`. See [`providers.md`](docs/providers.md) for more info. |
+| `"providers"` | `[]Provider` | ` ` | An array of custom OAuth2 providers that you may use as your `"auth"`. See [`provider.go`](https://github.com/nektro/go.oauth2#provider-schema) for more info. |
+| `"custom"` | `[]AppConf` | ` ` | An array of OA2 app configs, that can be used with providers created in `"providers"`. See [`appconf.go`](https://github.com/nektro/go.oauth2#appconf-schema) for more info. |
 | `"public"` | `string` | None. | Similar to `--root`, but served from `/public/` and no authorization is required to see files listings or download. Like a regular OD. |
 
 ### Discord Guild/Role Access Grant
