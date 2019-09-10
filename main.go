@@ -70,12 +70,12 @@ func main() {
 
 	//
 
-	config.Root = findFirstNonEmpty(*flagRoot, config.Root)
-	Log("Discovered option:", "--root", config.Root)
 	config.Port = findFirstNonZero(*flagPort, config.Port, 8000)
 	Log("Discovered option:", "--port", config.Port)
 	config.HTTPBase = findFirstNonEmpty(*flagBase, config.HTTPBase, "/")
 	Log("Discovered option:", "--base", config.HTTPBase)
+	config.Root = findFirstNonEmpty(*flagRoot, config.Root)
+	Log("Discovered option:", "--root", config.Root)
 	config.Public = findFirstNonEmpty(*flagPublic, config.Public)
 	Log("Discovered option:", "--public", config.Public)
 
