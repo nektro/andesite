@@ -112,7 +112,7 @@ func main() {
 		foundP := false
 		for _, item := range config.Providers {
 			if item.ID == config.Auth {
-				oauth2Provider = itypes.Oauth2Provider{item, ""}
+				oauth2Provider = itypes.Oauth2Provider{item}
 				foundP = true
 				break
 			}
@@ -141,6 +141,28 @@ func main() {
 	etc.Database.CreateTableStruct("access", itypes.UserAccessRow{})
 	etc.Database.CreateTableStruct("shares", itypes.ShareRow{})
 	etc.Database.CreateTableStruct("shares_discord_role", itypes.DiscordRoleAccessRow{})
+
+	//
+	// database upgrade (removing db prefixes in favor of provider column)
+
+	prefixes := map[string]string{
+		"reddit":    "1:",
+		"github":    "2:",
+		"google":    "3:",
+		"facebook":  "4:",
+		"microsoft": "5:",
+	}
+	for _, item := range queryAllUsers() {
+		for k, v := range prefixes {
+			if strings.HasPrefix(item.Snowflake, v) {
+				sn := item.Snowflake[len(v):]
+				tid := strconv.Itoa(item.ID)
+				Log("[db-upgrade]", item.Snowflake, "is now", sn, "as", k)
+				etc.Database.QueryDoUpdate("users", "snowflake", sn, "id", tid)
+				etc.Database.QueryDoUpdate("users", "provider", k, "id", tid)
+			}
+		}
+	}
 
 	//
 	// graceful stop

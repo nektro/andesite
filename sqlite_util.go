@@ -47,13 +47,13 @@ func queryAccess(user itypes.UserRow) []string {
 }
 
 func queryUserBySnowflake(snowflake string) (itypes.UserRow, bool) {
-	rows := etc.Database.Query(false, F("select * from users where snowflake = '%s'", oauth2Provider.DbP+snowflake))
+	rows := etc.Database.Query(false, F("select * from users where snowflake = '%s'", snowflake))
 	if !rows.Next() {
 		return itypes.UserRow{}, false
 	}
 	ur := scanUser(rows)
 	rows.Close()
-	ur.Snowflake = ur.Snowflake[len(oauth2Provider.DbP):]
+	ur.Snowflake = ur.Snowflake
 	return ur, true
 }
 
@@ -64,7 +64,7 @@ func queryUserByID(id int) (itypes.UserRow, bool) {
 	}
 	ur := scanUser(rows)
 	rows.Close()
-	ur.Snowflake = ur.Snowflake[len(oauth2Provider.DbP):]
+	ur.Snowflake = ur.Snowflake
 	return ur, true
 }
 
@@ -94,15 +94,15 @@ func queryAllAccess() []map[string]string {
 }
 
 func queryDoAddUser(id int, provider string, snowflake string, admin bool, name string) {
-	etc.Database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '', ?)", id, oauth2Provider.DbP+snowflake, boolToString(admin), T()), name, provider)
+	etc.Database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '', ?)", id, snowflake, boolToString(admin), T()), name, provider)
 	etc.Database.QueryDoUpdate("users", "passkey", generateNewUserPasskey(snowflake), "snowflake", snowflake)
 }
 
 func queryAssertUserName(provider string, snowflake string, name string) {
 	_, ok := queryUserBySnowflake(snowflake)
 	if ok {
-		etc.Database.QueryDoUpdate("users", "provider", provider, "snowflake", oauth2Provider.DbP+snowflake)
-		etc.Database.QueryDoUpdate("users", "name", name, "snowflake", oauth2Provider.DbP+snowflake)
+		etc.Database.QueryDoUpdate("users", "provider", provider, "snowflake", snowflake)
+		etc.Database.QueryDoUpdate("users", "name", name, "snowflake", snowflake)
 	} else {
 		uid := etc.Database.QueryNextID("users")
 		queryDoAddUser(uid, provider, snowflake, false, name)
