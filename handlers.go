@@ -150,6 +150,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
 				"user":      uID,
+				"provider":  user.Provider,
 				"path":      qpath,
 				"files":     data,
 				"admin":     isAdmin,
