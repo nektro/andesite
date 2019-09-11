@@ -53,7 +53,6 @@ func queryUserBySnowflake(snowflake string) (itypes.UserRow, bool) {
 	}
 	ur := scanUser(rows)
 	rows.Close()
-	ur.Snowflake = ur.Snowflake
 	return ur, true
 }
 
@@ -64,7 +63,6 @@ func queryUserByID(id int) (itypes.UserRow, bool) {
 	}
 	ur := scanUser(rows)
 	rows.Close()
-	ur.Snowflake = ur.Snowflake
 	return ur, true
 }
 
