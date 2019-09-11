@@ -191,7 +191,6 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	// remove /files
 	qpath := string(r.URL.Path[6:])
 
-	userUser, _ := queryUserBySnowflake(user.Snowflake)
 	userAccess := queryAccess(user)
 
 	if oauth2Provider.ID == "discord" {
@@ -219,7 +218,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		}
 	}
 
-	return config.Root, qpath, userAccess, user.Snowflake, user.Name, userUser.Admin, map[string]interface{}{
+	return config.Root, qpath, userAccess, user.Snowflake, user.Name, user.Admin, map[string]interface{}{
 		"user": user,
 	}, nil
 }
