@@ -36,7 +36,7 @@ func scanShare(rows *sql.Rows) itypes.ShareRow {
 //
 //
 
-func queryAccess(user itypes.UserRow) []string {
+func queryAccess(user *itypes.UserRow) []string {
 	result := []string{}
 	rows := etc.Database.Query(false, F("select * from access where user = '%d'", user.ID))
 	for rows.Next() {
@@ -46,24 +46,24 @@ func queryAccess(user itypes.UserRow) []string {
 	return result
 }
 
-func queryUserBySnowflake(snowflake string) (itypes.UserRow, bool) {
+func queryUserBySnowflake(snowflake string) (*itypes.UserRow, bool) {
 	rows := etc.Database.Query(false, F("select * from users where snowflake = '%s'", snowflake))
 	if !rows.Next() {
-		return itypes.UserRow{}, false
+		return nil, false
 	}
 	ur := scanUser(rows)
 	rows.Close()
-	return ur, true
+	return &ur, true
 }
 
-func queryUserByID(id int) (itypes.UserRow, bool) {
+func queryUserByID(id int) (*itypes.UserRow, bool) {
 	rows := etc.Database.Query(false, F("select * from users where id = '%d'", id))
 	if !rows.Next() {
-		return itypes.UserRow{}, false
+		return nil, false
 	}
 	ur := scanUser(rows)
 	rows.Close()
-	return ur, true
+	return &ur, true
 }
 
 func queryAllAccess() []map[string]string {
