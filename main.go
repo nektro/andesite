@@ -189,11 +189,6 @@ func main() {
 	}
 
 	//
-	// http server pre-setup
-
-	p := strconv.Itoa(config.Port)
-
-	//
 	// handlebars helpers
 
 	raymond.RegisterHelper("url_name", func(x string) string {
@@ -208,6 +203,8 @@ func main() {
 	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
 	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider, oauth2AppConfig.ID)))
 	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
+
+
 	http.HandleFunc("/test", mw(handleTest))
 	http.HandleFunc("/files/", mw(handleDirectoryListing(handleFileListing)))
 	http.HandleFunc("/admin", mw(handleAdmin))
@@ -235,6 +232,7 @@ func main() {
 		return
 	}
 
+	p := strconv.Itoa(config.Port)
 	Log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
 }
