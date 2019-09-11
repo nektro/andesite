@@ -30,6 +30,7 @@ func helperIsLoggedIn(r *http.Request) bool {
 
 func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
 	sess := etc.GetSession(r)
+	sess.Values["provider"] = provider
 	sess.Values["user"] = id
 	sess.Values["name"] = name
 	sess.Values[provider+"_access_token"] = resp["access_token"]

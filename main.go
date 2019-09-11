@@ -276,8 +276,8 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	sess := etc.GetSession(r)
 	sessName := sess.Values["name"]
 	if sessName != nil {
-		sessID := sess.Values["user"]
-		me += F("%s%s (%s)", oauth2Provider.NamePrefix, sessName.(string), sessID.(string))
+		sessID := sess.Values["user"].(string)
+		me += F("%s%s (%s)", oauth2Provider.NamePrefix, sessName.(string), sessID)
 	}
 
 	message := ""
