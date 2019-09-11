@@ -22,6 +22,7 @@ import (
 	"github.com/rakyll/statik/fs"
 	flag "github.com/spf13/pflag"
 
+	"github.com/nektro/andesite/internal/idata"
 	"github.com/nektro/andesite/internal/itypes"
 
 	. "github.com/nektro/go-util/alias"
@@ -44,17 +45,17 @@ func main() {
 	//
 	// parse options and find config
 
-	etc.Init("andesite", &config)
+	etc.Init("andesite", &idata.Config)
 
-	if config.Version == 0 {
-		config.Version = 1
+	if idata.Config.Version == 0 {
+		idata.Config.Version = 1
 	}
-	Log("Using config version:", config.Version)
+	Log("Using config version:", idata.Config.Version)
 
-	if config.Version != RequiredConfigVersion {
+	if idata.Config.Version != idata.RequiredConfigVersion {
 		DieOnError(
-			E(F("Current config.json version '%d' does not match required version '%d'.", config.Version, RequiredConfigVersion)),
-			F("Visit https://github.com/nektro/andesite/blob/master/docs/config/v%d.md for more info.", RequiredConfigVersion),
+			E(F("Current idata.Config.json version '%d' does not match required version '%d'.", idata.Config.Version, idata.RequiredConfigVersion)),
+			F("Visit https://github.com/nektro/andesite/blob/master/docs/config/v%d.md for more info.", idata.RequiredConfigVersion),
 		)
 	}
 
@@ -68,36 +69,36 @@ func main() {
 
 	//
 
-	config.Port = findFirstNonZero(*flagPort, config.Port, 8000)
-	Log("Discovered option:", "--port", config.Port)
-	config.HTTPBase = findFirstNonEmpty(*flagBase, config.HTTPBase, "/")
-	Log("Discovered option:", "--base", config.HTTPBase)
-	config.Root = findFirstNonEmpty(*flagRoot, config.Root)
-	Log("Discovered option:", "--root", config.Root)
-	config.Public = findFirstNonEmpty(*flagPublic, config.Public)
-	Log("Discovered option:", "--public", config.Public)
+	idata.Config.Port = findFirstNonZero(*flagPort, idata.Config.Port, 8000)
+	Log("Discovered option:", "--port", idata.Config.Port)
+	idata.Config.HTTPBase = findFirstNonEmpty(*flagBase, idata.Config.HTTPBase, "/")
+	Log("Discovered option:", "--base", idata.Config.HTTPBase)
+	idata.Config.Root = findFirstNonEmpty(*flagRoot, idata.Config.Root)
+	Log("Discovered option:", "--root", idata.Config.Root)
+	idata.Config.Public = findFirstNonEmpty(*flagPublic, idata.Config.Public)
+	Log("Discovered option:", "--public", idata.Config.Public)
 
 	if *flagSearch {
-		config.SearchOn = true
+		idata.Config.SearchOn = true
 	}
 
 	//
 	// configure root dir
 
-	config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(config.Root, "~", homedirPath, -1)))
-	Log("Sharing private files from " + config.Root)
-	DieOnError(Assert(DoesDirectoryExist(config.Root), "Please pass a valid directory as a root parameter!"))
+	idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
+	Log("Sharing private files from " + idata.Config.Root)
+	DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 
-	if len(config.Public) > 0 {
-		config.Public, _ = filepath.Abs(config.Public)
-		Log("Sharing public files from", config.Public)
-		DieOnError(Assert(DoesDirectoryExist(config.Public), "Public root directory does not exist. Aborting!"))
+	if len(idata.Config.Public) > 0 {
+		idata.Config.Public, _ = filepath.Abs(idata.Config.Public)
+		Log("Sharing public files from", idata.Config.Public)
+		DieOnError(Assert(DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
 	}
 
 	//
 	// add custom providers to the registry
 
-	for _, item := range config.Providers {
+	for _, item := range idata.Config.Providers {
 		Log(1, item)
 		oauth2.ProviderIDMap[item.ID] = item
 	}
@@ -141,7 +142,7 @@ func main() {
 		Log("Saving database to disk")
 		etc.Database.Close()
 
-		if config.SearchOn {
+		if idata.Config.SearchOn {
 			Log("Closing filesystem watcher")
 			watcher.Close()
 		}
@@ -152,7 +153,7 @@ func main() {
 	//
 	// initialize filesystem watching
 
-	if config.SearchOn {
+	if idata.Config.SearchOn {
 		go initFsWatcher()
 	}
 
@@ -169,8 +170,8 @@ func main() {
 	mw := chainMiddleware(mwAddAttribution)
 
 	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
-	http.HandleFunc("/login", mw(oauth2.HandleMultiOAuthLogin(helperIsLoggedIn, "./files/", config.Clients)))
-	http.HandleFunc("/callback", mw(oauth2.HandleMultiOAuthCallback("./files/", config.Clients, helperOA2SaveInfo)))
+	http.HandleFunc("/login", mw(oauth2.HandleMultiOAuthLogin(helperIsLoggedIn, "./files/", idata.Config.Clients)))
+	http.HandleFunc("/callback", mw(oauth2.HandleMultiOAuthCallback("./files/", idata.Config.Clients, helperOA2SaveInfo)))
 	http.HandleFunc("/test", mw(handleTest))
 	http.HandleFunc("/files/", mw(handleDirectoryListing(handleFileListing)))
 	http.HandleFunc("/admin", mw(handleAdmin))
@@ -190,15 +191,15 @@ func main() {
 	http.HandleFunc("/api/access_discord_role/delete", mw(handleDiscordRoleAccessDelete))
 	http.HandleFunc("/regen_passkey", mw(handleRegenPasskey))
 
-	if !IsPortAvailable(config.Port) {
+	if !IsPortAvailable(idata.Config.Port) {
 		DieOnError(
-			E(F("Binding to port %d failed.", config.Port)),
+			E(F("Binding to port %d failed.", idata.Config.Port)),
 			"It may be taken or you may not have permission to. Aborting!",
 		)
 		return
 	}
 
-	p := strconv.Itoa(config.Port)
+	p := strconv.Itoa(idata.Config.Port)
 	Log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
 }
@@ -260,7 +261,7 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 
 	linkmsg := ""
 	if showLogin {
-		linkmsg = "Please <a href='" + config.HTTPBase + "login'>Log In</a>."
+		linkmsg = "Please <a href='" + idata.Config.HTTPBase + "login'>Log In</a>."
 		w.WriteHeader(http.StatusForbidden)
 		writeResponse(r, w, "Forbidden", message, linkmsg)
 	} else {
@@ -279,7 +280,7 @@ func writeAPIResponse(r *http.Request, w http.ResponseWriter, good bool, message
 	} else {
 		titlemsg = "Update Failed"
 	}
-	writeResponse(r, w, titlemsg, message, "Return to <a href='"+config.HTTPBase+"admin'>the dashboard</a>.")
+	writeResponse(r, w, titlemsg, message, "Return to <a href='"+idata.Config.HTTPBase+"admin'>the dashboard</a>.")
 }
 
 func boolToString(x bool) string {
@@ -294,7 +295,7 @@ func writeResponse(r *http.Request, w http.ResponseWriter, title string, message
 		"title":   title,
 		"message": message,
 		"link":    link,
-		"base":    config.HTTPBase,
+		"base":    idata.Config.HTTPBase,
 	})
 }
 
@@ -409,10 +410,10 @@ func generateNewUserPasskey(snowflake string) string {
 }
 
 func makeDiscordRequest(endpoint string, body url.Values) []byte {
-	req, _ := http.NewRequest(http.MethodGet, DiscordAPI+endpoint, strings.NewReader(body.Encode()))
+	req, _ := http.NewRequest(http.MethodGet, idata.DiscordAPI+endpoint, strings.NewReader(body.Encode()))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Bot "+config.GetDiscordClient().Extra2)
+	req.Header.Set("Authorization", "Bot "+idata.Config.GetDiscordClient().Extra2)
 	req.Header.Set("Accept", "application/json")
 	res, _ := http.DefaultClient.Do(req)
 	bys, _ := ioutil.ReadAll(res.Body)

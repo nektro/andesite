@@ -1,4 +1,4 @@
-package main
+package idata
 
 import (
 	"github.com/mitchellh/go-homedir"
@@ -12,6 +12,6 @@ const (
 )
 
 var (
-	config         *itypes.Config
-	homedirPath, _ = homedir.Dir()
+	Config         *itypes.Config
+	HomedirPath, _ = homedir.Dir()
 )

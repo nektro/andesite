@@ -19,6 +19,7 @@ import (
 	oauth2 "github.com/nektro/go.oauth2"
 	"github.com/valyala/fastjson"
 
+	"github.com/nektro/andesite/internal/idata"
 	"github.com/nektro/andesite/internal/itypes"
 
 	. "github.com/nektro/go-util/alias"
@@ -158,9 +159,9 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"path":      qpath,
 				"files":     data,
 				"admin":     user.Admin,
-				"base":      config.HTTPBase,
+				"base":      idata.Config.HTTPBase,
 				"name":      oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
-				"search_on": config.SearchOn,
+				"search_on": idata.Config.SearchOn,
 				"host":      FullHost(r),
 				"extras":    extras,
 			})
@@ -202,10 +203,10 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		dra := queryAllDiscordRoleAccess()
 		var p fastjson.Parser
 
-		rurl := F("%s/guilds/%s/members/%s", DiscordAPI, config.GetDiscordClient().Extra1, user.Snowflake)
+		rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, idata.Config.GetDiscordClient().Extra1, user.Snowflake)
 		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
 		req.Header.Set("User-Agent", "nektro/andesite")
-		req.Header.Set("Authorization", "Bot "+config.GetDiscordClient().Extra2)
+		req.Header.Set("Authorization", "Bot "+idata.Config.GetDiscordClient().Extra2)
 		bys := DoHttpRequest(req)
 		v, err := p.Parse(string(bys))
 		if err != nil {
@@ -223,7 +224,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		}
 	}
 
-	return config.Root, qpath, userAccess, user, map[string]interface{}{
+	return idata.Config.Root, qpath, userAccess, user, map[string]interface{}{
 		"user": user,
 	}, nil
 }
@@ -234,10 +235,10 @@ func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 	qpath := string(r.URL.Path[7:])
 	qaccess := []string{}
 
-	if len(config.Public) > 0 {
+	if len(idata.Config.Public) > 0 {
 		qaccess = append(qaccess, "/")
 	}
-	return config.Public, qpath, qaccess, &itypes.UserRow{-1, "", false, "Guest!", "", "", ""}, map[string]interface{}{}, nil
+	return idata.Config.Public, qpath, qaccess, &itypes.UserRow{-1, "", false, "Guest!", "", "", ""}, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/admin
@@ -249,7 +250,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	etc.WriteHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
 		"user":           user.Snowflake,
 		"accesses":       queryAllAccess(),
-		"base":           config.HTTPBase,
+		"base":           idata.Config.HTTPBase,
 		"name":           oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 		"shares":         queryAllShares(),
 		"auth":           oauth2.ProviderIDMap[user.Provider].ID,
@@ -370,7 +371,7 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		return "", "", nil, nil, nil, errors.New("")
 	}
 
-	return config.Root, u[32:], s, &itypes.UserRow{-1, h, false, "", "", "", ""}, nil, nil
+	return idata.Config.Root, u[32:], s, &itypes.UserRow{-1, h, false, "", "", "", ""}, nil, nil
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
@@ -427,7 +428,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	//
 	etc.WriteHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
 		"user": user.Snowflake,
-		"base": config.HTTPBase,
+		"base": idata.Config.HTTPBase,
 		"name": oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 	})
 }
@@ -460,7 +461,7 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 	q := etc.Database.QueryPrepared(false, "select * from files where path like ? escape '!'", "%"+v4+"%")
 	for q.Next() {
 		wf := scanFile(q)
-		wf.URL = config.HTTPBase + "files" + wf.Path
+		wf.URL = idata.Config.HTTPBase + "files" + wf.Path
 		//
 		if strings.Contains(wf.Path, "/.") {
 			continue
@@ -496,12 +497,12 @@ func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	//
 	aid := etc.Database.QueryNextID("shares_discord_role")
 	// ags := r.PostForm.Get("GuildID")
-	ags := config.GetDiscordClient().Extra1
+	ags := idata.Config.GetDiscordClient().Extra1
 	agr := r.PostForm.Get("RoleID")
 	apt := r.PostForm.Get("Path")
 	//
-	gn := fetchDiscordGuild(config.GetDiscordClient().Extra1).Name
-	rn := fetchDiscordRole(config.GetDiscordClient().Extra1, agr).Name
+	gn := fetchDiscordGuild(idata.Config.GetDiscordClient().Extra1).Name
+	rn := fetchDiscordRole(idata.Config.GetDiscordClient().Extra1, agr).Name
 	//
 	etc.Database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?, ?, ?)", aid, ags, agr, apt, gn, rn)
 	writeAPIResponse(r, w, true, F("Created access for %s / %s to %s.", gn, rn, apt))
@@ -520,12 +521,12 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	//
 	qid := r.PostForm.Get("ID")
 	// qgs := r.PostForm.Get("GuildID")
-	qgs := config.GetDiscordClient().Extra1
+	qgs := idata.Config.GetDiscordClient().Extra1
 	qgr := r.PostForm.Get("RoleID")
 	qpt := r.PostForm.Get("Path")
 	//
-	gn := fetchDiscordGuild(config.GetDiscordClient().Extra1).Name
-	rn := fetchDiscordRole(config.GetDiscordClient().Extra1, qgr).Name
+	gn := fetchDiscordGuild(idata.Config.GetDiscordClient().Extra1).Name
+	rn := fetchDiscordRole(idata.Config.GetDiscordClient().Extra1, qgr).Name
 	//
 	etc.Database.QueryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
 	etc.Database.QueryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)
