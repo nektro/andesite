@@ -18,6 +18,8 @@ import (
 	etc "github.com/nektro/go.etc"
 	"github.com/valyala/fastjson"
 
+	"github.com/nektro/andesite/internal/itypes"
+
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
 )
@@ -60,9 +62,9 @@ func handleTest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, FullHost(r))
 }
 
-func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
+func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fileRoot, qpath, uAccess, uID, uName, isAdmin, extras, err := getAccess(w, r)
+		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
 
 		// if getAccess errored, response has already been written
 		if err != nil {
@@ -150,11 +152,11 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			}
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
-				"user":      uID,
 				"provider":  user.Provider,
+				"user":      user.Snowflake,
 				"path":      qpath,
 				"files":     data,
-				"admin":     isAdmin,
+				"admin":     user.Admin,
 				"base":      config.HTTPBase,
 				"name":      oauth2Provider.NamePrefix + uName,
 				"search_on": config.SearchOn,
@@ -183,10 +185,10 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 }
 
 // handler for http://andesite/files/*
-func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error) {
+func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
 	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if err != nil {
-		return "", "", []string{}, "", "", false, map[string]interface{}{}, err
+		return "", "", nil, nil, nil, err
 	}
 
 	// get path
@@ -195,7 +197,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 
 	userAccess := queryAccess(user)
 
-	if oauth2Provider.ID == "discord" {
+	if user.Provider == oauth2.ProviderDiscord.ID {
 		dra := queryAllDiscordRoleAccess()
 		var p fastjson.Parser
 
@@ -220,13 +222,13 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		}
 	}
 
-	return config.Root, qpath, userAccess, user.Snowflake, user.Name, user.Admin, map[string]interface{}{
+	return config.Root, qpath, userAccess, user, map[string]interface{}{
 		"user": user,
 	}, nil
 }
 
 // handler for http://andesite/public/*
-func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error) {
+func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
 	// remove /public
 	qpath := string(r.URL.Path[7:])
 	qaccess := []string{}
@@ -234,7 +236,7 @@ func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 	if len(config.Public) > 0 {
 		qaccess = append(qaccess, "/")
 	}
-	return config.Public, qpath, qaccess, "", "Guest!", false, map[string]interface{}{}, nil
+	return config.Public, qpath, qaccess, &itypes.UserRow{-1, "", false, "Guest!", "", "", ""}, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/admin
@@ -349,7 +351,7 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	writeAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ahs2, fpath))
 }
 
-func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, string, string, bool, map[string]interface{}, error) {
+func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
 	u := r.URL.Path[6:]
 	if len(u) == 0 {
 		w.Header().Add("Location", "../")
@@ -357,17 +359,17 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 	}
 	if match, _ := regexp.MatchString("^[0-9a-f]{32}/.*", u); !match {
 		writeResponse(r, w, "Invalid Share Link", "Invalid format for share code.", "")
-		return "", "", []string{}, "", "", false, map[string]interface{}{}, errors.New("")
+		return "", "", nil, nil, nil, errors.New("")
 	}
 
 	h := u[:32]
 	s := queryAccessByShare(h)
 	if len(s) == 0 {
 		writeResponse(r, w, "Not Found", "Public share code not found.", "")
-		return "", "", []string{}, "", "", false, map[string]interface{}{}, errors.New("")
+		return "", "", nil, nil, nil, errors.New("")
 	}
 
-	return config.Root, u[32:], s, h, "", false, map[string]interface{}{}, nil
+	return config.Root, u[32:], s, &itypes.UserRow{-1, h, false, "", "", "", ""}, nil, nil
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {

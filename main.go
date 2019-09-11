@@ -352,12 +352,12 @@ func containsAll(mp url.Values, keys ...string) bool {
 	return true
 }
 
-func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method string, requireAdmin bool) (*sessions.Session, itypes.UserRow, error) {
+func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method string, requireAdmin bool) (*sessions.Session, *itypes.UserRow, error) {
 	if r.Method != method {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Add("Allow", "HEAD, "+method)
 		writeAPIResponse(r, w, false, "This action requires using HTTP "+method)
-		return nil, itypes.UserRow{}, E("")
+		return nil, nil, E("")
 	}
 
 	sess := etc.GetSession(r)
@@ -367,12 +367,12 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 		pk := r.Header.Get("x-passkey")
 		if len(pk) == 0 {
 			writeUserDenied(r, w, true, true)
-			return nil, itypes.UserRow{}, E("not logged in and no passkey found")
+			return nil, nil, E("not logged in and no passkey found")
 		}
 		kq := etc.Database.QueryDoSelect("users", "passkey", pk)
 		if !kq.Next() {
 			writeUserDenied(r, w, true, true)
-			return nil, itypes.UserRow{}, E("invalid passkey")
+			return nil, nil, E("invalid passkey")
 		}
 		sessID = scanUser(kq).Snowflake
 		kq.Close()
@@ -383,17 +383,17 @@ func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 
 	if !ok {
 		writeResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+userID+")", "")
-		return nil, itypes.UserRow{}, E("")
+		return nil, nil, E("")
 	}
 	if requireAdmin && !user.Admin {
 		writeAPIResponse(r, w, false, "This action requires being a site administrator. ("+userID+")")
-		return nil, itypes.UserRow{}, E("")
+		return nil, nil, E("")
 	}
 
 	err := r.ParseForm()
 	if err != nil {
 		writeAPIResponse(r, w, false, "Error parsing form data")
-		return nil, itypes.UserRow{}, E("")
+		return nil, nil, E("")
 	}
 
 	return sess, user, nil
