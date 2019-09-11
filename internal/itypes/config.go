@@ -22,3 +22,7 @@ type Config struct {
 	Providers []oauth2.Provider `json:"providers"`
 	CustomIds []oauth2.AppConf  `json:"custom"`
 }
+
+func (c *Config) GetDiscordClient() *oauth2.AppConf {
+	return c.Discord
+}

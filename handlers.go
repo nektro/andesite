@@ -198,10 +198,10 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		dra := queryAllDiscordRoleAccess()
 		var p fastjson.Parser
 
-		rurl := F("%s/guilds/%s/members/%s", DiscordAPI, config.Discord.Extra1, user.Snowflake)
+		rurl := F("%s/guilds/%s/members/%s", DiscordAPI, config.GetDiscordClient().Extra1, user.Snowflake)
 		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
 		req.Header.Set("User-Agent", "nektro/andesite")
-		req.Header.Set("Authorization", "Bot "+config.Discord.Extra2)
+		req.Header.Set("Authorization", "Bot "+config.GetDiscordClient().Extra2)
 		bys := DoHttpRequest(req)
 		v, err := p.Parse(string(bys))
 		if err != nil {
@@ -492,12 +492,12 @@ func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	//
 	aid := etc.Database.QueryNextID("shares_discord_role")
 	// ags := r.PostForm.Get("GuildID")
-	ags := config.Discord.Extra1
+	ags := config.GetDiscordClient().Extra1
 	agr := r.PostForm.Get("RoleID")
 	apt := r.PostForm.Get("Path")
 	//
-	gn := fetchDiscordGuild(config.Discord.Extra1).Name
-	rn := fetchDiscordRole(config.Discord.Extra1, agr).Name
+	gn := fetchDiscordGuild(config.GetDiscordClient().Extra1).Name
+	rn := fetchDiscordRole(config.GetDiscordClient().Extra1, agr).Name
 	//
 	etc.Database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?, ?, ?)", aid, ags, agr, apt, gn, rn)
 	writeAPIResponse(r, w, true, F("Created access for %s / %s to %s.", gn, rn, apt))
@@ -516,12 +516,12 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	//
 	qid := r.PostForm.Get("ID")
 	// qgs := r.PostForm.Get("GuildID")
-	qgs := config.Discord.Extra1
+	qgs := config.GetDiscordClient().Extra1
 	qgr := r.PostForm.Get("RoleID")
 	qpt := r.PostForm.Get("Path")
 	//
-	gn := fetchDiscordGuild(config.Discord.Extra1).Name
-	rn := fetchDiscordRole(config.Discord.Extra1, qgr).Name
+	gn := fetchDiscordGuild(config.GetDiscordClient().Extra1).Name
+	rn := fetchDiscordRole(config.GetDiscordClient().Extra1, qgr).Name
 	//
 	etc.Database.QueryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
 	etc.Database.QueryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)

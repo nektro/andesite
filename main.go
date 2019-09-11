@@ -465,7 +465,7 @@ func makeDiscordRequest(endpoint string, body url.Values) []byte {
 	req, _ := http.NewRequest(http.MethodGet, DiscordAPI+endpoint, strings.NewReader(body.Encode()))
 	req.Header.Set("User-Agent", "nektro/andesite")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Bot "+config.Discord.Extra2)
+	req.Header.Set("Authorization", "Bot "+config.GetDiscordClient().Extra2)
 	req.Header.Set("Accept", "application/json")
 	res, _ := http.DefaultClient.Do(req)
 	bys, _ := ioutil.ReadAll(res.Body)
