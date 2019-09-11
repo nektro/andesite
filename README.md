@@ -20,7 +20,7 @@ Once you have finished the app creation process and obtained the Client ID and C
 
 In the `.andesite` folder make a `config.json` file and put the following data inside, replacing `AUTH` with whichever Identity Provider you chose, such as `discord`, `reddit`, etc. And `CLIENT_ID` and `CLIENT_SECRET` with their respective values. Do not worry, this folder will remain entirely private, even to users with full access.
 
-The current config version is `1`. See [docs/config](./docs/config/) for more info on setting up this info to be read by Andesite.
+The current config version is `2`. See [docs/config](./docs/config/) for more info on setting up this info to be read by Andesite.
 
 Once fully configured, you're ready to obtain a binary to run Andesite from either the [Development](#development) or [Deployment](#deployment) sections depending on your needs.
 

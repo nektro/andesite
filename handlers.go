@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	etc "github.com/nektro/go.etc"
+	oauth2 "github.com/nektro/go.oauth2"
 	"github.com/valyala/fastjson"
 
 	"github.com/nektro/andesite/internal/itypes"
@@ -158,7 +159,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"files":     data,
 				"admin":     user.Admin,
 				"base":      config.HTTPBase,
-				"name":      oauth2Provider.NamePrefix + uName,
+				"name":      oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 				"search_on": config.SearchOn,
 				"host":      FullHost(r),
 				"extras":    extras,
@@ -249,9 +250,9 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		"user":           user.Snowflake,
 		"accesses":       queryAllAccess(),
 		"base":           config.HTTPBase,
-		"name":           oauth2Provider.NamePrefix + user.Name,
+		"name":           oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 		"shares":         queryAllShares(),
-		"auth":           oauth2Provider.ID,
+		"auth":           oauth2.ProviderIDMap[user.Provider].ID,
 		"discord_shares": queryAllDiscordRoleAccess(),
 	})
 }
@@ -304,7 +305,7 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/create
 func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
@@ -324,7 +325,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		aud = u.ID
 	} else {
 		aud = etc.Database.QueryNextID("users")
-		queryDoAddUser(aud, oauth2Provider.ID, asn, false, "")
+		queryDoAddUser(aud, oauth2.ProviderIDMap[user.Provider].ID, asn, false, "")
 	}
 	//
 	etc.Database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, aud, apt)
@@ -427,7 +428,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	etc.WriteHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
 		"user": user.Snowflake,
 		"base": config.HTTPBase,
-		"name": oauth2Provider.NamePrefix + user.Name,
+		"name": oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 	})
 }
 

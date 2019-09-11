@@ -96,42 +96,11 @@ func main() {
 	}
 
 	//
-	// discover OAuth2 config info
+	// add custom providers to the registry
 
-	if len(config.Auth) == 0 {
-		config.Auth = "discord"
-	}
-	if cfp, ok := oauth2.ProviderIDMap[config.Auth]; ok {
-		cidp := findStructValueWithTag(&config, "json", config.Auth).Interface().(*oauth2.AppConf)
-		DieOnError(Assert(cidp != nil, F("Authorization keys not set for identity prodvider '%s' in config.json!", config.Auth)))
-		DieOnError(Assert(cidp.ID != "", F("App ID not set for identity prodvider '%s' in config.json!", config.Auth)))
-		DieOnError(Assert(cidp.Secret != "", F("App Secret not set for identity prodvider '%s' in config.json!", config.Auth)))
-		oauth2AppConfig = cidp
-		oauth2Provider = cfp
-	} else {
-		foundP := false
-		for _, item := range config.Providers {
-			if item.ID == config.Auth {
-				oauth2Provider = item
-				foundP = true
-				break
-			}
-		}
-		if !foundP {
-			DieOnError(E(F("Unable to find OAuth2 app type '%s' in config.json", config.Auth)))
-		}
-		//
-		foundI := false
-		for _, item := range config.CustomIds {
-			if item.For == config.Auth {
-				oauth2AppConfig = &item
-				foundI = true
-				break
-			}
-		}
-		if !foundI {
-			DieOnError(E(F("Unable to find OAuth2 client config for '%s' config.json", config.Auth)))
-		}
+	for _, item := range config.Providers {
+		Log(1, item)
+		oauth2.ProviderIDMap[item.ID] = item
 	}
 
 	//
@@ -201,10 +170,8 @@ func main() {
 	mw := chainMiddleware(mwAddAttribution)
 
 	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
-	http.HandleFunc("/login", mw(oauth2.HandleOAuthLogin(helperIsLoggedIn, "./files/", oauth2Provider, oauth2AppConfig.ID)))
-	http.HandleFunc("/callback", mw(oauth2.HandleOAuthCallback(oauth2Provider, oauth2AppConfig.ID, oauth2AppConfig.Secret, helperOA2SaveInfo, "./files")))
-
-
+	http.HandleFunc("/login", mw(oauth2.HandleMultiOAuthLogin(helperIsLoggedIn, "./files/", config.Clients)))
+	http.HandleFunc("/callback", mw(oauth2.HandleMultiOAuthCallback("./files/", config.Clients, helperOA2SaveInfo)))
 	http.HandleFunc("/test", mw(handleTest))
 	http.HandleFunc("/files/", mw(handleDirectoryListing(handleFileListing)))
 	http.HandleFunc("/admin", mw(handleAdmin))
@@ -277,7 +244,8 @@ func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	sessName := sess.Values["name"]
 	if sessName != nil {
 		sessID := sess.Values["user"].(string)
-		me += F("%s%s (%s)", oauth2Provider.NamePrefix, sessName.(string), sessID)
+		provider := sess.Values["provider"].(string)
+		me += F("%s%s (%s)", oauth2.ProviderIDMap[provider].NamePrefix, sessName.(string), sessID)
 	}
 
 	message := ""

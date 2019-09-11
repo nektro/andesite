@@ -12,17 +12,15 @@ type Config struct {
 	Themes    []string          `json:"themes"`
 	HTTPBase  string            `json:"base"`
 	SearchOn  bool              `json:"search_on"`
-	Auth      string            `json:"auth"`
-	Discord   *oauth2.AppConf   `json:"discord"`
-	Reddit    *oauth2.AppConf   `json:"reddit"`
-	GitHub    *oauth2.AppConf   `json:"github"`
-	Google    *oauth2.AppConf   `json:"google"`
-	Facebook  *oauth2.AppConf   `json:"facebook"`
-	Microsoft *oauth2.AppConf   `json:"microsoft"`
+	Clients   []oauth2.AppConf  `json:"clients"`
 	Providers []oauth2.Provider `json:"providers"`
-	CustomIds []oauth2.AppConf  `json:"custom"`
 }
 
 func (c *Config) GetDiscordClient() *oauth2.AppConf {
-	return c.Discord
+	for _, item := range c.Clients {
+		if item.For == oauth2.ProviderDiscord.ID {
+			return &item
+		}
+	}
+	return &oauth2.AppConf{}
 }
