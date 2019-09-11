@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"reflect"
 	"runtime/debug"
 	"strconv"
 	"strings"
@@ -283,14 +282,6 @@ func writeAPIResponse(r *http.Request, w http.ResponseWriter, good bool, message
 	writeResponse(r, w, titlemsg, message, "Return to <a href='"+config.HTTPBase+"admin'>the dashboard</a>.")
 }
 
-func fixID(id interface{}) string {
-	switch id.(type) {
-	case float64:
-		return strconv.Itoa(int(id.(float64)))
-	}
-	return id.(string)
-}
-
 func boolToString(x bool) string {
 	if x {
 		return "1"
@@ -385,18 +376,6 @@ func mwAddAttribution(next http.HandlerFunc) http.HandlerFunc {
 		w.Header().Add("Server", "nektro/andesite")
 		next.ServeHTTP(w, r)
 	}
-}
-
-func findStructValueWithTag(item interface{}, ttype string, tag string) reflect.Value {
-	v := reflect.ValueOf(config).Elem()
-	t := v.Type()
-	for i := 0; i < v.NumField(); i++ {
-		f := t.Field(i)
-		if f.Tag.Get(ttype) == tag {
-			return v.FieldByName(f.Name)
-		}
-	}
-	return reflect.Zero(nil)
 }
 
 func findFirstNonEmpty(values ...string) string {
