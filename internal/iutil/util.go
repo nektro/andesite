@@ -4,12 +4,10 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
-	"runtime/debug"
 	"strings"
 
 	"github.com/gorilla/sessions"
@@ -51,14 +49,6 @@ func Filter(stack []os.FileInfo, cb func(os.FileInfo) bool) []os.FileInfo {
 		}
 	}
 	return result
-}
-
-func CheckErr(err error, args ...string) {
-	if err != nil {
-		fmt.Println("Error")
-		fmt.Println(F("%q: %s", err, args))
-		debug.PrintStack()
-	}
 }
 
 func WriteUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, showLogin bool) {
