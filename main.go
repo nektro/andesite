@@ -1,22 +1,13 @@
 package main
 
 import (
-	"crypto/md5"
-	"encoding/hex"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"path/filepath"
-	"runtime/debug"
 	"strconv"
 	"strings"
 
 	"github.com/aymerick/raymond"
-	"github.com/gorilla/sessions"
-	discord "github.com/nektro/go.discord"
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
 	"github.com/rakyll/statik/fs"
@@ -24,6 +15,7 @@ import (
 
 	"github.com/nektro/andesite/internal/idata"
 	"github.com/nektro/andesite/internal/itypes"
+	"github.com/nektro/andesite/internal/iutil"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
@@ -69,13 +61,13 @@ func main() {
 
 	//
 
-	idata.Config.Port = findFirstNonZero(*flagPort, idata.Config.Port, 8000)
+	idata.Config.Port = iutil.FindFirstNonZero(*flagPort, idata.Config.Port, 8000)
 	Log("Discovered option:", "--port", idata.Config.Port)
-	idata.Config.HTTPBase = findFirstNonEmpty(*flagBase, idata.Config.HTTPBase, "/")
+	idata.Config.HTTPBase = iutil.FindFirstNonEmpty(*flagBase, idata.Config.HTTPBase, "/")
 	Log("Discovered option:", "--base", idata.Config.HTTPBase)
-	idata.Config.Root = findFirstNonEmpty(*flagRoot, idata.Config.Root)
+	idata.Config.Root = iutil.FindFirstNonEmpty(*flagRoot, idata.Config.Root)
 	Log("Discovered option:", "--root", idata.Config.Root)
-	idata.Config.Public = findFirstNonEmpty(*flagPublic, idata.Config.Public)
+	idata.Config.Public = iutil.FindFirstNonEmpty(*flagPublic, idata.Config.Public)
 	Log("Discovered option:", "--public", idata.Config.Public)
 
 	if *flagSearch {
@@ -121,7 +113,7 @@ func main() {
 		"facebook":  "4:",
 		"microsoft": "5:",
 	}
-	for _, item := range queryAllUsers() {
+	for _, item := range iutil.QueryAllUsers() {
 		for k, v := range prefixes {
 			if strings.HasPrefix(item.Snowflake, v) {
 				sn := item.Snowflake[len(v):]
@@ -167,7 +159,7 @@ func main() {
 	//
 	// http server setup and launch
 
-	mw := chainMiddleware(mwAddAttribution)
+	mw := iutil.ChainMiddleware(iutil.MwAddAttribution)
 
 	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
 	http.HandleFunc("/login", mw(oauth2.HandleMultiOAuthLogin(helperIsLoggedIn, "./files/", idata.Config.Clients)))
@@ -202,244 +194,4 @@ func main() {
 	p := strconv.Itoa(idata.Config.Port)
 	Log("Initialization complete. Starting server on port " + p)
 	http.ListenAndServe(":"+p, nil)
-}
-
-func reduceNumber(input int64, unit int64, base string, prefixes string) string {
-	if input < unit {
-		return F("%d "+base, input)
-	}
-	div, exp := int64(unit), 0
-	for n := input / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return F("%.1f %ci", float64(input)/float64(div), prefixes[exp]) + base
-}
-
-func byteCountIEC(b int64) string {
-	return reduceNumber(b, 1024, "B", "KMGTPEZY")
-}
-
-func filter(stack []os.FileInfo, cb func(os.FileInfo) bool) []os.FileInfo {
-	result := []os.FileInfo{}
-	for _, item := range stack {
-		if cb(item) {
-			result = append(result, item)
-		}
-	}
-	return result
-}
-
-func checkErr(err error, args ...string) {
-	if err != nil {
-		fmt.Println("Error")
-		fmt.Println(F("%q: %s", err, args))
-		debug.PrintStack()
-	}
-}
-
-func writeUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, showLogin bool) {
-	me := ""
-	sess := etc.GetSession(r)
-	sessName := sess.Values["name"]
-	if sessName != nil {
-		sessID := sess.Values["user"].(string)
-		provider := sess.Values["provider"].(string)
-		me += F("%s%s (%s)", oauth2.ProviderIDMap[provider].NamePrefix, sessName.(string), sessID)
-	}
-
-	message := ""
-	if fileOrAdmin {
-		if showLogin {
-			message = "You " + me + " do not have access to this resource."
-		} else {
-			message = "Unable to find the requested resource for you " + me + "."
-		}
-	} else {
-		message = "Admin priviledge required. Access denied."
-	}
-
-	linkmsg := ""
-	if showLogin {
-		linkmsg = "Please <a href='" + idata.Config.HTTPBase + "login'>Log In</a>."
-		w.WriteHeader(http.StatusForbidden)
-		writeResponse(r, w, "Forbidden", message, linkmsg)
-	} else {
-		w.WriteHeader(http.StatusForbidden)
-		writeResponse(r, w, "Not Found", message, linkmsg)
-	}
-}
-
-func writeAPIResponse(r *http.Request, w http.ResponseWriter, good bool, message string) {
-	if !good {
-		w.WriteHeader(http.StatusForbidden)
-	}
-	titlemsg := ""
-	if good {
-		titlemsg = "Update Successful"
-	} else {
-		titlemsg = "Update Failed"
-	}
-	writeResponse(r, w, titlemsg, message, "Return to <a href='"+idata.Config.HTTPBase+"admin'>the dashboard</a>.")
-}
-
-func boolToString(x bool) string {
-	if x {
-		return "1"
-	}
-	return "0"
-}
-
-func writeResponse(r *http.Request, w http.ResponseWriter, title string, message string, link string) {
-	etc.WriteHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
-		"title":   title,
-		"message": message,
-		"link":    link,
-		"base":    idata.Config.HTTPBase,
-	})
-}
-
-func writeLinkResponse(r *http.Request, w http.ResponseWriter, title string, message string, linkText string, href string) {
-	writeResponse(r, w, title, message, "<a href=\""+href+"\">"+linkText+"</a>")
-}
-
-func containsAll(mp url.Values, keys ...string) bool {
-	for _, item := range keys {
-		if _, ok := mp[item]; !ok {
-			return false
-		}
-	}
-	return true
-}
-
-func apiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method string, requireAdmin bool) (*sessions.Session, *itypes.UserRow, error) {
-	if r.Method != method {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Header().Add("Allow", "HEAD, "+method)
-		writeAPIResponse(r, w, false, "This action requires using HTTP "+method)
-		return nil, nil, E("")
-	}
-
-	sess := etc.GetSession(r)
-	sessID := sess.Values["user"]
-
-	if sessID == nil {
-		pk := r.Header.Get("x-passkey")
-		if len(pk) == 0 {
-			writeUserDenied(r, w, true, true)
-			return nil, nil, E("not logged in and no passkey found")
-		}
-		kq := etc.Database.QueryDoSelect("users", "passkey", pk)
-		if !kq.Next() {
-			writeUserDenied(r, w, true, true)
-			return nil, nil, E("invalid passkey")
-		}
-		sessID = scanUser(kq).Snowflake
-		kq.Close()
-	}
-
-	userID := sessID.(string)
-	user, ok := queryUserBySnowflake(userID)
-
-	if !ok {
-		writeResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+userID+")", "")
-		return nil, nil, E("")
-	}
-	if requireAdmin && !user.Admin {
-		writeAPIResponse(r, w, false, "This action requires being a site administrator. ("+userID+")")
-		return nil, nil, E("")
-	}
-
-	err := r.ParseForm()
-	if err != nil {
-		writeAPIResponse(r, w, false, "Error parsing form data")
-		return nil, nil, E("")
-	}
-
-	return sess, user, nil
-}
-
-// @from https://gist.github.com/gbbr/fa652db0bab132976620bcb7809fd89a
-func chainMiddleware(mw ...itypes.Middleware) itypes.Middleware {
-	return func(final http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			last := final
-			for i := len(mw) - 1; i >= 0; i-- {
-				last = mw[i](last)
-			}
-			last(w, r)
-		}
-	}
-}
-
-func mwAddAttribution(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Server", "nektro/andesite")
-		next.ServeHTTP(w, r)
-	}
-}
-
-func findFirstNonEmpty(values ...string) string {
-	for _, item := range values {
-		if len(item) > 0 {
-			return item
-		}
-	}
-	return ""
-}
-
-func findFirstNonZero(values ...int) int {
-	for _, item := range values {
-		if item != 0 {
-			return item
-		}
-	}
-	return 0
-}
-
-func writeJSON(w http.ResponseWriter, data map[string]interface{}) {
-	w.Header().Add("content-type", "application/json")
-	bytes, _ := json.Marshal(data)
-	w.Write(bytes)
-}
-
-func generateNewUserPasskey(snowflake string) string {
-	hash1 := md5.Sum([]byte(F("astheno.andesite.passkey.%s.%s", snowflake, T())))
-	hash2 := hex.EncodeToString(hash1[:])
-	return hash2[0:10]
-}
-
-func makeDiscordRequest(endpoint string, body url.Values) []byte {
-	req, _ := http.NewRequest(http.MethodGet, idata.DiscordAPI+endpoint, strings.NewReader(body.Encode()))
-	req.Header.Set("User-Agent", "nektro/andesite")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Bot "+idata.Config.GetDiscordClient().Extra2)
-	req.Header.Set("Accept", "application/json")
-	res, _ := http.DefaultClient.Do(req)
-	bys, _ := ioutil.ReadAll(res.Body)
-	return bys
-}
-
-func fetchDiscordRole(guild string, role string) discord.GuildRole {
-	bys := makeDiscordRequest("/guilds/"+guild+"/roles", url.Values{})
-	roles := []discord.GuildRole{}
-	json.Unmarshal(bys, &roles)
-	for i, item := range roles {
-		if item.ID == role {
-			return roles[i]
-		}
-	}
-	return discord.GuildRole{}
-}
-
-type DiscordGuild struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-func fetchDiscordGuild(guild string) DiscordGuild {
-	bys := makeDiscordRequest("/guilds/"+guild, url.Values{})
-	var dg DiscordGuild
-	json.Unmarshal(bys, &dg)
-	return dg
 }

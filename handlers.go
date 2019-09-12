@@ -21,6 +21,7 @@ import (
 
 	"github.com/nektro/andesite/internal/idata"
 	"github.com/nektro/andesite/internal/itypes"
+	"github.com/nektro/andesite/internal/iutil"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
@@ -41,7 +42,7 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 	sess.Values[provider+"_expires_in"] = resp["expires_in"]
 	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
 	sess.Save(r, w)
-	queryAssertUserName(provider, id, name)
+	iutil.QueryAssertUserName(provider, id, name)
 	Log("[user-login]", provider, id, name)
 }
 
@@ -80,7 +81,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 		// disallow exploring dotfile folders
 		if strings.Contains(qpath, "/.") {
-			writeUserDenied(r, w, true, false)
+			iutil.WriteUserDenied(r, w, true, false)
 			return
 		}
 
@@ -88,7 +89,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 		stat, err := os.Stat(fileRoot + qpath)
 		if os.IsNotExist(err) {
 			// 404
-			writeUserDenied(r, w, true, false)
+			iutil.WriteUserDenied(r, w, true, false)
 			return
 		}
 
@@ -100,7 +101,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			files, _ := ioutil.ReadDir(fileRoot + qpath)
 
 			// hide dot files
-			files = filter(files, func(x os.FileInfo) bool {
+			files = iutil.Filter(files, func(x os.FileInfo) bool {
 				return !strings.HasPrefix(x.Name(), ".")
 			})
 
@@ -108,7 +109,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			l1 := len(files)
 
 			// access check
-			files = filter(files, func(x os.FileInfo) bool {
+			files = iutil.Filter(files, func(x os.FileInfo) bool {
 				ok := false
 				fpath := qpath + x.Name()
 				for _, item := range uAccess {
@@ -123,7 +124,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			l2 := len(files)
 
 			if l1 > 0 && l2 == 0 {
-				writeUserDenied(r, w, true, false)
+				iutil.WriteUserDenied(r, w, true, false)
 				return
 			}
 
@@ -146,7 +147,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				}
 				data[gi] = map[string]string{
 					"name": a,
-					"size": byteCountIEC(files[i].Size()),
+					"size": iutil.ByteCountIEC(files[i].Size()),
 					"mod":  files[i].ModTime().UTC().String()[:19],
 					"ext":  ext[1:],
 				}
@@ -174,7 +175,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				}
 			}
 			if can == false {
-				writeUserDenied(r, w, true, false)
+				iutil.WriteUserDenied(r, w, true, false)
 				return
 			}
 
@@ -188,7 +189,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 // handler for http://andesite/files/*
 func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
-	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if err != nil {
 		return "", "", nil, nil, nil, err
 	}
@@ -197,10 +198,10 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	// remove /files
 	qpath := string(r.URL.Path[6:])
 
-	userAccess := queryAccess(user)
+	userAccess := iutil.QueryAccess(user)
 
 	if user.Provider == oauth2.ProviderDiscord.ID {
-		dra := queryAllDiscordRoleAccess()
+		dra := iutil.QueryAllDiscordRoleAccess()
 		var p fastjson.Parser
 
 		rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, idata.Config.GetDiscordClient().Extra1, user.Snowflake)
@@ -243,47 +244,47 @@ func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 
 // handler for http://andesite/admin
 func handleAdmin(w http.ResponseWriter, r *http.Request) {
-	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, true)
+	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodGet, true)
 	if err != nil {
 		return
 	}
 	etc.WriteHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
 		"user":           user.Snowflake,
-		"accesses":       queryAllAccess(),
+		"accesses":       iutil.QueryAllAccess(),
 		"base":           idata.Config.HTTPBase,
 		"name":           oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
-		"shares":         queryAllShares(),
+		"shares":         iutil.QueryAllShares(),
 		"auth":           oauth2.ProviderIDMap[user.Provider].ID,
-		"discord_shares": queryAllDiscordRoleAccess(),
+		"discord_shares": iutil.QueryAllDiscordRoleAccess(),
 	})
 }
 
 // handler for http://andesite/api/access/delete
 func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
 	//
-	if !containsAll(r.PostForm, "id", "snowflake") {
-		writeAPIResponse(r, w, false, "Missing POST values")
+	if !iutil.ContainsAll(r.PostForm, "id", "snowflake") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	//
 	aid := r.PostForm.Get("id")
 	iid, err := strconv.ParseInt(aid, 10, 32)
 	if err != nil {
-		writeAPIResponse(r, w, false, "ID parameter must be an integer")
+		iutil.WriteAPIResponse(r, w, false, "ID parameter must be an integer")
 		return
 	}
 	//
 	etc.Database.Query(true, F("delete from access where id = '%d'", iid))
-	writeAPIResponse(r, w, true, F("Removed access from %s.", r.PostForm.Get("snowflake")))
+	iutil.WriteAPIResponse(r, w, true, F("Removed access from %s.", r.PostForm.Get("snowflake")))
 }
 
 // handler for http://andesite/api/access/update
 func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
@@ -291,28 +292,28 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	aid := r.PostForm.Get("id")
 	iid, err := strconv.ParseInt(string(aid), 10, 32)
 	if err != nil {
-		writeAPIResponse(r, w, false, "ID parameter must be an integer")
+		iutil.WriteAPIResponse(r, w, false, "ID parameter must be an integer")
 		return
 	}
 	//
-	if !containsAll(r.PostForm, "snowflake", "path") {
-		writeAPIResponse(r, w, false, "Missing POST values")
+	if !iutil.ContainsAll(r.PostForm, "snowflake", "path") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	//
 	etc.Database.QueryDoUpdate("access", "path", r.PostForm.Get("path"), "id", strconv.FormatInt(iid, 10))
-	writeAPIResponse(r, w, true, F("Updated access for %s.", r.PostForm.Get("snowflake")))
+	iutil.WriteAPIResponse(r, w, true, F("Updated access for %s.", r.PostForm.Get("snowflake")))
 }
 
 // handler for http://andesite/api/access/create
 func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
 	//
-	if !containsAll(r.PostForm, "snowflake", "path") {
-		writeAPIResponse(r, w, false, "Missing POST values")
+	if !iutil.ContainsAll(r.PostForm, "snowflake", "path") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	//
@@ -320,27 +321,27 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	asn := r.PostForm.Get("snowflake")
 	apt := r.PostForm.Get("path")
 	//
-	u, ok := queryUserBySnowflake(asn)
+	u, ok := iutil.QueryUserBySnowflake(asn)
 	aud := -1
 	if ok {
 		aud = u.ID
 	} else {
 		aud = etc.Database.QueryNextID("users")
-		queryDoAddUser(aud, oauth2.ProviderIDMap[user.Provider].ID, asn, false, "")
+		iutil.QueryDoAddUser(aud, oauth2.ProviderIDMap[user.Provider].ID, asn, false, "")
 	}
 	//
 	etc.Database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, aud, apt)
-	writeAPIResponse(r, w, true, F("Created access for %s.", asn))
+	iutil.WriteAPIResponse(r, w, true, F("Created access for %s.", asn))
 }
 
 func handleShareCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
 	//
-	if !containsAll(r.PostForm, "path") {
-		writeAPIResponse(r, w, false, "Missing POST values")
+	if !iutil.ContainsAll(r.PostForm, "path") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	//
@@ -350,7 +351,7 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	fpath := r.PostForm.Get("path")
 	//
 	etc.Database.QueryPrepared(true, "insert into shares values (?, ?, ?)", aid, ahs2, fpath)
-	writeAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ahs2, fpath))
+	iutil.WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ahs2, fpath))
 }
 
 func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
@@ -360,14 +361,14 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		w.WriteHeader(http.StatusFound)
 	}
 	if match, _ := regexp.MatchString("^[0-9a-f]{32}/.*", u); !match {
-		writeResponse(r, w, "Invalid Share Link", "Invalid format for share code.", "")
+		iutil.WriteResponse(r, w, "Invalid Share Link", "Invalid format for share code.", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
 
 	h := u[:32]
-	s := queryAccessByShare(h)
+	s := iutil.QueryAccessByShare(h)
 	if len(s) == 0 {
-		writeResponse(r, w, "Not Found", "Public share code not found.", "")
+		iutil.WriteResponse(r, w, "Not Found", "Public share code not found.", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
 
@@ -375,13 +376,13 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
 	//
-	if !containsAll(r.PostForm, "id", "hash", "path") {
-		writeAPIResponse(r, w, false, "Missing POST values")
+	if !iutil.ContainsAll(r.PostForm, "id", "hash", "path") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	//
@@ -389,39 +390,39 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	aph := r.PostForm.Get("path")
 	// //
 	etc.Database.QueryDoUpdate("shares", "path", aph, "hash", ahs)
-	writeAPIResponse(r, w, true, "Successfully updated share path.")
+	iutil.WriteAPIResponse(r, w, true, "Successfully updated share path.")
 }
 
 func handleShareDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
 	//
-	if !containsAll(r.PostForm, "id", "hash", "path") {
-		writeAPIResponse(r, w, false, "Missing POST values")
+	if !iutil.ContainsAll(r.PostForm, "id", "hash", "path") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	//
 	ahs := r.PostForm.Get("hash")
 	//
 	etc.Database.QueryPrepared(true, "delete from shares where hash = ?", ahs)
-	writeAPIResponse(r, w, true, "Successfully deleted share link.")
+	iutil.WriteAPIResponse(r, w, true, "Successfully deleted share link.")
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
-	sess, _, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	sess, _, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if err != nil {
 		return
 	}
 	//
 	sess.Options.MaxAge = -1
 	sess.Save(r, w)
-	writeResponse(r, w, "Success", "Successfully logged out.", "")
+	iutil.WriteResponse(r, w, "Success", "Successfully logged out.", "")
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
-	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if err != nil {
 		return
 	}
@@ -434,9 +435,9 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
-	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if err != nil {
-		writeJSON(w, map[string]interface{}{
+		iutil.WriteJSON(w, map[string]interface{}{
 			"response": "bad",
 			"message":  err.Error(),
 		})
@@ -444,7 +445,7 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	p := r.URL.Query()["q"]
 	if len(p) == 0 || len(p[0]) == 0 {
-		writeJSON(w, map[string]interface{}{
+		iutil.WriteJSON(w, map[string]interface{}{
 			"response": "bad",
 			"message":  "'q' parameter is required",
 		})
@@ -457,7 +458,7 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 	v3 := strings.Replace(v2, "_", "!_", -1)
 	v4 := strings.Replace(v3, "[", "![", -1)
 	a := []WatchedFile{}
-	ua := queryAccess(user)
+	ua := iutil.QueryAccess(user)
 	q := etc.Database.QueryPrepared(false, "select * from files where path like ? escape '!'", "%"+v4+"%")
 	for q.Next() {
 		wf := scanFile(q)
@@ -477,7 +478,7 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	q.Close()
-	writeJSON(w, map[string]interface{}{
+	iutil.WriteJSON(w, map[string]interface{}{
 		"response": "good",
 		"count":    len(a),
 		"results":  a,
@@ -485,13 +486,13 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
 	//
-	if !containsAll(r.PostForm, "RoleID", "Path") {
-		writeAPIResponse(r, w, false, "Missing POST values")
+	if !iutil.ContainsAll(r.PostForm, "RoleID", "Path") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	//
@@ -501,21 +502,21 @@ func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	agr := r.PostForm.Get("RoleID")
 	apt := r.PostForm.Get("Path")
 	//
-	gn := fetchDiscordGuild(idata.Config.GetDiscordClient().Extra1).Name
-	rn := fetchDiscordRole(idata.Config.GetDiscordClient().Extra1, agr).Name
+	gn := iutil.FetchDiscordGuild(idata.Config.GetDiscordClient().Extra1).Name
+	rn := iutil.FetchDiscordRole(idata.Config.GetDiscordClient().Extra1, agr).Name
 	//
 	etc.Database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?, ?, ?)", aid, ags, agr, apt, gn, rn)
-	writeAPIResponse(r, w, true, F("Created access for %s / %s to %s.", gn, rn, apt))
+	iutil.WriteAPIResponse(r, w, true, F("Created access for %s / %s to %s.", gn, rn, apt))
 }
 
 func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
 	//
-	if !containsAll(r.PostForm, "ID", "RoleID", "Path") {
-		writeAPIResponse(r, w, false, "Missing POST values")
+	if !iutil.ContainsAll(r.PostForm, "ID", "RoleID", "Path") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	//
@@ -525,39 +526,39 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	qgr := r.PostForm.Get("RoleID")
 	qpt := r.PostForm.Get("Path")
 	//
-	gn := fetchDiscordGuild(idata.Config.GetDiscordClient().Extra1).Name
-	rn := fetchDiscordRole(idata.Config.GetDiscordClient().Extra1, qgr).Name
+	gn := iutil.FetchDiscordGuild(idata.Config.GetDiscordClient().Extra1).Name
+	rn := iutil.FetchDiscordRole(idata.Config.GetDiscordClient().Extra1, qgr).Name
 	//
 	etc.Database.QueryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
 	etc.Database.QueryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)
 	etc.Database.QueryDoUpdate("shares_discord_role", "path", qpt, "id", qid)
 	etc.Database.QueryDoUpdate("shares_discord_role", "guild_name", gn, "id", qid)
 	etc.Database.QueryDoUpdate("shares_discord_role", "role_name", rn, "id", qid)
-	writeAPIResponse(r, w, true, F("Successfully updated share path for %s / %s to %s.", gn, rn, qpt))
+	iutil.WriteAPIResponse(r, w, true, F("Successfully updated share path for %s / %s to %s.", gn, rn, qpt))
 }
 
 func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, err := apiBootstrapRequireLogin(r, w, http.MethodPost, true)
+	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodPost, true)
 	if err != nil {
 		return
 	}
-	if !containsAll(r.PostForm, "ID") {
-		writeAPIResponse(r, w, false, "Missing POST values")
+	if !iutil.ContainsAll(r.PostForm, "ID") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	qID := r.PostForm.Get("ID")
-	dra := queryDiscordRoleAccess(qID)
+	dra := iutil.QueryDiscordRoleAccess(qID)
 	etc.Database.QueryPrepared(true, "delete from shares_discord_role where id = ?", qID)
-	writeAPIResponse(r, w, true, F("Successfully deleted access for %s / %s to %s.", dra.GuildName, dra.RoleName, dra.Path))
+	iutil.WriteAPIResponse(r, w, true, F("Successfully deleted access for %s / %s to %s.", dra.GuildName, dra.RoleName, dra.Path))
 }
 
 //
 func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
-	_, user, err := apiBootstrapRequireLogin(r, w, http.MethodGet, false)
+	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodGet, false)
 	if err != nil {
 		return
 	}
-	pk := generateNewUserPasskey(user.Snowflake)
+	pk := iutil.GenerateNewUserPasskey(user.Snowflake)
 	etc.Database.QueryDoUpdate("users", "passkey", pk, "snowflake", user.Snowflake)
-	writeLinkResponse(r, w, "Passkey Updated", "It is now: "+pk, "Return", "./files/")
+	iutil.WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+pk, "Return", "./files/")
 }

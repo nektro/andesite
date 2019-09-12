@@ -1,4 +1,4 @@
-package main
+package iutil
 
 import (
 	"database/sql"
@@ -15,19 +15,19 @@ import (
 //
 //
 
-func scanUser(rows *sql.Rows) itypes.UserRow {
+func ScanUser(rows *sql.Rows) itypes.UserRow {
 	var v itypes.UserRow
 	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey, &v.Provider)
 	return v
 }
 
-func scanAccessRow(rows *sql.Rows) itypes.UserAccessRow {
+func ScanAccessRow(rows *sql.Rows) itypes.UserAccessRow {
 	var v itypes.UserAccessRow
 	rows.Scan(&v.ID, &v.User, &v.Path)
 	return v
 }
 
-func scanShare(rows *sql.Rows) itypes.ShareRow {
+func ScanShare(rows *sql.Rows) itypes.ShareRow {
 	var v itypes.ShareRow
 	rows.Scan(&v.ID, &v.Hash, &v.Path)
 	return v
@@ -36,48 +36,48 @@ func scanShare(rows *sql.Rows) itypes.ShareRow {
 //
 //
 
-func queryAccess(user *itypes.UserRow) []string {
+func QueryAccess(user *itypes.UserRow) []string {
 	result := []string{}
 	rows := etc.Database.Query(false, F("select * from access where user = '%d'", user.ID))
 	for rows.Next() {
-		result = append(result, scanAccessRow(rows).Path)
+		result = append(result, ScanAccessRow(rows).Path)
 	}
 	rows.Close()
 	return result
 }
 
-func queryUserBySnowflake(snowflake string) (*itypes.UserRow, bool) {
+func QueryUserBySnowflake(snowflake string) (*itypes.UserRow, bool) {
 	rows := etc.Database.Query(false, F("select * from users where snowflake = '%s'", snowflake))
 	if !rows.Next() {
 		return nil, false
 	}
-	ur := scanUser(rows)
+	ur := ScanUser(rows)
 	rows.Close()
 	return &ur, true
 }
 
-func queryUserByID(id int) (*itypes.UserRow, bool) {
+func QueryUserByID(id int) (*itypes.UserRow, bool) {
 	rows := etc.Database.Query(false, F("select * from users where id = '%d'", id))
 	if !rows.Next() {
 		return nil, false
 	}
-	ur := scanUser(rows)
+	ur := ScanUser(rows)
 	rows.Close()
 	return &ur, true
 }
 
-func queryAllAccess() []map[string]string {
+func QueryAllAccess() []map[string]string {
 	var result []map[string]string
 	rows := etc.Database.Query(false, "select * from access")
 	accs := []itypes.UserAccessRow{}
 	for rows.Next() {
-		accs = append(accs, scanAccessRow(rows))
+		accs = append(accs, ScanAccessRow(rows))
 	}
 	rows.Close()
 	ids := map[int][]string{}
 	for _, uar := range accs {
 		if _, ok := ids[uar.User]; !ok {
-			uu, _ := queryUserByID(uar.User)
+			uu, _ := QueryUserByID(uar.User)
 			ids[uar.User] = []string{uu.Snowflake, uu.Name}
 		}
 		result = append(result, map[string]string{
@@ -91,19 +91,19 @@ func queryAllAccess() []map[string]string {
 	return result
 }
 
-func queryDoAddUser(id int, provider string, snowflake string, admin bool, name string) {
-	etc.Database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '', ?)", id, snowflake, boolToString(admin), T()), name, provider)
-	etc.Database.QueryDoUpdate("users", "passkey", generateNewUserPasskey(snowflake), "snowflake", snowflake)
+func QueryDoAddUser(id int, provider string, snowflake string, admin bool, name string) {
+	etc.Database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '', ?)", id, snowflake, BoolToString(admin), T()), name, provider)
+	etc.Database.QueryDoUpdate("users", "passkey", GenerateNewUserPasskey(snowflake), "snowflake", snowflake)
 }
 
-func queryAssertUserName(provider string, snowflake string, name string) {
-	_, ok := queryUserBySnowflake(snowflake)
+func QueryAssertUserName(provider string, snowflake string, name string) {
+	_, ok := QueryUserBySnowflake(snowflake)
 	if ok {
 		etc.Database.QueryDoUpdate("users", "provider", provider, "snowflake", snowflake)
 		etc.Database.QueryDoUpdate("users", "name", name, "snowflake", snowflake)
 	} else {
 		uid := etc.Database.QueryNextID("users")
-		queryDoAddUser(uid, provider, snowflake, false, name)
+		QueryDoAddUser(uid, provider, snowflake, false, name)
 
 		if uid == 0 {
 			// always admin first user
@@ -115,11 +115,11 @@ func queryAssertUserName(provider string, snowflake string, name string) {
 	}
 }
 
-func queryAllShares() []map[string]string {
+func QueryAllShares() []map[string]string {
 	var result []map[string]string
 	rows := etc.Database.QueryDoSelectAll("shares")
 	for rows.Next() {
-		sr := scanShare(rows)
+		sr := ScanShare(rows)
 		result = append(result, map[string]string{
 			"id":   strconv.Itoa(sr.ID),
 			"hash": sr.Hash,
@@ -130,25 +130,25 @@ func queryAllShares() []map[string]string {
 	return result
 }
 
-func queryAllSharesByCode(code string) []itypes.ShareRow {
+func QueryAllSharesByCode(code string) []itypes.ShareRow {
 	shrs := []itypes.ShareRow{}
 	rows := etc.Database.QueryDoSelect("shares", "hash", code)
 	for rows.Next() {
-		shrs = append(shrs, scanShare(rows))
+		shrs = append(shrs, ScanShare(rows))
 	}
 	rows.Close()
 	return shrs
 }
 
-func queryAccessByShare(code string) []string {
+func QueryAccessByShare(code string) []string {
 	result := []string{}
-	for _, item := range queryAllSharesByCode(code) {
+	for _, item := range QueryAllSharesByCode(code) {
 		result = append(result, item.Path)
 	}
 	return result
 }
 
-func queryAllDiscordRoleAccess() []itypes.DiscordRoleAccessRow {
+func QueryAllDiscordRoleAccess() []itypes.DiscordRoleAccessRow {
 	var result []itypes.DiscordRoleAccessRow
 	rows := etc.Database.QueryDoSelectAll("shares_discord_role")
 	for rows.Next() {
@@ -160,9 +160,9 @@ func queryAllDiscordRoleAccess() []itypes.DiscordRoleAccessRow {
 	return result
 }
 
-func queryDiscordRoleAccess(id string) *itypes.DiscordRoleAccessRow {
+func QueryDiscordRoleAccess(id string) *itypes.DiscordRoleAccessRow {
 	sid, _ := strconv.Atoi(id)
-	for _, item := range queryAllDiscordRoleAccess() {
+	for _, item := range QueryAllDiscordRoleAccess() {
 		if item.ID == sid {
 			return &item
 		}
@@ -170,11 +170,11 @@ func queryDiscordRoleAccess(id string) *itypes.DiscordRoleAccessRow {
 	return nil
 }
 
-func queryAllUsers() []itypes.UserRow {
+func QueryAllUsers() []itypes.UserRow {
 	result := []itypes.UserRow{}
 	q := etc.Database.QueryDoSelectAll("users")
 	for q.Next() {
-		result = append(result, scanUser(q))
+		result = append(result, ScanUser(q))
 	}
 	return result
 }
