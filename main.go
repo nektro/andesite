@@ -180,9 +180,6 @@ func main() {
 		http.HandleFunc("/public/", iutil.Mw(handleDirectoryListing(handlePublicListing)))
 	}
 
-	http.HandleFunc("/search", iutil.Mw(handleSearch))
-	http.HandleFunc("/api/search", iutil.Mw(handleSearchAPI))
-
 	if !IsPortAvailable(idata.Config.Port) {
 		DieOnError(
 			E(F("Binding to port %d failed.", idata.Config.Port)),
