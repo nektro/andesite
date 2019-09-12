@@ -146,32 +146,30 @@ func main() {
 	//
 	// http server setup and launch
 
-	mw := iutil.ChainMiddleware(iutil.MwAddAttribution)
-
-	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
-	http.HandleFunc("/test", mw(handleTest))
+	http.HandleFunc("/", iutil.Mw(http.FileServer(etc.MFS).ServeHTTP))
+	http.HandleFunc("/test", iutil.Mw(handleTest))
 
 	if len(idata.Config.Root) > 0 {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
 		Log("Sharing private files from " + idata.Config.Root)
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 
-		http.HandleFunc("/login", mw(oauth2.HandleMultiOAuthLogin(helperIsLoggedIn, "./files/", idata.Config.Clients)))
-		http.HandleFunc("/callback", mw(oauth2.HandleMultiOAuthCallback("./files/", idata.Config.Clients, helperOA2SaveInfo)))
-		http.HandleFunc("/files/", mw(handleDirectoryListing(handleFileListing)))
-		http.HandleFunc("/admin", mw(handleAdmin))
-		http.HandleFunc("/api/access/delete", mw(handleAccessDelete))
-		http.HandleFunc("/api/access/update", mw(handleAccessUpdate))
-		http.HandleFunc("/api/access/create", mw(handleAccessCreate))
-		http.HandleFunc("/open/", mw(handleDirectoryListing(handleShareListing)))
-		http.HandleFunc("/api/share/create", mw(handleShareCreate))
-		http.HandleFunc("/api/share/update", mw(handleShareUpdate))
-		http.HandleFunc("/api/share/delete", mw(handleShareDelete))
-		http.HandleFunc("/logout", mw(handleLogout))
-		http.HandleFunc("/api/access_discord_role/create", mw(handleDiscordRoleAccessCreate))
-		http.HandleFunc("/api/access_discord_role/update", mw(handleDiscordRoleAccessUpdate))
-		http.HandleFunc("/api/access_discord_role/delete", mw(handleDiscordRoleAccessDelete))
-		http.HandleFunc("/regen_passkey", mw(handleRegenPasskey))
+		http.HandleFunc("/login", iutil.Mw(oauth2.HandleMultiOAuthLogin(helperIsLoggedIn, "./files/", idata.Config.Clients)))
+		http.HandleFunc("/callback", iutil.Mw(oauth2.HandleMultiOAuthCallback("./files/", idata.Config.Clients, helperOA2SaveInfo)))
+		http.HandleFunc("/files/", iutil.Mw(handleDirectoryListing(handleFileListing)))
+		http.HandleFunc("/admin", iutil.Mw(handleAdmin))
+		http.HandleFunc("/api/access/delete", iutil.Mw(handleAccessDelete))
+		http.HandleFunc("/api/access/update", iutil.Mw(handleAccessUpdate))
+		http.HandleFunc("/api/access/create", iutil.Mw(handleAccessCreate))
+		http.HandleFunc("/open/", iutil.Mw(handleDirectoryListing(handleShareListing)))
+		http.HandleFunc("/api/share/create", iutil.Mw(handleShareCreate))
+		http.HandleFunc("/api/share/update", iutil.Mw(handleShareUpdate))
+		http.HandleFunc("/api/share/delete", iutil.Mw(handleShareDelete))
+		http.HandleFunc("/logout", iutil.Mw(handleLogout))
+		http.HandleFunc("/api/access_discord_role/create", iutil.Mw(handleDiscordRoleAccessCreate))
+		http.HandleFunc("/api/access_discord_role/update", iutil.Mw(handleDiscordRoleAccessUpdate))
+		http.HandleFunc("/api/access_discord_role/delete", iutil.Mw(handleDiscordRoleAccessDelete))
+		http.HandleFunc("/regen_passkey", iutil.Mw(handleRegenPasskey))
 	}
 
 	if len(idata.Config.Public) > 0 {
@@ -179,11 +177,11 @@ func main() {
 		Log("Sharing public files from", idata.Config.Public)
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
 
-		http.HandleFunc("/public/", mw(handleDirectoryListing(handlePublicListing)))
+		http.HandleFunc("/public/", iutil.Mw(handleDirectoryListing(handlePublicListing)))
 	}
 
-	http.HandleFunc("/search", mw(handleSearch))
-	http.HandleFunc("/api/search", mw(handleSearchAPI))
+	http.HandleFunc("/search", iutil.Mw(handleSearch))
+	http.HandleFunc("/api/search", iutil.Mw(handleSearchAPI))
 
 	if !IsPortAvailable(idata.Config.Port) {
 		DieOnError(

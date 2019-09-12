@@ -23,6 +23,10 @@ import (
 	. "github.com/nektro/go-util/alias"
 )
 
+var (
+	Mw = ChainMiddleware(MwAddAttribution)
+)
+
 func ReduceNumber(input int64, unit int64, base string, prefixes string) string {
 	if input < unit {
 		return F("%d "+base, input)
