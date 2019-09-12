@@ -150,9 +150,11 @@ func main() {
 
 	http.HandleFunc("/", mw(http.FileServer(etc.MFS).ServeHTTP))
 
-	idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
-	Log("Sharing private files from " + idata.Config.Root)
-	DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
+	if len(idata.Config.Root) > 0 {
+		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
+		Log("Sharing private files from " + idata.Config.Root)
+		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
+	}
 
 	if len(idata.Config.Public) > 0 {
 		idata.Config.Public, _ = filepath.Abs(idata.Config.Public)
