@@ -27,12 +27,6 @@ import (
 	. "github.com/nektro/go-util/util"
 )
 
-func helperIsLoggedIn(r *http.Request) bool {
-	sess := etc.GetSession(r)
-	_, ok := sess.Values["user"]
-	return ok
-}
-
 func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
 	sess := etc.GetSession(r)
 	sess.Values["provider"] = provider
