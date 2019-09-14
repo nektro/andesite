@@ -107,7 +107,7 @@ func QueryAssertUserName(provider string, snowflake string, name string) {
 
 		if uid == 1 {
 			// always admin first user
-			etc.Database.QueryDoUpdate("users", "admin", "1", "id", "0")
+			etc.Database.QueryDoUpdate("users", "admin", "1", "id", "1")
 			aid := etc.Database.QueryNextID("access")
 			etc.Database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, uid))
 			Log(F("Set user '%s's status to admin", snowflake))
