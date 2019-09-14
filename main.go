@@ -9,8 +9,6 @@ import (
 
 	"github.com/aymerick/raymond"
 	etc "github.com/nektro/go.etc"
-	oauth2 "github.com/nektro/go.oauth2"
-	"github.com/rakyll/statik/fs"
 	flag "github.com/spf13/pflag"
 
 	"github.com/nektro/andesite/internal/idata"
@@ -37,7 +35,7 @@ func main() {
 	//
 	// parse options and find config
 
-	etc.Init("andesite", &idata.Config)
+	etc.Init("andesite", &idata.Config, "./files/", helperOA2SaveInfo)
 
 	if idata.Config.Version == 0 {
 		idata.Config.Version = 1
@@ -53,14 +51,6 @@ func main() {
 
 	//
 
-	etc.MFS.Add(http.Dir("./www/"))
-
-	statikFS, err := fs.New()
-	DieOnError(err)
-	etc.MFS.Add(http.FileSystem(statikFS))
-
-	//
-
 	idata.Config.Port = iutil.FindFirstNonZero(*flagPort, idata.Config.Port, 8000)
 	Log("Discovered option:", "--port", idata.Config.Port)
 	idata.Config.HTTPBase = iutil.FindFirstNonEmpty(*flagBase, idata.Config.HTTPBase, "/")
@@ -72,14 +62,6 @@ func main() {
 
 	if *flagSearch {
 		idata.Config.SearchOn = true
-	}
-
-	//
-	// add custom providers to the registry
-
-	for _, item := range idata.Config.Providers {
-		Log(1, item)
-		oauth2.ProviderIDMap[item.ID] = item
 	}
 
 	//
@@ -146,7 +128,6 @@ func main() {
 	//
 	// http server setup and launch
 
-	http.HandleFunc("/", iutil.Mw(http.FileServer(etc.MFS).ServeHTTP))
 	http.HandleFunc("/test", iutil.Mw(handleTest))
 
 	if len(idata.Config.Root) > 0 {
@@ -154,8 +135,6 @@ func main() {
 		Log("Sharing private files from " + idata.Config.Root)
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 
-		http.HandleFunc("/login", iutil.Mw(oauth2.HandleMultiOAuthLogin(helperIsLoggedIn, "./files/", idata.Config.Clients)))
-		http.HandleFunc("/callback", iutil.Mw(oauth2.HandleMultiOAuthCallback("./files/", idata.Config.Clients, helperOA2SaveInfo)))
 		http.HandleFunc("/files/", iutil.Mw(handleDirectoryListing(handleFileListing)))
 		http.HandleFunc("/admin", iutil.Mw(handleAdmin))
 		http.HandleFunc("/api/access/delete", iutil.Mw(handleAccessDelete))
