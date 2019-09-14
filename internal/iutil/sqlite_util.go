@@ -105,7 +105,7 @@ func QueryAssertUserName(provider string, snowflake string, name string) {
 		uid := etc.Database.QueryNextID("users")
 		QueryDoAddUser(uid, provider, snowflake, false, name)
 
-		if uid == 0 {
+		if uid == 1 {
 			// always admin first user
 			etc.Database.QueryDoUpdate("users", "admin", "1", "id", "0")
 			aid := etc.Database.QueryNextID("access")
