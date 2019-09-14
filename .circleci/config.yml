@@ -5,7 +5,7 @@ jobs:
   build:
     working_directory: /go/src/github.com/nektro/andesite
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.12
     steps:
       - checkout
       - run: go get -v -t -d ./...
