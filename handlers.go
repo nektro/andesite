@@ -63,6 +63,8 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
 
+		w.Header().Add("access-control-allow-origin", "*")
+
 		// if getAccess errored, response has already been written
 		if err != nil {
 			return
