@@ -88,8 +88,8 @@ func main() {
 				sn := item.Snowflake[len(v):]
 				tid := strconv.Itoa(item.ID)
 				Log("[db-upgrade]", item.Snowflake, "is now", sn, "as", k)
-				etc.Database.QueryDoUpdate("users", "snowflake", sn, "id", tid)
-				etc.Database.QueryDoUpdate("users", "provider", k, "id", tid)
+				etc.Database.Build().Up("users", "snowflake", sn).Wh("id", tid).Exe()
+				etc.Database.Build().Up("users", "provider", k).Wh("id", tid).Exe()
 			}
 		}
 	}

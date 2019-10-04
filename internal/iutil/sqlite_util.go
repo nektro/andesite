@@ -38,7 +38,7 @@ func ScanShare(rows *sql.Rows) itypes.ShareRow {
 
 func QueryAccess(user *itypes.UserRow) []string {
 	result := []string{}
-	rows := etc.Database.Query(false, F("select * from access where user = '%d'", user.ID))
+	rows := etc.Database.Build().Se("*").Fr("access").Wh("user", strconv.Itoa(user.ID)).Exe()
 	for rows.Next() {
 		result = append(result, ScanAccessRow(rows).Path)
 	}
@@ -47,7 +47,7 @@ func QueryAccess(user *itypes.UserRow) []string {
 }
 
 func QueryUserBySnowflake(snowflake string) (*itypes.UserRow, bool) {
-	rows := etc.Database.Query(false, F("select * from users where snowflake = '%s'", snowflake))
+	rows := etc.Database.Build().Se("*").Fr("users").Wh("snowflake", snowflake).Exe()
 	if !rows.Next() {
 		return nil, false
 	}
@@ -57,7 +57,7 @@ func QueryUserBySnowflake(snowflake string) (*itypes.UserRow, bool) {
 }
 
 func QueryUserByID(id int) (*itypes.UserRow, bool) {
-	rows := etc.Database.Query(false, F("select * from users where id = '%d'", id))
+	rows := etc.Database.Build().Se("*").Fr("users").Wh("id", strconv.Itoa(id)).Exe()
 	if !rows.Next() {
 		return nil, false
 	}
@@ -68,7 +68,7 @@ func QueryUserByID(id int) (*itypes.UserRow, bool) {
 
 func QueryAllAccess() []map[string]string {
 	var result []map[string]string
-	rows := etc.Database.Query(false, "select * from access")
+	rows := etc.Database.Build().Se("*").Fr("access").Exe()
 	accs := []itypes.UserAccessRow{}
 	for rows.Next() {
 		accs = append(accs, ScanAccessRow(rows))
@@ -93,23 +93,23 @@ func QueryAllAccess() []map[string]string {
 
 func QueryDoAddUser(id int, provider string, snowflake string, admin bool, name string) {
 	etc.Database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '', ?)", id, snowflake, BoolToString(admin), T()), name, provider)
-	etc.Database.QueryDoUpdate("users", "passkey", GenerateNewUserPasskey(snowflake), "snowflake", snowflake)
+	etc.Database.Build().Up("users", "passkey", GenerateNewUserPasskey(snowflake)).Wh("snowflake", snowflake).Exe()
 }
 
 func QueryAssertUserName(provider string, snowflake string, name string) {
 	_, ok := QueryUserBySnowflake(snowflake)
 	if ok {
-		etc.Database.QueryDoUpdate("users", "provider", provider, "snowflake", snowflake)
-		etc.Database.QueryDoUpdate("users", "name", name, "snowflake", snowflake)
+		etc.Database.Build().Up("users", "provider", provider).Wh("snowflake", snowflake).Exe()
+		etc.Database.Build().Up("users", "name", name).Wh("snowflake", snowflake).Exe()
 	} else {
 		uid := etc.Database.QueryNextID("users")
-		QueryDoAddUser(uid, provider, snowflake, false, name)
+		QueryDoAddUser(int(uid), provider, snowflake, false, name)
 
 		if uid == 1 {
 			// always admin first user
-			etc.Database.QueryDoUpdate("users", "admin", "1", "id", "1")
+			etc.Database.Build().Up("users", "admin", "1").Wh("id", "1").Exe()
 			aid := etc.Database.QueryNextID("access")
-			etc.Database.Query(true, F("insert into access values ('%d', '%d', '/')", aid, uid))
+			etc.Database.QueryPrepared(true, F("insert into access values ('%d', '%d', '/')", aid, uid))
 			Log(F("Set user '%s's status to admin", snowflake))
 		}
 	}
@@ -117,7 +117,7 @@ func QueryAssertUserName(provider string, snowflake string, name string) {
 
 func QueryAllShares() []map[string]string {
 	var result []map[string]string
-	rows := etc.Database.QueryDoSelectAll("shares")
+	rows := etc.Database.Build().Se("*").Fr("shares").Exe()
 	for rows.Next() {
 		sr := ScanShare(rows)
 		result = append(result, map[string]string{
@@ -132,7 +132,7 @@ func QueryAllShares() []map[string]string {
 
 func QueryAllSharesByCode(code string) []itypes.ShareRow {
 	shrs := []itypes.ShareRow{}
-	rows := etc.Database.QueryDoSelect("shares", "hash", code)
+	rows := etc.Database.Build().Se("*").Fr("shares").Wh("hash", code).Exe()
 	for rows.Next() {
 		shrs = append(shrs, ScanShare(rows))
 	}
@@ -150,7 +150,7 @@ func QueryAccessByShare(code string) []string {
 
 func QueryAllDiscordRoleAccess() []itypes.DiscordRoleAccessRow {
 	var result []itypes.DiscordRoleAccessRow
-	rows := etc.Database.QueryDoSelectAll("shares_discord_role")
+	rows := etc.Database.Build().Se("*").Fr("shares_discord_role").Exe()
 	for rows.Next() {
 		var v itypes.DiscordRoleAccessRow
 		rows.Scan(&v.ID, &v.GuildID, &v.RoleID, &v.Path, &v.GuildName, &v.RoleName)
@@ -160,10 +160,9 @@ func QueryAllDiscordRoleAccess() []itypes.DiscordRoleAccessRow {
 	return result
 }
 
-func QueryDiscordRoleAccess(id string) *itypes.DiscordRoleAccessRow {
-	sid, _ := strconv.Atoi(id)
+func QueryDiscordRoleAccess(id int) *itypes.DiscordRoleAccessRow {
 	for _, item := range QueryAllDiscordRoleAccess() {
-		if item.ID == sid {
+		if item.ID == id {
 			return &item
 		}
 	}
@@ -172,7 +171,7 @@ func QueryDiscordRoleAccess(id string) *itypes.DiscordRoleAccessRow {
 
 func QueryAllUsers() []itypes.UserRow {
 	result := []itypes.UserRow{}
-	q := etc.Database.QueryDoSelectAll("users")
+	q := etc.Database.Build().Se("*").Fr("shares_discord_role").Exe()
 	for q.Next() {
 		result = append(result, ScanUser(q))
 	}

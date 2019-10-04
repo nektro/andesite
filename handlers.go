@@ -272,7 +272,7 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	etc.Database.Query(true, F("delete from access where id = '%d'", iid))
+	etc.Database.QueryPrepared(true, "delete from access where id = ?", iid)
 	iutil.WriteAPIResponse(r, w, true, F("Removed access from %s.", r.PostForm.Get("snowflake")))
 }
 
@@ -284,7 +284,7 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	aid := r.PostForm.Get("id")
-	iid, err := strconv.ParseInt(string(aid), 10, 32)
+	_, err = strconv.ParseInt(string(aid), 10, 64)
 	if err != nil {
 		iutil.WriteAPIResponse(r, w, false, "ID parameter must be an integer")
 		return
@@ -295,7 +295,7 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	etc.Database.QueryDoUpdate("access", "path", r.PostForm.Get("path"), "id", strconv.FormatInt(iid, 10))
+	etc.Database.Build().Up("access", "path", r.PostForm.Get("path")).Wh("id", aid).Exe()
 	iutil.WriteAPIResponse(r, w, true, F("Updated access for %s.", r.PostForm.Get("snowflake")))
 }
 
@@ -320,7 +320,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		aud = u.ID
 	} else {
-		aud = etc.Database.QueryNextID("users")
+		aud = int(etc.Database.QueryNextID("users"))
 		iutil.QueryDoAddUser(aud, oauth2.ProviderIDMap[user.Provider].ID, asn, false, "")
 	}
 	//
@@ -383,7 +383,7 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	ahs := r.PostForm.Get("hash")
 	aph := r.PostForm.Get("path")
 	// //
-	etc.Database.QueryDoUpdate("shares", "path", aph, "hash", ahs)
+	etc.Database.Build().Up("shares", "path", aph).Wh("hash", ahs).Exe()
 	iutil.WriteAPIResponse(r, w, true, "Successfully updated share path.")
 }
 
@@ -523,11 +523,11 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	gn := iutil.FetchDiscordGuild(idata.Config.GetDiscordClient().Extra1).Name
 	rn := iutil.FetchDiscordRole(idata.Config.GetDiscordClient().Extra1, qgr).Name
 	//
-	etc.Database.QueryDoUpdate("shares_discord_role", "guild_snowflake", qgs, "id", qid)
-	etc.Database.QueryDoUpdate("shares_discord_role", "role_snowflake", qgr, "id", qid)
-	etc.Database.QueryDoUpdate("shares_discord_role", "path", qpt, "id", qid)
-	etc.Database.QueryDoUpdate("shares_discord_role", "guild_name", gn, "id", qid)
-	etc.Database.QueryDoUpdate("shares_discord_role", "role_name", rn, "id", qid)
+	etc.Database.Build().Up("shares_discord_role", "guild_snowflake", qgs).Wh("id", qid).Exe()
+	etc.Database.Build().Up("shares_discord_role", "role_snowflake", qgr).Wh("id", qid).Exe()
+	etc.Database.Build().Up("shares_discord_role", "path", qpt).Wh("id", qid).Exe()
+	etc.Database.Build().Up("shares_discord_role", "guild_name", gn).Wh("id", qid).Exe()
+	etc.Database.Build().Up("shares_discord_role", "role_name", rn).Wh("id", qid).Exe()
 	iutil.WriteAPIResponse(r, w, true, F("Successfully updated share path for %s / %s to %s.", gn, rn, qpt))
 }
 
@@ -540,8 +540,14 @@ func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
-	qID := r.PostForm.Get("ID")
-	dra := iutil.QueryDiscordRoleAccess(qID)
+	qID, err := strconv.ParseInt(r.PostForm.Get("ID"), 10, 64)
+	if err != nil {
+		return
+	}
+	dra := iutil.QueryDiscordRoleAccess(int(qID))
+	if dra == nil {
+		return
+	}
 	etc.Database.QueryPrepared(true, "delete from shares_discord_role where id = ?", qID)
 	iutil.WriteAPIResponse(r, w, true, F("Successfully deleted access for %s / %s to %s.", dra.GuildName, dra.RoleName, dra.Path))
 }
@@ -553,6 +559,6 @@ func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pk := iutil.GenerateNewUserPasskey(user.Snowflake)
-	etc.Database.QueryDoUpdate("users", "passkey", pk, "snowflake", user.Snowflake)
+	etc.Database.Build().Up("users", "passkey", pk).Wh("snowflake", user.Snowflake).Exe()
 	iutil.WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+pk, "Return", "./files/")
 }

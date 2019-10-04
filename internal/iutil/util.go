@@ -126,7 +126,7 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 			WriteUserDenied(r, w, true, true)
 			return nil, nil, E("not logged in and no passkey found")
 		}
-		kq := etc.Database.QueryDoSelect("users", "passkey", pk)
+		kq := etc.Database.Build().Se("*").Fr("users").Wh("passkey", pk).Exe()
 		if !kq.Next() {
 			WriteUserDenied(r, w, true, true)
 			return nil, nil, E("invalid passkey")
