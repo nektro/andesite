@@ -25,22 +25,6 @@ var (
 	Mw = ChainMiddleware(MwAddAttribution)
 )
 
-func ReduceNumber(input int64, unit int64, base string, prefixes string) string {
-	if input < unit {
-		return F("%d "+base, input)
-	}
-	div, exp := int64(unit), 0
-	for n := input / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return F("%.1f %ci", float64(input)/float64(div), prefixes[exp]) + base
-}
-
-func ByteCountIEC(b int64) string {
-	return ReduceNumber(b, 1024, "B", "KMGTPEZY")
-}
-
 func Filter(stack []os.FileInfo, cb func(os.FileInfo) bool) []os.FileInfo {
 	result := []os.FileInfo{}
 	for _, item := range stack {
