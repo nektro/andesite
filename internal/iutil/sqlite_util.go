@@ -18,6 +18,7 @@ import (
 func ScanUser(rows *sql.Rows) itypes.UserRow {
 	var v itypes.UserRow
 	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey, &v.Provider)
+	v.IDS = strconv.FormatInt(v.ID, 10)
 	return v
 }
 
@@ -38,7 +39,7 @@ func ScanShare(rows *sql.Rows) itypes.ShareRow {
 
 func QueryAccess(user *itypes.UserRow) []string {
 	result := []string{}
-	rows := etc.Database.Build().Se("*").Fr("access").Wh("user", strconv.FormatInt(user.ID, 10)).Exe()
+	rows := etc.Database.Build().Se("*").Fr("access").Wh("user", user.IDS).Exe()
 	for rows.Next() {
 		result = append(result, ScanAccessRow(rows).Path)
 	}

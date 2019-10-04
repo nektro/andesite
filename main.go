@@ -86,10 +86,9 @@ func main() {
 		for k, v := range prefixes {
 			if strings.HasPrefix(item.Snowflake, v) {
 				sn := item.Snowflake[len(v):]
-				tid := strconv.FormatInt(item.ID, 10)
 				Log("[db-upgrade]", item.Snowflake, "is now", sn, "as", k)
-				etc.Database.Build().Up("users", "snowflake", sn).Wh("id", tid).Exe()
-				etc.Database.Build().Up("users", "provider", k).Wh("id", tid).Exe()
+				etc.Database.Build().Up("users", "snowflake", sn).Wh("id", item.IDS).Exe()
+				etc.Database.Build().Up("users", "provider", k).Wh("id", item.IDS).Exe()
 			}
 		}
 	}

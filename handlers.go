@@ -235,7 +235,7 @@ func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 	if len(idata.Config.Public) > 0 {
 		qaccess = append(qaccess, "/")
 	}
-	return idata.Config.Public, qpath, qaccess, &itypes.UserRow{-1, "", false, "Guest!", "", "", ""}, map[string]interface{}{}, nil
+	return idata.Config.Public, qpath, qaccess, &itypes.UserRow{-1, "", "", false, "Guest!", "", "", ""}, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/admin
@@ -368,7 +368,7 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		return "", "", nil, nil, nil, errors.New("")
 	}
 
-	return idata.Config.Root, u[32:], s, &itypes.UserRow{-1, h, false, "", "", "", ""}, nil, nil
+	return idata.Config.Root, u[32:], s, &itypes.UserRow{-1, "", h, false, "", "", "", ""}, nil, nil
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {

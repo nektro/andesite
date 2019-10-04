@@ -6,7 +6,8 @@ import (
 
 //
 type UserRow struct {
-	ID        int64  `json:"id"`
+	ID        int64 `json:"id"`
+	IDS       string
 	Snowflake string `json:"snowflake" sqlite:"text"`
 	Admin     bool   `json:"admin" sqlite:"tinyint(1)"`
 	Name      string `json:"name" sqlite:"text"`
