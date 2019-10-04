@@ -318,11 +318,11 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	apt := r.PostForm.Get("path")
 	//
 	u, ok := iutil.QueryUserBySnowflake(asn)
-	aud := -1
+	aud := int64(-1)
 	if ok {
 		aud = u.ID
 	} else {
-		aud = int(etc.Database.QueryNextID("users"))
+		aud = etc.Database.QueryNextID("users")
 		iutil.QueryDoAddUser(aud, oauth2.ProviderIDMap[user.Provider].ID, asn, false, "")
 	}
 	//
@@ -546,7 +546,7 @@ func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	dra := iutil.QueryDiscordRoleAccess(int(qID))
+	dra := iutil.QueryDiscordRoleAccess(qID)
 	if dra == nil {
 		return
 	}

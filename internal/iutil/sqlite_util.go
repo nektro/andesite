@@ -38,7 +38,7 @@ func ScanShare(rows *sql.Rows) itypes.ShareRow {
 
 func QueryAccess(user *itypes.UserRow) []string {
 	result := []string{}
-	rows := etc.Database.Build().Se("*").Fr("access").Wh("user", strconv.Itoa(user.ID)).Exe()
+	rows := etc.Database.Build().Se("*").Fr("access").Wh("user", strconv.FormatInt(user.ID, 10)).Exe()
 	for rows.Next() {
 		result = append(result, ScanAccessRow(rows).Path)
 	}
@@ -56,8 +56,8 @@ func QueryUserBySnowflake(snowflake string) (*itypes.UserRow, bool) {
 	return &ur, true
 }
 
-func QueryUserByID(id int) (*itypes.UserRow, bool) {
-	rows := etc.Database.Build().Se("*").Fr("users").Wh("id", strconv.Itoa(id)).Exe()
+func QueryUserByID(id int64) (*itypes.UserRow, bool) {
+	rows := etc.Database.Build().Se("*").Fr("users").Wh("id", strconv.FormatInt(id, 10)).Exe()
 	if !rows.Next() {
 		return nil, false
 	}
@@ -74,15 +74,15 @@ func QueryAllAccess() []map[string]string {
 		accs = append(accs, ScanAccessRow(rows))
 	}
 	rows.Close()
-	ids := map[int][]string{}
+	ids := map[int64][]string{}
 	for _, uar := range accs {
 		if _, ok := ids[uar.User]; !ok {
 			uu, _ := QueryUserByID(uar.User)
 			ids[uar.User] = []string{uu.Snowflake, uu.Name}
 		}
 		result = append(result, map[string]string{
-			"id":        strconv.Itoa(uar.ID),
-			"user":      strconv.Itoa(uar.User),
+			"id":        strconv.FormatInt(uar.ID, 10),
+			"user":      strconv.FormatInt(uar.User, 10),
 			"snowflake": ids[uar.User][0],
 			"name":      ids[uar.User][1],
 			"path":      uar.Path,
@@ -91,7 +91,7 @@ func QueryAllAccess() []map[string]string {
 	return result
 }
 
-func QueryDoAddUser(id int, provider string, snowflake string, admin bool, name string) {
+func QueryDoAddUser(id int64, provider string, snowflake string, admin bool, name string) {
 	etc.Database.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '', ?)", id, snowflake, BoolToString(admin), T()), name, provider)
 	etc.Database.Build().Up("users", "passkey", GenerateNewUserPasskey(snowflake)).Wh("snowflake", snowflake).Exe()
 }
@@ -103,7 +103,7 @@ func QueryAssertUserName(provider string, snowflake string, name string) {
 		etc.Database.Build().Up("users", "name", name).Wh("snowflake", snowflake).Exe()
 	} else {
 		uid := etc.Database.QueryNextID("users")
-		QueryDoAddUser(int(uid), provider, snowflake, false, name)
+		QueryDoAddUser(uid, provider, snowflake, false, name)
 
 		if uid == 1 {
 			// always admin first user
@@ -121,7 +121,7 @@ func QueryAllShares() []map[string]string {
 	for rows.Next() {
 		sr := ScanShare(rows)
 		result = append(result, map[string]string{
-			"id":   strconv.Itoa(sr.ID),
+			"id":   strconv.FormatInt(sr.ID, 10),
 			"hash": sr.Hash,
 			"path": sr.Path,
 		})
@@ -160,7 +160,7 @@ func QueryAllDiscordRoleAccess() []itypes.DiscordRoleAccessRow {
 	return result
 }
 
-func QueryDiscordRoleAccess(id int) *itypes.DiscordRoleAccessRow {
+func QueryDiscordRoleAccess(id int64) *itypes.DiscordRoleAccessRow {
 	for _, item := range QueryAllDiscordRoleAccess() {
 		if item.ID == id {
 			return &item
