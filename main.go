@@ -96,7 +96,7 @@ func main() {
 	//
 	// graceful stop
 
-	etc.RunOnClose(func() {
+	RunOnClose(func() {
 		Log("Gracefully shutting down...")
 
 		Log("Saving database to disk")
