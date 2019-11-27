@@ -172,7 +172,7 @@ func QueryDiscordRoleAccess(id int64) *itypes.DiscordRoleAccessRow {
 
 func QueryAllUsers() []itypes.UserRow {
 	result := []itypes.UserRow{}
-	q := etc.Database.Build().Se("*").Fr("shares_discord_role").Exe()
+	q := etc.Database.Build().Se("*").Fr("users").Exe()
 	for q.Next() {
 		result = append(result, ScanUser(q))
 	}
