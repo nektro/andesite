@@ -18,7 +18,7 @@ type Config struct {
 
 func (c *Config) GetDiscordClient() *oauth2.AppConf {
 	for _, item := range c.Clients {
-		if item.For == oauth2.ProviderDiscord.ID {
+		if item.For == oauth2.ProviderIDMap["discord"].ID {
 			return &item
 		}
 	}
