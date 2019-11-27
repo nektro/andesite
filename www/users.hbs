@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Andesite Admin Panel</title>
+        <!---->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.css" integrity="sha256-S4n5rcKkPwT9YZGXPue8OorJ7GCPxBA5o/Z0ALWXyHs=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.js" integrity="sha256-x9fzgXT3ttK2cZF12FIafkDJzEqqLnaWcchT+Y/plJ4=" crossorigin="anonymous"></script>
+        <!---->
+        <style>
+            body > div { margin: 1em; }
+            table tbody tr { line-height: 1; }
+        </style>
+    </head>
+    <body>
+        <div class="ui main menu">
+            <div class="header item">Welcome, {{name}}</div>
+            <div class="item">{{user}}</div>
+            <div class="item"><a href="./files/">Back to Files</a></div>
+            <div class="right item">Powered by&nbsp;<a href="https://github.com/nektro/andesite" target="_blank">Andesite</a></div>
+        </div>
+        <div>
+            <h1 class="ui header">Instance Users</h1>
+            <table class="ui compact table">
+                <thead>
+                    <th>ID</th>
+                    <th>Snowflake</th>
+                    <th>Provider</th>
+                    <th>Name</th>
+                    <th>JoinedOn</th>
+                    <th>Admin</th>
+                </thead>
+                <tbody>
+                    {{#each users}}
+                    <tr>
+                        <td>{{ID}}</td>
+                        <td>{{Snowflake}}</td>
+                        <td>{{Provider}}</td>
+                        <td>{{Name}}</td>
+                        <td>{{JoinedOn}}</td>
+                        <td>{{Admin}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

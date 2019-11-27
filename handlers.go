@@ -564,3 +564,18 @@ func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
 	etc.Database.Build().Up("users", "passkey", pk).Wh("snowflake", user.Snowflake).Exe()
 	iutil.WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+pk, "Return", "./files/")
 }
+
+//
+func handleAdminUsers(w http.ResponseWriter, r *http.Request) {
+	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, http.MethodGet, true)
+	if err != nil {
+		return
+	}
+	etc.WriteHandlebarsFile(r, w, "/users.hbs", map[string]interface{}{
+		"user":  user.Snowflake,
+		"base":  idata.Config.HTTPBase,
+		"name":  oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
+		"auth":  oauth2.ProviderIDMap[user.Provider].ID,
+		"users": iutil.QueryAllUsers(),
+	})
+}

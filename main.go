@@ -148,6 +148,7 @@ func main() {
 		http.HandleFunc("/api/access_discord_role/update", iutil.Mw(handleDiscordRoleAccessUpdate))
 		http.HandleFunc("/api/access_discord_role/delete", iutil.Mw(handleDiscordRoleAccessDelete))
 		http.HandleFunc("/regen_passkey", iutil.Mw(handleRegenPasskey))
+		http.HandleFunc("/admin/users", iutil.Mw(handleAdminUsers))
 	}
 
 	if len(idata.Config.Public) > 0 {
