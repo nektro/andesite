@@ -123,13 +123,13 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 	if sessID == nil {
 		pk := ""
 
-		if len(pk == 0) {
+		if len(pk) == 0 {
 			ua := r.Header.Get("user-agent")
 			if strings.HasPrefix(ua, "AndesiteUser/") {
 				pk = strings.Split(ua, "/")[1]
 			}
 		}
-		if len(pk == 0) {
+		if len(pk) == 0 {
 			pk = r.Header.Get("x-passkey")
 		}
 		if len(pk) == 0 {
