@@ -121,7 +121,11 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 	sessID := sess.Values["user"]
 
 	if sessID == nil {
-		pk := r.Header.Get("x-passkey")
+		var pk string
+
+		if len(pk == 0) {
+			pk = r.Header.Get("x-passkey")
+		}
 		if len(pk) == 0 {
 			WriteUserDenied(r, w, true, true)
 			return nil, nil, E("not logged in and no passkey found")
