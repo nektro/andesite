@@ -121,7 +121,7 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method str
 	sessID := sess.Values["user"]
 
 	if sessID == nil {
-		var pk string
+		pk := ""
 
 		if len(pk == 0) {
 			pk = r.Header.Get("x-passkey")
