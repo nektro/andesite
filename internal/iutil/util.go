@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/sessions"
+	"github.com/nektro/go-util/util"
 	discord "github.com/nektro/go.discord"
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
@@ -109,11 +110,11 @@ func ContainsAll(mp url.Values, keys ...string) bool {
 	return true
 }
 
-func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, method string, requireAdmin bool) (*sessions.Session, *itypes.UserRow, error) {
-	if r.Method != method {
+func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []string, requireAdmin bool) (*sessions.Session, *itypes.UserRow, error) {
+	if util.Contains(methods, r.Method) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Header().Add("Allow", "HEAD, "+method)
-		WriteAPIResponse(r, w, false, "This action requires using HTTP "+method)
+		w.Header().Add("Allow", F("%v", methods))
+		WriteAPIResponse(r, w, false, "This action requires using HTTP "+F("%v", methods))
 		return nil, nil, E("")
 	}
 
