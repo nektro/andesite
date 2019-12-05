@@ -414,7 +414,7 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	//
 	sess.Options.MaxAge = -1
 	sess.Save(r, w)
-	iutil.WriteResponse(r, w, "Success", "Successfully logged out.", "")
+	iutil.WriteLinkResponse(r, w, "Success", "Successfully logged out.", "Back Home", "./../")
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
