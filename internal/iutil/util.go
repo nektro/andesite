@@ -10,14 +10,14 @@ import (
 	"os"
 	"strings"
 
+	"github.com/nektro/andesite/internal/idata"
+	"github.com/nektro/andesite/internal/itypes"
+
 	"github.com/gorilla/sessions"
 	"github.com/nektro/go-util/util"
 	discord "github.com/nektro/go.discord"
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
-
-	"github.com/nektro/andesite/internal/idata"
-	"github.com/nektro/andesite/internal/itypes"
 
 	. "github.com/nektro/go-util/alias"
 )
