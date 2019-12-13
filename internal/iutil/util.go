@@ -111,7 +111,7 @@ func ContainsAll(mp url.Values, keys ...string) bool {
 }
 
 func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []string, requireAdmin bool) (*sessions.Session, *itypes.UserRow, error) {
-	if util.Contains(methods, r.Method) {
+	if !util.Contains(methods, r.Method) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Add("Allow", F("%v", methods))
 		WriteAPIResponse(r, w, false, "This action requires using HTTP "+F("%v", methods))
