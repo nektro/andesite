@@ -1,0 +1,46 @@
+name: Go
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          path: go/src/github.com/nektro/andesite
+        env:
+          GOPATH: /home/runner/work/andesite/go
+          
+      - name: add build dependecies
+        run: sudo apt-get install mingw-w64 -y
+      - name: Set up Go 1.12
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.12
+        id: go
+        env:
+          GOPATH: /home/runner/work/andesite/go
+      - run: go get -v -t -d ./...
+        env:
+          GOPATH: /home/runner/work/andesite/go
+      - run: go test -v ./...
+        env:
+          GOPATH: /home/runner/work/andesite/go
+      - run: ./scritps/build_all.sh
+        env:
+          GOPATH: /home/runner/work/andesite/go
+      - uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "./bin/andesite*"
+          draft: true
+          tags: false
