@@ -18,7 +18,6 @@ jobs:
           path: go/src/github.com/nektro/andesite
         env:
           GOPATH: /home/runner/work/andesite/go
-          
       - name: add build dependecies
         run: sudo apt-get install mingw-w64 -y
       - name: Set up Go 1.12
