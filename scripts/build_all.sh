@@ -5,11 +5,11 @@ init() {
     $GOPATH/bin/statik -src="./www/"
 }
 build_template() {
+    export CGO_ENABLED=1
     export GOOS=$1
     export GOARCH=$2
     if [ $GOOS = 'windows' ]
     then
-        export CGO_ENABLED=1
         if [ $GOARCH = 'amd64' ]
         then
             export CC="x86_64-w64-mingw32-gcc"
