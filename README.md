@@ -60,12 +60,13 @@ If you decide to pass Andesite through a reverse proxy, be sure to check out the
 Due to a limitation in the Discord API, in order to determine if a user has a role on a specific server, you must use a bot. To get started, go to https://discordapp.com/developers/applications/ and add a Bot user to your app and copy down the Bot Token. Now, to be able to give file/folder access to entire roles, we are going to be using the "Extra" fields of our app conf for Discord, so go ahead and addto your Discord config like so:
 
 ```json
-"discord": {
+"clients": [{
+    "for": "discord",
     "id": "{CLIENT_ID}",
     "secret": "{CLIENT_SECRET}",
     "extra_1": "{GUILD_SNOWFLAKE}",
     "extra_2": "{BOT_TOKEN}"
-}
+}]
 ```
 
 The value for `{GUILD_SNOWFLAKE}` can be obtained from the URL of the server. So if the server you want to add access for is `https://discordapp.com/channels/184315303323238400/184315303323238400`, then the first ID, `184315303323238400`, is the snowflake you need. The other is for the channel you are currently in. This value is not needed.
