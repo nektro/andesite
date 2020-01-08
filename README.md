@@ -4,6 +4,7 @@
 [![discord](https://img.shields.io/discord/551971034593755159.svg)](https://discord.gg/P6Y4zQC)
 [![paypal](https://img.shields.io/badge/donate-paypal-009cdf)](https://paypal.me/nektro)
 [![circleci](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
+[![goreportcard](https://goreportcard.com/badge/github.com/nektro/andesite)](https://goreportcard.com/report/github.com/nektro/andesite)
 
 Share folders in an Open Directory without making your entire server public. Manages users with OAuth2.
 
