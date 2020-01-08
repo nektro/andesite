@@ -25,7 +25,7 @@ import (
 func main() {
 	Log("Initializing Andesite...")
 
-	flagCV := flag.Int("version", 2, "Config version to use.")
+	flagCV := flag.Int("version", idata.RequiredConfigVersion, "Config version to use.")
 	flagRoot := flag.String("root", "", "Path of root directory for files")
 	flagPort := flag.Int("port", 0, "Port to open server on")
 	flagBase := flag.String("base", "", "Http Origin Path")
