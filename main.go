@@ -37,6 +37,19 @@ func main() {
 
 	etc.Init("andesite", &idata.Config, "./files/", helperOA2SaveInfo)
 
+	//
+
+	idata.Config.Port = iutil.FindFirstNonZero(*flagPort, idata.Config.Port, 8000)
+	Log("Discovered option:", "--port", idata.Config.Port)
+	idata.Config.HTTPBase = iutil.FindFirstNonEmpty(*flagBase, idata.Config.HTTPBase, "/")
+	Log("Discovered option:", "--base", idata.Config.HTTPBase)
+	idata.Config.Root = iutil.FindFirstNonEmpty(*flagRoot, idata.Config.Root)
+	Log("Discovered option:", "--root", idata.Config.Root)
+	idata.Config.Public = iutil.FindFirstNonEmpty(*flagPublic, idata.Config.Public)
+	Log("Discovered option:", "--public", idata.Config.Public)
+
+	//
+
 	if idata.Config.Version == 0 {
 		idata.Config.Version = 1
 	}
@@ -50,15 +63,6 @@ func main() {
 	}
 
 	//
-
-	idata.Config.Port = iutil.FindFirstNonZero(*flagPort, idata.Config.Port, 8000)
-	Log("Discovered option:", "--port", idata.Config.Port)
-	idata.Config.HTTPBase = iutil.FindFirstNonEmpty(*flagBase, idata.Config.HTTPBase, "/")
-	Log("Discovered option:", "--base", idata.Config.HTTPBase)
-	idata.Config.Root = iutil.FindFirstNonEmpty(*flagRoot, idata.Config.Root)
-	Log("Discovered option:", "--root", idata.Config.Root)
-	idata.Config.Public = iutil.FindFirstNonEmpty(*flagPublic, idata.Config.Public)
-	Log("Discovered option:", "--public", idata.Config.Public)
 
 	if *flagSearch {
 		idata.Config.SearchOn = true
