@@ -2,7 +2,7 @@
 ![loc](https://sloc.xyz/github/nektro/andesite)
 [![license](https://img.shields.io/github/license/nektro/andesite.svg)](https://github.com/nektro/andesite/blob/master/LICENSE)
 [![discord](https://img.shields.io/discord/551971034593755159.svg)](https://discord.gg/P6Y4zQC)
-[![CircleCI](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
+[![circleci](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
 
 Share folders in an Open Directory without making your entire server public. Manages users with OAuth2.
 
@@ -45,7 +45,7 @@ $ ./andesite
 ```
 
 ## Deployment
-[![CircleCI](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
+[![circleci](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
 
 Pre-compiled binaries are published on Circle CI at https://circleci.com/gh/nektro/andesite. To download a binary, navigate to the most recent build and click on 'Artifacts'. Here there will be a list of files. Click on the one appropriate for your system.
 
