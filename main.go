@@ -25,6 +25,7 @@ import (
 func main() {
 	Log("Initializing Andesite...")
 
+	flagCV := flag.Int("version", 2, "Config version to use.")
 	flagRoot := flag.String("root", "", "Path of root directory for files")
 	flagPort := flag.Int("port", 0, "Port to open server on")
 	flagBase := flag.String("base", "", "Http Origin Path")
@@ -39,6 +40,7 @@ func main() {
 
 	//
 
+	idata.Config.Version = iutil.FindFirstNonZero(*flagCV, idata.Config.Version, 0)
 	idata.Config.Port = iutil.FindFirstNonZero(*flagPort, idata.Config.Port, 8000)
 	Log("Discovered option:", "--port", idata.Config.Port)
 	idata.Config.HTTPBase = iutil.FindFirstNonEmpty(*flagBase, idata.Config.HTTPBase, "/")
