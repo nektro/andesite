@@ -2,11 +2,10 @@
 ![loc](https://sloc.xyz/github/nektro/andesite)
 [![license](https://img.shields.io/github/license/nektro/andesite.svg)](https://github.com/nektro/andesite/blob/master/LICENSE)
 [![discord](https://img.shields.io/discord/551971034593755159.svg)](https://discord.gg/P6Y4zQC)
+[![paypal](https://img.shields.io/badge/donate-paypal-009cdf)](https://paypal.me/nektro)
 [![circleci](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
 
 Share folders in an Open Directory without making your entire server public. Manages users with OAuth2.
-
-[![buymeacoffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/nektro)
 
 ## Getting Started
 These instructions will help you get the project up and running. After completing these steps, follow the [Development](#development) or [Deployment](#deployment) sections for futher direction.
