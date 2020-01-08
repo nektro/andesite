@@ -31,7 +31,7 @@ func main() {
 	flagBase := flag.String("base", "", "Http Origin Path")
 	flagPublic := flag.String("public", "", "Public root of files to serve")
 	flagSearch := flag.Bool("enable-search", false, "Set to true to enable search database")
-	flag.Parse()
+	etc.PreInit()
 
 	//
 	// parse options and find config
