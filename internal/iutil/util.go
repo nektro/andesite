@@ -63,6 +63,7 @@ func WriteUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 		w.WriteHeader(http.StatusForbidden)
 		WriteResponse(r, w, "Forbidden", message, linkmsg)
 	} else {
+		linkmsg = "<a href='" + idata.Config.HTTPBase + "logout'>Logout</a>."
 		w.WriteHeader(http.StatusForbidden)
 		WriteResponse(r, w, "Not Found", message, linkmsg)
 	}
