@@ -1,9 +1,9 @@
 package idata
 
 import (
-	"github.com/mitchellh/go-homedir"
+	"github.com/nektro/andesite/pkg/itypes"
 
-	"github.com/nektro/andesite/internal/itypes"
+	"github.com/mitchellh/go-homedir"
 )
 
 const (

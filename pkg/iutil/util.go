@@ -10,8 +10,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nektro/andesite/internal/idata"
-	"github.com/nektro/andesite/internal/itypes"
+	"github.com/nektro/andesite/pkg/idata"
+	"github.com/nektro/andesite/pkg/itypes"
 
 	"github.com/gorilla/sessions"
 	"github.com/nektro/go-util/util"

@@ -7,13 +7,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nektro/andesite/pkg/idata"
+	"github.com/nektro/andesite/pkg/itypes"
+	"github.com/nektro/andesite/pkg/iutil"
+
 	"github.com/aymerick/raymond"
 	etc "github.com/nektro/go.etc"
 	flag "github.com/spf13/pflag"
-
-	"github.com/nektro/andesite/internal/idata"
-	"github.com/nektro/andesite/internal/itypes"
-	"github.com/nektro/andesite/internal/iutil"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"

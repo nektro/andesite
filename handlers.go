@@ -15,13 +15,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nektro/andesite/pkg/idata"
+	"github.com/nektro/andesite/pkg/itypes"
+	"github.com/nektro/andesite/pkg/iutil"
+
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
 	"github.com/valyala/fastjson"
-
-	"github.com/nektro/andesite/internal/idata"
-	"github.com/nektro/andesite/internal/itypes"
-	"github.com/nektro/andesite/internal/iutil"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"

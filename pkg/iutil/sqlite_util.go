@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"strconv"
 
-	etc "github.com/nektro/go.etc"
+	"github.com/nektro/andesite/pkg/itypes"
 
-	"github.com/nektro/andesite/internal/itypes"
+	etc "github.com/nektro/go.etc"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
