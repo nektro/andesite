@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/nektro/andesite/pkg/idata"
+	"github.com/nektro/andesite/pkg/iutil"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
-
-	"github.com/nektro/andesite/internal/idata"
-	"github.com/nektro/andesite/internal/iutil"
 )
 
 //

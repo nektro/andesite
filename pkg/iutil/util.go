@@ -10,8 +10,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nektro/andesite/internal/idata"
-	"github.com/nektro/andesite/internal/itypes"
+	"github.com/nektro/andesite/pkg/idata"
+	"github.com/nektro/andesite/pkg/itypes"
 
 	"github.com/gorilla/sessions"
 	"github.com/nektro/go-util/util"
@@ -63,6 +63,7 @@ func WriteUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 		w.WriteHeader(http.StatusForbidden)
 		WriteResponse(r, w, "Forbidden", message, linkmsg)
 	} else {
+		linkmsg = "<a href='" + idata.Config.HTTPBase + "logout'>Logout</a>."
 		w.WriteHeader(http.StatusForbidden)
 		WriteResponse(r, w, "Not Found", message, linkmsg)
 	}

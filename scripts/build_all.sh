@@ -8,6 +8,7 @@ build_template() {
     export CGO_ENABLED=1
     export GOOS=$1
     export GOARCH=$2
+<<<<<<< HEAD
     if [ $GOOS = 'windows' ]
     then
         if [ $GOARCH = 'amd64' ]
@@ -35,6 +36,15 @@ build_template() {
         echo $TAG-$GOOS-$GOARCH
         go build -ldflags="-s -w" -o ./bin/andesite-v$TAG-$GOOS-$GOARCH$EXT
     fi
+=======
+    export GOARM=7
+    ext=$3
+    date=$(date +'%Y.%m.%d')
+    version=${CIRCLE_BUILD_NUM-$date}
+    tag=v$version-$(git log --format=%h -1)
+    echo $tag-$GOOS-$GOARCH
+    go build -ldflags="-s -w" -o ./bin/andesite-$tag-$GOOS-$GOARCH$ext
+>>>>>>> upstream/master
 }
 
 init
