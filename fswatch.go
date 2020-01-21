@@ -11,6 +11,7 @@ import (
 	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/karrick/godirwalk"
 	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
@@ -44,7 +45,7 @@ func initFsWatcher() {
 	watcher, _ = fsnotify.NewWatcher()
 	etc.Database.CreateTableStruct("files", WatchedFile{})
 
-	if err := filepath.Walk(idata.Config.Root, wWatchDir); err != nil {
+	if err := godirwalk.Walk(idata.Config.Root, &godirwalk.Options{Callback: wWatchDir, Unsorted: true, FollowSymbolicLinks: true}); err != nil {
 		util.LogError(err)
 	}
 
@@ -72,7 +73,7 @@ func initFsWatcher() {
 						etc.Database.QueryPrepared(true, "insert into files values (?, ?, ?)", i, r1, n)
 						util.Log("[file-index-add]", r1)
 					} else {
-						if err := filepath.Walk(event.Name, wWatchDir); err != nil {
+						if err := godirwalk.Walk(idata.Config.Root, &godirwalk.Options{Callback: wWatchDir, Unsorted: true, FollowSymbolicLinks: true}); err != nil {
 							util.LogError(err)
 						}
 					}
@@ -87,11 +88,11 @@ func initFsWatcher() {
 	http.HandleFunc("/api/search", iutil.Mw(handleSearchAPI))
 }
 
-func wWatchDir(path string, fi os.FileInfo, err error) error {
-	if fi.IsDir() {
+func wWatchDir(path string, de *godirwalk.Dirent) error {
+	if de.IsDir() {
 		return watcher.Add(path)
 	}
-	wAddFile(strings.TrimPrefix(path, idata.Config.Root), fi.Name())
+	wAddFile(strings.TrimPrefix(path, idata.Config.Root), de.Name())
 	return nil
 }
 
