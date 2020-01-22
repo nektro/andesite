@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/nektro/andesite/pkg/idata"
@@ -165,15 +164,5 @@ func main() {
 		http.HandleFunc("/public/", iutil.Mw(handleDirectoryListing(handlePublicListing)))
 	}
 
-	if !IsPortAvailable(idata.Config.Port) {
-		DieOnError(
-			E(F("Binding to port %d failed.", idata.Config.Port)),
-			"It may be taken or you may not have permission to. Aborting!",
-		)
-		return
-	}
-
-	p := strconv.Itoa(idata.Config.Port)
-	Log("Initialization complete. Starting server on port " + p)
-	http.ListenAndServe(":"+p, nil)
+	etc.StartServer(idata.Config.Port)
 }
