@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -224,9 +223,7 @@ func MakeDiscordRequest(endpoint string, body url.Values) []byte {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bot "+idata.Config.GetDiscordClient().Extra2)
 	req.Header.Set("Accept", "application/json")
-	res, _ := http.DefaultClient.Do(req)
-	bys, _ := ioutil.ReadAll(res.Body)
-	return bys
+	return util.DoHttpRequest(req)
 }
 
 func FetchDiscordRole(guild string, role string) discord.GuildRole {
