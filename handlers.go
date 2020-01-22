@@ -91,7 +91,6 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 		// server file/folder
 		if stat.IsDir() {
-			w.Header().Add("Content-Type", "text/html")
 
 			// get list of all files
 			files, _ := ioutil.ReadDir(fileRoot + qpath)
