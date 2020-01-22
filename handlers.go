@@ -251,12 +251,12 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	etc.WriteHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
-		"user":           user.Snowflake,
+		"user": user.Snowflake,
+		"base": idata.Config.HTTPBase,
+		"name": oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
+		"auth": oauth2.ProviderIDMap[user.Provider].ID,
 		"accesses":       iutil.QueryAllAccess(),
-		"base":           idata.Config.HTTPBase,
-		"name":           oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 		"shares":         iutil.QueryAllShares(),
-		"auth":           oauth2.ProviderIDMap[user.Provider].ID,
 		"discord_shares": iutil.QueryAllDiscordRoleAccess(),
 	})
 }
