@@ -91,16 +91,15 @@ Andesite supports making custom themes for the splash page and the various HTML 
 All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `--theme` was `example`. Doing this will tell Andesite to serve files from `.andesite/themes/example/`.
 
 ## Built With
-- The Go Programming Lanuage - https://golang.org/
-- https://github.com/aymerick/raymond - Handlebars template rendering
-- https://github.com/fsnotify/fsnotify - Filesystem notifications for Go
-- https://github.com/gorilla/sessions - HTTP Session manager for Go
-- https://github.com/nektro/go.discord - Typings for interacting with the Discord API.
-- https://github.com/nektro/go.etc - Bootstrapping functions for all Astheno group projects
-- https://github.com/nektro/go.oauth2 - OAuth2 Client library for Go
-- https://github.com/nektro/go-util - Go utilities for simplifying common complex tasks
-- https://github.com/rakyll/statik - Static asset bundler for Go
-- https://github.com/spf13/pflag - Optimized flag handler that makes program flags POSIX compliant
+- http://github.com/aymerick/raymond
+- http://github.com/fsnotify/fsnotify
+- http://github.com/nektro/go-util
+- http://github.com/nektro/go.etc
+- http://github.com/nektro/go.oauth2
+- http://github.com/mitchellh/go-homedir
+- http://github.com/rakyll/statik
+- http://github.com/spf13/pflag
+- http://github.com/valyala/fastjson
 
 ## Contributing
 We listen to issues all the time right here on GitHub. Labels are extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it has been answered! Off-topic and '+1' comments will be deleted. Please use post/comment reactions for this purpose.
