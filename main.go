@@ -30,6 +30,8 @@ func main() {
 	flagBase := flag.String("base", "", "Http Origin Path")
 	flagPublic := flag.String("public", "", "Public root of files to serve")
 	flagSearch := flag.Bool("enable-search", false, "Set to true to enable search database")
+	flagDGS := flag.String("discord-guild-id", "", "")
+	flagDBT := flag.String("discord-bot-token", "", "")
 	etc.PreInit()
 
 	//
@@ -48,6 +50,21 @@ func main() {
 	Log("Discovered option:", "--root", idata.Config.Root)
 	idata.Config.Public = iutil.FindFirstNonEmpty(*flagPublic, idata.Config.Public)
 	Log("Discovered option:", "--public", idata.Config.Public)
+
+	if len(*flagDGS) > 0 {
+		for i, item := range idata.Config.Clients {
+			if item.For == "discord" {
+				idata.Config.Clients[i].Extra1 = *flagDGS
+			}
+		}
+	}
+	if len(*flagDBT) > 0 {
+		for i, item := range idata.Config.Clients {
+			if item.For == "discord" {
+				idata.Config.Clients[i].Extra2 = *flagDGS
+			}
+		}
+	}
 
 	//
 
