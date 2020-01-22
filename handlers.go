@@ -202,14 +202,15 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 
 	userAccess := iutil.QueryAccess(user)
 
-	if user.Provider == oauth2.ProviderIDMap["discord"].ID && idata.Config.GetDiscordClient().Extra1 != "" && idata.Config.GetDiscordClient().Extra2 != "" {
+	dc := idata.Config.GetDiscordClient()
+	if user.Provider == oauth2.ProviderIDMap["discord"].ID && dc.Extra1 != "" && dc.Extra2 != "" {
 		dra := iutil.QueryAllDiscordRoleAccess()
 		var p fastjson.Parser
 
-		rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, idata.Config.GetDiscordClient().Extra1, user.Snowflake)
+		rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, dc.Extra1, user.Snowflake)
 		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
 		req.Header.Set("User-Agent", "nektro/andesite")
-		req.Header.Set("Authorization", "Bot "+idata.Config.GetDiscordClient().Extra2)
+		req.Header.Set("Authorization", "Bot "+dc.Extra2)
 		bys := DoHttpRequest(req)
 		v, err := p.Parse(string(bys))
 		if err != nil {
