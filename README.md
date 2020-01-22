@@ -10,7 +10,7 @@
 Share folders in an Open Directory without making your entire server public. Manages users with OAuth2.
 
 ## Getting Started
-These instructions will help you get the project up and running. After completing these steps, follow the [Development](#development) or [Deployment](#deployment) sections for futher direction.
+These instructions will help you get the project up and running. To obtain the binary you will use to run the app, follow the [Development](#development) or [Deployment](#deployment) sections for futher direction. Below, are general directions for all builds.
 
 ### Creating Credentials
 In order to create a "closed directory" with Andesite, you will need to create an app on your IDP(s) of choice. See the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) docs for more detailed info on this process on where to go and what data you'll need.
