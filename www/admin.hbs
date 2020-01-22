@@ -94,6 +94,7 @@
                 </table>
             </details>
             {{#equal auth "discord"}}
+            {{#if discord_role_share_on}}
             <details open id="tab_discord_access">
                 <summary>Discord Guild Role Access</summary>
                 <table class="ui compact table">
@@ -133,6 +134,7 @@
                     </tbody>
                 </table>
             </details>
+            {{/if}}
             {{/equal}}
         </div>
     </body>
