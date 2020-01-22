@@ -57,7 +57,7 @@
                 <tbody>
                     <tr><td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
                     {{#each files}}
-                    <tr><td>{{@index}}</td><td><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td>{{mod}}</td><td>{{size}}</td><td></td></tr>
+                    <tr><td>{{add_i @index 1}}</td><td><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td>{{mod}}</td><td>{{size}}</td><td></td></tr>
                     {{/each}}
                 </tbody>
             </table>

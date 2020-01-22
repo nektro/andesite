@@ -128,6 +128,9 @@ func main() {
 	raymond.RegisterHelper("url_name", func(x string) string {
 		return strings.Replace(url.PathEscape(x), "%2F", "/", -1)
 	})
+	raymond.RegisterHelper("add_i", func(a, b int) int {
+		return a + b
+	})
 
 	//
 	// http server setup and launch
