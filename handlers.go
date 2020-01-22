@@ -201,8 +201,8 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	qpath := string(r.URL.Path[6:])
 
 	userAccess := iutil.QueryAccess(user)
-
 	dc := idata.Config.GetDiscordClient()
+
 	if user.Provider == oauth2.ProviderIDMap["discord"].ID && dc.Extra1 != "" && dc.Extra2 != "" {
 		dra := iutil.QueryAllDiscordRoleAccess()
 		var p fastjson.Parser
