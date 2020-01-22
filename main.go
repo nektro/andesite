@@ -47,17 +47,15 @@ func main() {
 	idata.Config.Root = iutil.FindFirstNonEmpty(*flagRoot, idata.Config.Root)
 	idata.Config.Public = iutil.FindFirstNonEmpty(*flagPublic, idata.Config.Public)
 
-	if len(*flagDGS) > 0 {
-		for i, item := range idata.Config.Clients {
-			if item.For == "discord" {
+	//
+
+	for i, item := range idata.Config.Clients {
+		if item.For == "discord" {
+			if len(*flagDGS) > 0 {
 				idata.Config.Clients[i].Extra1 = *flagDGS
 			}
-		}
-	}
-	if len(*flagDBT) > 0 {
-		for i, item := range idata.Config.Clients {
-			if item.For == "discord" {
-				idata.Config.Clients[i].Extra2 = *flagDGS
+			if len(*flagDBT) > 0 {
+				idata.Config.Clients[i].Extra2 = *flagDBT
 			}
 		}
 	}
