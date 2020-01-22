@@ -48,5 +48,5 @@ build_template linux amd64
 # build_template plan9 amd64
 # build_template plan9 arm
 # build_template solaris amd64
-# build_template windows 386
-# build_template windows amd64
+# build_template windows 386 .exe
+# build_template windows amd64 .exe
