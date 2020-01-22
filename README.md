@@ -12,18 +12,30 @@ Share folders in an Open Directory without making your entire server public. Man
 ## Getting Started
 These instructions will help you get the project up and running. To obtain the binary you will use to run the app, follow the [Development](#development) or [Deployment](#deployment) sections for futher direction. Below, are general directions for all builds.
 
+### Flags
+Use these to configure your Andesite instance. All are optional.
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `--root` | `string` | none. | Path of root directory for `/files/`. |
+| `--public` | `string` | none. | Path of root directory for `/public/`. |
+| `--port` | `int` | `8000` | Port for web server to bind to. |
+| `--base` | `string` | `/` | HTTP path of app root. |
+
 ### Creating Credentials
 In order to create a "closed directory" with Andesite, you will need to create an app on your Identity Provider(s) of choice. See the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) docs for more detailed info on this process on where to go and what data you'll need.
 
 Here you can also fill out a picture and description that will be displayed during the authorization of users on your chosen Identity Provider. When prompted for the "Redirect URI" during the app setup process, the URL to use will be `http://andesite/callback`, replacing `andesite` with any origins you wish Andesite to be usable from, such as `example.com` or `localhost:800`.
 
-Once you have finished the app creation process and obtained the Client ID and Client Secret, create a folder in your home directory at the path of `~/.config/andesite/`. All of Andesite's config and local save files will go here. This directory will be referred to as `.andesite` going forward.
+Once you have finished the app creation process you should now have a Client ID and Client Secret. These are passed into Andesite through flags as well.
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `--auth-{IDP-ID}-id` | `string` | none. | Client ID. |
+| `--auth-{IDP-ID}-secret` | `string` | none. | Client Secret. |
 
-In the `.andesite` folder make a `config.json` file and put the following data inside, replacing `AUTH` with whichever Identity Provider you chose, such as `discord`, `reddit`, etc. And `CLIENT_ID` and `CLIENT_SECRET` with their respective values. Do not worry, this folder will remain entirely private, even to users with full access.
+The Identity Provider IDs can be found from the table in the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) documentation.
 
-The current config version is `2`. See [docs/config](./docs/config/) for more info on setting up this info to be read by Andesite.
 
-Once fully configured, you're ready to obtain a binary to run Andesite from either the [Development](#development) or [Deployment](#deployment) sections depending on your needs.
+
 
 ## Development
 
