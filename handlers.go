@@ -92,6 +92,13 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 		// server file/folder
 		if stat.IsDir() {
 
+			// ensure directory paths end in `/`
+			if !strings.HasSuffix(r.URL.Path, "/") {
+				w.Header().Set("Location", r.URL.Path+"/")
+				w.WriteHeader(http.StatusFound)
+				return
+			}
+
 			// get list of all files
 			files, _ := ioutil.ReadDir(fileRoot + qpath)
 
