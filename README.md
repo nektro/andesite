@@ -34,8 +34,17 @@ Once you have finished the app creation process you should now have a Client ID 
 
 The Identity Provider IDs can be found from the table in the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) documentation.
 
+## Deployment
+[![circleci](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
 
+Pre-compiled binaries are published on Circle CI at https://circleci.com/gh/nektro/andesite. To download a binary, navigate to the most recent build and click on 'Artifacts'. Here there will be a list of files. Click on the one appropriate for your system.
 
+Once downloaded, run the following with the values applicable to you.
+```
+$ ./andesite-{version}-{os}-{arch}
+```
+
+If you decide to pass Andesite through a reverse proxy, be sure to check out the [documentation](./docs/deployment/) for more info.
 
 ## Development
 
@@ -57,17 +66,6 @@ $ go build
 $ ./andesite
 ```
 
-## Deployment
-[![circleci](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
-
-Pre-compiled binaries are published on Circle CI at https://circleci.com/gh/nektro/andesite. To download a binary, navigate to the most recent build and click on 'Artifacts'. Here there will be a list of files. Click on the one appropriate for your system.
-
-Once downloaded, run the following with the values applicable to you.
-```
-$ ./andesite-{date}-{tag}-{os}-{arch}
-```
-
-If you decide to pass Andesite through a reverse proxy, be sure to check out the [documentation](./docs/deployment/) for more info.
 
 ### Discord Guild/Role Access Grant
 Due to a limitation in the Discord API, in order to determine if a user has a role on a specific server, you must use a bot. To get started, go to https://discordapp.com/developers/applications/ and add a Bot user to your app and copy down the Bot Token. Now, to be able to give file/folder access to entire roles, we are going to be using the "Extra" fields of our app conf for Discord, so go ahead and addto your Discord config like so:
