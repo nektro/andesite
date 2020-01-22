@@ -510,6 +510,10 @@ func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	gn := iutil.FetchDiscordGuild(ags).Name
 	rn := iutil.FetchDiscordRole(ags, agr).Name
 	//
+	if len(gn) == 0 && len(rn) == 0 {
+		iutil.WriteAPIResponse(r, w, false, "Unable to fetch role metadata from Discord API.")
+		return
+	}
 	etc.Database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?, ?, ?)", aid, ags, agr, apt, gn, rn)
 	iutil.WriteAPIResponse(r, w, true, F("Created access for %s / %s to %s.", gn, rn, apt))
 }
@@ -534,6 +538,10 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	gn := iutil.FetchDiscordGuild(qgs).Name
 	rn := iutil.FetchDiscordRole(qgs, qgr).Name
 	//
+	if len(gn) == 0 && len(rn) == 0 {
+		iutil.WriteAPIResponse(r, w, false, "Unable to fetch role metadata from Discord API.")
+		return
+	}
 	etc.Database.Build().Up("shares_discord_role", "guild_snowflake", qgs).Wh("id", qid).Exe()
 	etc.Database.Build().Up("shares_discord_role", "role_snowflake", qgr).Wh("id", qid).Exe()
 	etc.Database.Build().Up("shares_discord_role", "path", qpt).Wh("id", qid).Exe()
