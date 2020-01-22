@@ -77,7 +77,7 @@ Due to a limitation in the Discord API, in order to determine if a user has a ro
 
 Enabling these values will add a section to `http://andesite/admin` that you can input the role snowflakes and the path you are granting.
 
-## Themes
+### Themes
 Andesite supports making custom themes for the splash page and the various HTML templates throughout the program. Those are:
 - `index.html` - [Default Source](./www/index.html)
     - The main page shown to all users at the root of the server.
@@ -88,7 +88,6 @@ Andesite supports making custom themes for the splash page and the various HTML 
 - `admin.hbs` - [Default Source](./www/admin.hbs)
     - The admin dashboard that allows editing the access of users
 
-### Using A Theme
 All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `--theme` was `example`. Doing this will tell Andesite to serve files from `.andesite/themes/example/`.
 
 ## Built With
