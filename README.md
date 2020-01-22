@@ -87,6 +87,8 @@ Andesite supports making custom themes for the splash page and the various HTML 
     - The main directory listing page.
 - `admin.hbs` - [Default Source](./www/admin.hbs)
     - The admin dashboard that allows editing the access of users
+- `style.css` - [Default Source](./www/style.css)
+    - Empty CSS file you can use to easily make style-only themes.
 
 All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `--theme` was `example`. Doing this will tell Andesite to serve files from `.andesite/themes/example/`.
 
