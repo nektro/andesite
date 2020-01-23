@@ -11,7 +11,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -393,24 +392,18 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
-	u := r.URL.Path[6:]
-	if len(u) == 0 {
+	u := strings.Split(r.URL.Path, "/")
+	if len(u) <= 3 {
 		w.Header().Add("Location", "../")
 		w.WriteHeader(http.StatusFound)
 	}
-	if match, _ := regexp.MatchString("^[0-9a-f]{32}/.*", u); !match {
-		iutil.WriteResponse(r, w, "Invalid Share Link", "Invalid format for share code.", "")
-		return "", "", nil, nil, nil, errors.New("")
-	}
-
-	h := u[:32]
+	h := u[2]
 	s := iutil.QueryAccessByShare(h)
 	if len(s) == 0 {
 		iutil.WriteResponse(r, w, "Not Found", "Public share code not found.", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-
-	return idata.Config.Root, u[32:], s, &itypes.UserRow{-1, "", h, false, "", "", "", ""}, nil, nil
+	return idata.Config.Root, "/" + strings.Join(u[3:], "/"), s, &itypes.UserRow{ID: -1, IDS: "-1"}, nil, nil
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
