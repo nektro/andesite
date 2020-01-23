@@ -34,8 +34,8 @@
                 <summary>User Access</summary>
                 <table class="ui compact table">
                     <thead>
-                        <th class="collapsing">Snowflake</th>
-                        <th class="collapsing">User Name</th>
+                        <th class="collapsing">User</th>
+                        <th class="collapsing">Name</th>
                         <th>Path</th>
                         <th class="collapsing"></th>
                         <th class="collapsing"></th>
@@ -45,8 +45,8 @@
                         <tr>
                             <form method="POST">
                                 <input type="hidden" name="id" value="{{id}}">
-                                <td><input type="text" name="snowflake" class="snowflake" placeholder="User Snowflake" value="{{snowflake}}"></td>
-                                <td><input type="text" name="name" class="name" placeholder="{User Name}" value="{{name}}" readonly></td>
+                                <td><select name="user">{{#each users}}<option value="{{ID}}"{{#equal ID userO.ID}} selected{{/equal}}>{{Name}}@{{Provider}}</option>{{/each}}</select></td>
+                                <td><input type="text" name="name" class="name" placeholder="{User Name}" value="{{userO.Name}}@{{userO.Provider}}" readonly></td>
                                 <td><input type="text" name="path" placeholder="Path" value="{{path}}"></td>
                                 <td><button class="ui button" formaction="./api/access/update">Update</button></td>
                                 <td><button class="ui button" formaction="./api/access/delete">Delete</button></td>
@@ -55,7 +55,7 @@
                         {{/each}}
                         <tr>
                             <form method="POST">
-                                <td><input type="text" name="snowflake" class="snowflake" placeholder="User Snowflake"></td>
+                                <td><select name="user">{{#each users}}<option value="{{ID}}">{{Name}}@{{Provider}}</option>{{/each}}</select></td>
                                 <td colspan="2"><input type="text" name="path" placeholder="Path"></td>
                                 <td colspan="2"><button class="ui button" formaction="./api/access/create">Add Access</button></td>
                             </form>

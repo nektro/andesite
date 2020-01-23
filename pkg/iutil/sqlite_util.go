@@ -67,26 +67,21 @@ func QueryUserByID(id int64) (*itypes.UserRow, bool) {
 	return &ur, true
 }
 
-func QueryAllAccess() []map[string]string {
-	var result []map[string]string
+func QueryAllAccess() []map[string]interface{} {
+	var result []map[string]interface{}
 	rows := etc.Database.Build().Se("*").Fr("access").Exe()
 	accs := []itypes.UserAccessRow{}
 	for rows.Next() {
 		accs = append(accs, ScanAccessRow(rows))
 	}
 	rows.Close()
-	ids := map[int64][]string{}
 	for _, uar := range accs {
-		if _, ok := ids[uar.User]; !ok {
-			uu, _ := QueryUserByID(uar.User)
-			ids[uar.User] = []string{uu.Snowflake, uu.Name}
-		}
-		result = append(result, map[string]string{
-			"id":        strconv.FormatInt(uar.ID, 10),
-			"user":      strconv.FormatInt(uar.User, 10),
-			"snowflake": ids[uar.User][0],
-			"name":      ids[uar.User][1],
-			"path":      uar.Path,
+		uu, _ := QueryUserByID(uar.User)
+		result = append(result, map[string]interface{}{
+			"id":    strconv.FormatInt(uar.ID, 10),
+			"user":  strconv.FormatInt(uar.User, 10),
+			"userO": uu,
+			"path":  uar.Path,
 		})
 	}
 	return result
