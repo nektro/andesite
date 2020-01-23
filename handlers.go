@@ -393,7 +393,7 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		iutil.WriteResponse(r, w, "Not Found", "Public share code not found.", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	return idata.Config.Root, "/" + strings.Join(u[3:], "/"), s, &itypes.UserRow{ID: -1, IDS: "-1"}, nil, nil
+	return idata.Config.Root, "/" + strings.Join(u[3:], "/"), s, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
