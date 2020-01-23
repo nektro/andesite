@@ -11,7 +11,7 @@ jobs:
       - run: go get -v -u .
       - run: go test -v .
       - run: ./scripts/build_all.sh
-
       - store_artifacts:
           path: ./bin/
           destination: /artifacts/
+      - run: ./scripts/make_release.sh
