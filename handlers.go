@@ -40,6 +40,45 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 	Log("[user-login]", provider, id, name)
 }
 
+//
+//
+
+func hGrabID(r *http.Request, w http.ResponseWriter) (string, int64, error) {
+	if !iutil.ContainsAll(r.PostForm, "id") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
+		return "", -1, E("")
+	}
+	a := r.PostForm.Get("id")
+	n, err := strconv.ParseInt(a, 10, 64)
+	if err != nil {
+		iutil.WriteAPIResponse(r, w, false, "ID parameter must be an integer")
+		return a, -1, E("")
+	}
+	return a, n, nil
+}
+
+func hGrabUser(r *http.Request, w http.ResponseWriter) (string, *itypes.UserRow, error) {
+	if !iutil.ContainsAll(r.PostForm, "user") {
+		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
+		return "", nil, E("")
+	}
+	a := r.PostForm.Get("user")
+	n, err := strconv.ParseInt(a, 10, 64)
+	if err != nil {
+		iutil.WriteAPIResponse(r, w, false, "User parameter must be an integer")
+		return a, nil, E("")
+	}
+	u, ok := iutil.QueryUserByID(n)
+	if !ok {
+		iutil.WriteLinkResponse(r, w, "Unable to find User", "Invalid user ID.", "Return", "./../../admin")
+		return a, nil, E("")
+	}
+	return a, u, nil
+}
+
+//
+//
+
 // handler for http://andesite/test
 func handleTest(w http.ResponseWriter, r *http.Request) {
 	// sessions test and debug info
@@ -272,20 +311,13 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	if !iutil.ContainsAll(r.PostForm, "id", "snowflake") {
-		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
-		return
-	}
-	//
-	aid := r.PostForm.Get("id")
-	iid, err := strconv.ParseInt(aid, 10, 32)
+	idS, _, err := hGrabID(r, w)
 	if err != nil {
-		iutil.WriteAPIResponse(r, w, false, "ID parameter must be an integer")
 		return
 	}
 	//
-	etc.Database.QueryPrepared(true, "delete from access where id = ?", iid)
-	iutil.WriteAPIResponse(r, w, true, F("Removed access from %s.", r.PostForm.Get("snowflake")))
+	etc.Database.QueryPrepared(true, "delete from access where id = ?", idS)
+	iutil.WriteAPIResponse(r, w, true, "Removed access "+idS+".")
 }
 
 // handler for http://andesite/api/access/update
