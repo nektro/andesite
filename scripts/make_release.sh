@@ -10,7 +10,7 @@ init() {
         -u ${CIRCLE_PROJECT_USERNAME} \
         -r ${CIRCLE_PROJECT_REPONAME} \
         "$tag" \
-        "/artifacts/"
+        "./bin/"
 }
 
 init
