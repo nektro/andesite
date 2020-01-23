@@ -41,11 +41,11 @@ func main() {
 
 	//
 
-	idata.Config.Version = iutil.FindFirstNonZero(*flagCV, idata.Config.Version, 0)
-	idata.Config.Port = iutil.FindFirstNonZero(*flagPort, idata.Config.Port, 8000)
-	idata.Config.HTTPBase = iutil.FindFirstNonEmpty(*flagBase, idata.Config.HTTPBase, "/")
-	idata.Config.Root = iutil.FindFirstNonEmpty(*flagRoot, idata.Config.Root)
-	idata.Config.Public = iutil.FindFirstNonEmpty(*flagPublic, idata.Config.Public)
+	idata.Config.Version = FirstNonZero(*flagCV, idata.Config.Version, 0)
+	idata.Config.Port = FirstNonZero(*flagPort, idata.Config.Port, 8000)
+	idata.Config.HTTPBase = FirstNonEmptyS(*flagBase, idata.Config.HTTPBase, "/")
+	idata.Config.Root = FirstNonEmptyS(*flagRoot, idata.Config.Root)
+	idata.Config.Public = FirstNonEmptyS(*flagPublic, idata.Config.Public)
 
 	//
 

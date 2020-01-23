@@ -189,24 +189,6 @@ func MwAddAttribution(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func FindFirstNonEmpty(values ...string) string {
-	for _, item := range values {
-		if len(item) > 0 {
-			return item
-		}
-	}
-	return ""
-}
-
-func FindFirstNonZero(values ...int) int {
-	for _, item := range values {
-		if item != 0 {
-			return item
-		}
-	}
-	return 0
-}
-
 func WriteJSON(w http.ResponseWriter, data map[string]interface{}) {
 	w.Header().Add("content-type", "application/json")
 	bytes, _ := json.Marshal(data)
