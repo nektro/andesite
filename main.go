@@ -65,8 +65,6 @@ func main() {
 	if idata.Config.Version == 0 {
 		idata.Config.Version = 1
 	}
-	Log("Using config version:", idata.Config.Version)
-
 	if idata.Config.Version != idata.RequiredConfigVersion {
 		DieOnError(
 			E(F("Current idata.Config.json version '%d' does not match required version '%d'.", idata.Config.Version, idata.RequiredConfigVersion)),
