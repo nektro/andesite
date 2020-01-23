@@ -32,8 +32,7 @@
     </head>
     <body class="page-listing">
         <div class="ui main menu">
-            <div class="header item">Welcome, {{name}}</div>
-            <div class="item">{{user}}</div>
+            <div class="header item">Welcome, {{user.Name}}@{{user.Provider}}</div>
             {{#if search_on}}
             <div class="item"><a href="{{base}}search"><i class="search icon"></i> Search</a></div>
             {{/if}}

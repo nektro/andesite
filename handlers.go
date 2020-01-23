@@ -158,7 +158,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
 				"provider":  user.Provider,
-				"user":      user.Snowflake,
+				"user":      user,
 				"path":      qpath,
 				"files":     data,
 				"admin":     user.Admin,
@@ -242,7 +242,7 @@ func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 	if len(idata.Config.Public) > 0 {
 		qaccess = append(qaccess, "/")
 	}
-	return idata.Config.Public, qpath, qaccess, &itypes.UserRow{-1, "", "", false, "Guest!", "", "", ""}, map[string]interface{}{}, nil
+	return idata.Config.Public, qpath, qaccess, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/admin
@@ -253,7 +253,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 	dc := idata.Config.GetDiscordClient()
 	etc.WriteHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
-		"user":                  user.Snowflake,
+		"user":                  user,
 		"base":                  idata.Config.HTTPBase,
 		"name":                  oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 		"auth":                  oauth2.ProviderIDMap[user.Provider].ID,
@@ -433,7 +433,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	etc.WriteHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
-		"user": user.Snowflake,
+		"user": user,
 		"base": idata.Config.HTTPBase,
 		"name": oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 	})
@@ -589,7 +589,7 @@ func handleAdminUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	etc.WriteHandlebarsFile(r, w, "/users.hbs", map[string]interface{}{
-		"user":  user.Snowflake,
+		"user":  user,
 		"base":  idata.Config.HTTPBase,
 		"name":  oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 		"auth":  oauth2.ProviderIDMap[user.Provider].ID,
