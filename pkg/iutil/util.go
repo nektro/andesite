@@ -119,6 +119,7 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []
 	}
 
 	sess := etc.GetSession(r)
+	provID := sess.Values["provider"]
 	sessID := sess.Values["user"]
 
 	if sessID == nil {
@@ -146,8 +147,9 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []
 		kq.Close()
 	}
 
-	userID := sessID.(string)
-	user, ok := QueryUserBySnowflake(userID)
+	pS := provID.(string)
+	uS := sessID.(string)
+	user, ok := QueryUserBySnowflake(pS, uS)
 
 	if !ok {
 		WriteResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+userID+")", "")

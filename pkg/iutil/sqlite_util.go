@@ -47,8 +47,8 @@ func QueryAccess(user *itypes.UserRow) []string {
 	return result
 }
 
-func QueryUserBySnowflake(snowflake string) (*itypes.UserRow, bool) {
-	rows := etc.Database.Build().Se("*").Fr("users").Wh("snowflake", snowflake).Exe()
+func QueryUserBySnowflake(provider, snowflake string) (*itypes.UserRow, bool) {
+	rows := etc.Database.Build().Se("*").Fr("users").Wh("provider", provider).Wh("snowflake", snowflake).Exe()
 	if !rows.Next() {
 		return nil, false
 	}
@@ -97,8 +97,8 @@ func QueryDoAddUser(id int64, provider string, snowflake string, admin bool, nam
 	etc.Database.Build().Up("users", "passkey", GenerateNewUserPasskey(snowflake)).Wh("snowflake", snowflake).Exe()
 }
 
-func QueryAssertUserName(provider string, snowflake string, name string) {
-	_, ok := QueryUserBySnowflake(snowflake)
+func QueryAssertUserName(provider, snowflake string, name string) {
+	_, ok := QueryUserBySnowflake(provider, snowflake)
 	if ok {
 		etc.Database.Build().Up("users", "provider", provider).Wh("snowflake", snowflake).Exe()
 		etc.Database.Build().Up("users", "name", name).Wh("snowflake", snowflake).Exe()
