@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -325,50 +323,45 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	//
-	aid := r.PostForm.Get("id")
-	_, err = strconv.ParseInt(string(aid), 10, 64)
+	idS, _, err := hGrabID(r, w)
 	if err != nil {
-		iutil.WriteAPIResponse(r, w, false, "ID parameter must be an integer")
 		return
 	}
-	//
-	if !iutil.ContainsAll(r.PostForm, "snowflake", "path") {
+	uS, u, err := hGrabUser(r, w)
+	if err != nil {
+		return
+	}
+	if !iutil.ContainsAll(r.PostForm, "path") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
+	apt := r.PostForm.Get("path")
 	//
-	etc.Database.Build().Up("access", "path", r.PostForm.Get("path")).Wh("id", aid).Exe()
-	iutil.WriteAPIResponse(r, w, true, F("Updated access for %s.", r.PostForm.Get("snowflake")))
+	etc.Database.Build().Up("access", "user", uS).Wh("id", idS).Exe()
+	etc.Database.Build().Up("access", "path", apt).Wh("id", idS).Exe()
+	iutil.WriteAPIResponse(r, w, true, "Updated access for "+u.Name+"@"+u.Provider+".")
 }
 
 // handler for http://andesite/api/access/create
 func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
 	}
 	//
-	if !iutil.ContainsAll(r.PostForm, "snowflake", "path") {
+	aid := etc.Database.QueryNextID("access")
+	uS, u, err := hGrabUser(r, w)
+	if err != nil {
+		return
+	}
+	if !iutil.ContainsAll(r.PostForm, "path") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
-	//
-	aid := etc.Database.QueryNextID("access")
-	asn := r.PostForm.Get("snowflake")
 	apt := r.PostForm.Get("path")
 	//
-	u, ok := iutil.QueryUserBySnowflake(asn)
-	aud := int64(-1)
-	if ok {
-		aud = u.ID
-	} else {
-		aud = etc.Database.QueryNextID("users")
-		iutil.QueryDoAddUser(aud, oauth2.ProviderIDMap[user.Provider].ID, asn, false, "")
-	}
-	//
-	etc.Database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, aud, apt)
-	iutil.WriteAPIResponse(r, w, true, F("Created access for %s.", asn))
+	etc.Database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, uS, apt)
+	iutil.WriteAPIResponse(r, w, true, F("Created access for %s.", u.Name+"@"+u.Provider))
 }
 
 func handleShareCreate(w http.ResponseWriter, r *http.Request) {
@@ -376,19 +369,16 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	//
+	aid := etc.Database.QueryNextID("shares")
+	ash := Hash("MD5", []byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(aid, 10), GetIsoDateTime())))[:12]
 	if !iutil.ContainsAll(r.PostForm, "path") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
-	//
-	aid := etc.Database.QueryNextID("shares")
-	ahs1 := md5.Sum([]byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(int64(aid), 10), GetIsoDateTime())))
-	ahs2 := hex.EncodeToString(ahs1[:])
 	fpath := r.PostForm.Get("path")
 	//
-	etc.Database.QueryPrepared(true, "insert into shares values (?, ?, ?)", aid, ahs2, fpath)
-	iutil.WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ahs2, fpath))
+	etc.Database.QueryPrepared(true, "insert into shares values (?, ?, ?)", aid, ash, fpath)
+	iutil.WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ash, fpath))
 }
 
 func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
@@ -411,16 +401,17 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	//
-	if !iutil.ContainsAll(r.PostForm, "id", "hash", "path") {
+	idS, _, err := hGrabID(r, w)
+	if err != nil {
+		return
+	}
+	if !iutil.ContainsAll(r.PostForm, "path") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
-	//
-	ahs := r.PostForm.Get("hash")
 	aph := r.PostForm.Get("path")
 	// //
-	etc.Database.Build().Up("shares", "path", aph).Wh("hash", ahs).Exe()
+	etc.Database.Build().Up("shares", "path", aph).Wh("id", idS).Exe()
 	iutil.WriteAPIResponse(r, w, true, "Successfully updated share path.")
 }
 
@@ -430,14 +421,16 @@ func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	if !iutil.ContainsAll(r.PostForm, "id", "hash", "path") {
+	if !iutil.ContainsAll(r.PostForm, "path") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
+	idS, _, err := hGrabID(r, w)
+	if err != nil {
+		return
+	}
 	//
-	ahs := r.PostForm.Get("hash")
-	//
-	etc.Database.QueryPrepared(true, "delete from shares where hash = ?", ahs)
+	etc.Database.QueryPrepared(true, "delete from shares where id = ?", idS)
 	iutil.WriteAPIResponse(r, w, true, "Successfully deleted share link.")
 }
 
