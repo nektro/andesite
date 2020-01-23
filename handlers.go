@@ -258,6 +258,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 		"name":                  oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 		"auth":                  oauth2.ProviderIDMap[user.Provider].ID,
 		"discord_role_share_on": len(dc.Extra1) > 0 && len(dc.Extra2) > 0,
+		"users":                 iutil.QueryAllUsers(),
 		"accesses":              iutil.QueryAllAccess(),
 		"shares":                iutil.QueryAllShares(),
 		"discord_shares":        iutil.QueryAllDiscordRoleAccess(),
