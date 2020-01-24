@@ -14,6 +14,7 @@ These instructions will help you get the project up and running. To obtain the b
 
 ### Flags
 Use these to configure your Andesite instance. All are optional.
+
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `--root` | `string` | none. | Path of root directory for `/files/`. |
@@ -27,6 +28,7 @@ In order to create a "closed directory" with Andesite, you will need to create a
 Here you can also fill out a picture and description that will be displayed during the authorization of users on your chosen Identity Provider. When prompted for the "Redirect URI" during the app setup process, the URL to use will be `http://andesite/callback`, replacing `andesite` with any origins you wish Andesite to be usable from, such as `example.com` or `localhost:800`.
 
 Once you have finished the app creation process you should now have a Client ID and Client Secret. These are passed into Andesite through flags as well.
+
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `--auth-{IDP-ID}-id` | `string` | none. | Client ID. |
@@ -70,6 +72,7 @@ $ ./andesite
 
 ### Discord Guild/Role Access Grant
 Due to a limitation in the Discord API, in order to determine if a user has a role on a specific server, you must use a bot. To get started, go to https://discordapp.com/developers/applications/ and add a Bot user to your app and copy down the Bot Token. Now, to be able to give file/folder access to entire roles, we are going to be using more flags:
+
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `--discord-guild-id` | `string` | none. | Guild Snowflake. |
