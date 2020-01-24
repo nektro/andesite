@@ -1,6 +1,6 @@
 # Deploying Andesite with Nginx
 
-1. Setup a "development" environment using the installation instructions in [`README.md`](../README.md)
+1. Download a copy of Andesite from https://github.com/nektro/andesite/releases/latest.
 2. Make sure Andesite is visible from http://localhost:8000
 3. Download Nginx (https://nginx.org/en/download.html)
 4. Configure a `location` context for Andesite such as:

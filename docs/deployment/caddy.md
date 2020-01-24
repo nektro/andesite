@@ -1,6 +1,6 @@
 # Deploying Andesite via Caddy
 
-1. Setup a "development" environment using the installation instructions in [`README.md`](../README.md)
+1. Download a copy of Andesite from https://github.com/nektro/andesite/releases/latest.
 2. Make sure Andesite is visible from http://localhost:8000
 3. Download Caddy (https://caddyserver.com/download)
 4. Configure a new site context for Andesite such as:

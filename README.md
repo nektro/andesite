@@ -4,6 +4,7 @@
 [![discord](https://img.shields.io/discord/551971034593755159.svg)](https://discord.gg/P6Y4zQC)
 [![paypal](https://img.shields.io/badge/donate-paypal-009cdf)](https://paypal.me/nektro)
 [![circleci](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
+[![release](https://img.shields.io/github/v/release/nektro/andesite)](https://github.com/nektro/andesite/releases/latest)
 [![goreportcard](https://goreportcard.com/badge/github.com/nektro/andesite)](https://goreportcard.com/report/github.com/nektro/andesite)
 [![codefactor](https://www.codefactor.io/repository/github/nektro/andesite/badge)](https://www.codefactor.io/repository/github/nektro/andesite)
 
@@ -37,16 +38,7 @@ Once you have finished the app creation process you should now have a Client ID 
 The Identity Provider IDs can be found from the table in the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) documentation.
 
 ## Deployment
-[![circleci](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
-
-Pre-compiled binaries are published on Circle CI at https://circleci.com/gh/nektro/andesite. To download a binary, navigate to the most recent build and click on 'Artifacts'. Here there will be a list of files. Click on the one appropriate for your system.
-
-Once downloaded, run the following with the values applicable to you.
-```
-$ ./andesite-{version}-{os}-{arch}
-```
-
-If you decide to pass Andesite through a reverse proxy, be sure to check out the [documentation](./docs/deployment/) for more info.
+Pre-compiled binaries can be obtained from https://github.com/nektro/andesite/releases/latest.
 
 ## Development
 
