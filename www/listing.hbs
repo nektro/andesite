@@ -24,6 +24,27 @@
         </style>
         <script>
             (function() {
+                $.tablesort.defaults.compare = function compare(a, b) {
+                    if (a == "" || a == "Parent Directory") {
+                        const direction = $("table.sortable").data("tablesort").direction;
+                        
+                        if (direction == "asc") {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    }
+                    
+                    if (a < b) {
+                        return -1;
+                    }
+                    if (a > b) {
+                        return 1;
+                    }
+
+                    return 0;
+                };
+                
                 $(document).ready(function() {
                     $("table.sortable").tablesort();
                 })
