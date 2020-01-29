@@ -12,7 +12,10 @@
         <link rel="stylesheet" href="style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.js" integrity="sha256-x9fzgXT3ttK2cZF12FIafkDJzEqqLnaWcchT+Y/plJ4=" crossorigin="anonymous"></script>
-        <script src="https://semantic-ui.com/javascript/library/tablesort.js"></script>
+
+        <script src="https://rawcdn.githack.com/tristen/tablesort/39fa382c7728c4301960224f39b3f1969e6cf090/dist/tablesort.min.js"></script>
+        <script src="https://rawcdn.githack.com/tristen/tablesort/39fa382c7728c4301960224f39b3f1969e6cf090/dist/sorts/tablesort.date.min.js"></script>
+        <script src="https://rawcdn.githack.com/tristen/tablesort/39fa382c7728c4301960224f39b3f1969e6cf090/dist/sorts/tablesort.filesize.min.js"></script>
         <!---->
         <style>
             body > div { margin: 1em; }
@@ -22,13 +25,6 @@
             #dlbox { background-color: #dedede; border-radius: .25em; padding: 1em; }
             code { background-color: #ccc; border-radius: .2em; padding: .25em; }
         </style>
-        <script>
-            (function() {
-                $(document).ready(function() {
-                    $("table.sortable").tablesort();
-                })
-            })();
-        </script>
     </head>
     <body class="page-listing">
         <div class="ui main menu">
@@ -45,17 +41,17 @@
         <div>
             <h1 class="ui header">Index of {{path}}</h1>
             <div class="ui divider"></div>
-            <table class="ui sortable compact table">
+            <table id="files" class="ui sortable compact table">
                 <thead>
-                    <th class="collapsing no-sort"></th>
-                    <th class="collapsing no-sort"></th>
+                    <th class="collapsing" data-sort-method="none"></th>
+                    <th class="collapsing" data-sort-method="none"></th>
                     <th class="collapsing">Name</th>
                     <th class="collapsing">Last Modified</th>
                     <th class="collapsing">Size</th>
                     <th class="no-sort"></th>
                 </thead>
                 <tbody>
-                    <tr><td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
+                    <tr data-sort-method="none"><td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
                     {{#each files}}
                     <tr><td>{{add_i @index 1}}</td><td><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td>{{mod}}</td><td>{{size}}</td><td></td></tr>
                     {{/each}}
@@ -69,5 +65,9 @@
             <p><code>rclone copy --http-url="{{host}}/files{{path}}" :http: ./ -P --user-agent "AndesiteUser/{{extras.user.PassKey}}"</code></p>
         </div>
         {{/if}}
+
+    <script>
+        new Tablesort(document.getElementById("files"));
+    </script>
     </body>
 </html>
