@@ -39,7 +39,9 @@
             {{#if admin}}
             <div class="item"><a href="{{base}}admin">Admin Panel</a></div>
             {{/if}}
+            {{#if user.PassKey}}
             <div class="item"><a href="{{base}}logout">Logout</a></div>
+            {{/if}}
             <div class="right item">Powered by&nbsp;<a href="https://github.com/nektro/andesite" target="_blank">Andesite</a>&nbsp;<code>{{version}}</code></div>
         </div>
         <div>
