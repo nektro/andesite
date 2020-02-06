@@ -193,6 +193,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			}
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
+				"version":   idata.Version,
 				"provider":  user.Provider,
 				"user":      user,
 				"path":      qpath,
@@ -289,6 +290,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 	dc := idata.Config.GetDiscordClient()
 	etc.WriteHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
+		"version":               idata.Version,
 		"user":                  user,
 		"base":                  idata.Config.HTTPBase,
 		"name":                  oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
@@ -452,9 +454,10 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	etc.WriteHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
-		"user": user,
-		"base": idata.Config.HTTPBase,
-		"name": oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
+		"version": idata.Version,
+		"user":    user,
+		"base":    idata.Config.HTTPBase,
+		"name":    oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 	})
 }
 
@@ -608,10 +611,11 @@ func handleAdminUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	etc.WriteHandlebarsFile(r, w, "/users.hbs", map[string]interface{}{
-		"user":  user,
-		"base":  idata.Config.HTTPBase,
-		"name":  oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
-		"auth":  oauth2.ProviderIDMap[user.Provider].ID,
-		"users": iutil.QueryAllUsers(),
+		"version": idata.Version,
+		"user":    user,
+		"base":    idata.Config.HTTPBase,
+		"name":    oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
+		"auth":    oauth2.ProviderIDMap[user.Provider].ID,
+		"users":   iutil.QueryAllUsers(),
 	})
 }

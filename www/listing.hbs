@@ -20,7 +20,7 @@
             table.table tr td { white-space: nowrap; padding: .2em .7em !important; }
             table.table tr td:nth-child(5) { text-align: right; }
             #dlbox { background-color: #dedede; border-radius: .25em; padding: 1em; }
-            code { background-color: #ccc; border-radius: .2em; padding: .25em; }
+            p code { background-color: #ccc; border-radius: .2em; padding: .25em; }
         </style>
         <script>
             (function() {
@@ -40,7 +40,7 @@
             <div class="item"><a href="{{base}}admin">Admin Panel</a></div>
             {{/if}}
             <div class="item"><a href="{{base}}logout">Logout</a></div>
-            <div class="right item">Powered by&nbsp;<a href="https://github.com/nektro/andesite" target="_blank">Andesite</a></div>
+            <div class="right item">Powered by&nbsp;<a href="https://github.com/nektro/andesite" target="_blank">Andesite</a>&nbsp;<code>{{version}}</code></div>
         </div>
         <div>
             <h1 class="ui header">Index of {{path}}</h1>
