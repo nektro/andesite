@@ -36,7 +36,7 @@ func main() {
 	flagSearch := flag.Bool("enable-search", false, "Set to true to enable search database")
 	flagDGS := flag.String("discord-guild-id", "", "")
 	flagDBT := flag.String("discord-bot-token", "", "")
-	etc.PreInit()
+	etc.PreInit("andesite")
 
 	//
 	// parse options and find config
