@@ -90,6 +90,7 @@ func BoolToString(x bool) string {
 
 func WriteResponse(r *http.Request, w http.ResponseWriter, title string, message string, link string) {
 	etc.WriteHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
+		"version": idata.Version,
 		"title":   title,
 		"message": message,
 		"link":    link,
