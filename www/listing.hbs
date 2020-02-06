@@ -12,9 +12,12 @@
         <link rel="stylesheet" href="style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.7.5/semantic.min.js" integrity="sha256-x9fzgXT3ttK2cZF12FIafkDJzEqqLnaWcchT+Y/plJ4=" crossorigin="anonymous"></script>
-        <script src="https://semantic-ui.com/javascript/library/tablesort.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/tablesort.min.js" integrity="sha256-p3wukcf2d2jxbVnlqPDO9t4AAjnl42D2aIzrK4S0X6w=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/sorts/tablesort.number.min.js" integrity="sha256-ra1pWQ7MfuVIolZ/phcEXegs9m1ehXaCNI8cmc3gJEs=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/sorts/tablesort.filesize.min.js" integrity="sha256-qNYlSpvv2lsmkcarYkQBkUzVcHKaml/BHcGxcSNsyrU=" crossorigin="anonymous"></script>
         <!---->
         <style>
+            body { overflow-x: visible; }
             body > div { margin: 1em; }
             table.table { font-family: 'Source Code Pro', 'Courier New', monospace; }
             table.table tr td { white-space: nowrap; padding: .2em .7em !important; }
@@ -25,7 +28,9 @@
         <script>
             (function() {
                 $(document).ready(function() {
-                    $("table.sortable").tablesort();
+                    new Tablesort(document.querySelector("table"), {
+                        descending: false,
+                    });
                 })
             })();
         </script>
@@ -49,17 +54,17 @@
             <div class="ui divider"></div>
             <table class="ui sortable compact table">
                 <thead>
-                    <th class="collapsing no-sort"></th>
-                    <th class="collapsing no-sort"></th>
+                    <th class="collapsing" data-sort-method="number"></th>
+                    <th class="collapsing" data-sort-method="none"></th>
                     <th class="collapsing">Name</th>
-                    <th class="collapsing">Last Modified</th>
-                    <th class="collapsing">Size</th>
-                    <th class="no-sort"></th>
+                    <th class="collapsing" data-sort-method="number">Last Modified</th>
+                    <th class="collapsing" data-sort-method="filesize">Size</th>
+                    <th data-sort-method="none"></th>
                 </thead>
                 <tbody>
-                    <tr><td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
+                    <tr data-sort-method="none"><td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
                     {{#each files}}
-                    <tr><td>{{add_i @index 1}}</td><td><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td>{{mod}}</td><td>{{size}}</td><td></td></tr>
+                    <tr><td>{{add_i @index 1}}</td><td><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td data-sort="{{mod_raw}}">{{mod}}</td><td>{{size}}</td><td></td></tr>
                     {{/each}}
                 </tbody>
             </table>

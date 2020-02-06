@@ -184,10 +184,11 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 					ext = ".asc"
 				}
 				data[gi] = map[string]string{
-					"name": a,
-					"size": ByteCountIEC(files[i].Size()),
-					"mod":  files[i].ModTime().UTC().String()[:19],
-					"ext":  ext[1:],
+					"name":    a,
+					"size":    ByteCountIEC(files[i].Size()),
+					"mod":     files[i].ModTime().UTC().String()[:19],
+					"ext":     ext[1:],
+					"mod_raw": strconv.FormatInt(files[i].ModTime().UTC().Unix(), 10),
 				}
 				gi++
 			}
