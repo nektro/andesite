@@ -20,9 +20,13 @@ import (
 	_ "github.com/nektro/andesite/statik"
 )
 
+var (
+	Version = "vMASTER"
+)
 
 func main() {
-	Log("Initializing Andesite...")
+	idata.Version = Version
+	Log("Initializing Andesite " + idata.Version + "...")
 
 	flagCV := flag.Int("version", idata.RequiredConfigVersion, "Config version to use.")
 	flagRoot := flag.String("root", "", "Path of root directory for files")

@@ -12,6 +12,7 @@ const (
 )
 
 var (
+	Version        = "vMASTER"
 	Config         *itypes.Config
 	HomedirPath, _ = homedir.Dir()
 )
