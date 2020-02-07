@@ -136,10 +136,10 @@ func QueryAllSharesByCode(code string) []itypes.ShareRow {
 	return shrs
 }
 
-func QueryAccessByShare(code string) []string {
-	result := []string{}
+func QueryAccessByShare(code string) string {
+	result := ""
 	for _, item := range QueryAllSharesByCode(code) {
-		result = append(result, item.Path)
+		result = item.Path
 	}
 	return result
 }

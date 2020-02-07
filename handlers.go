@@ -386,17 +386,27 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 
 func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
 	u := strings.Split(r.URL.Path, "/")
-	if len(u) <= 3 {
+	if len(u) <= 4 {
 		w.Header().Add("Location", "../")
 		w.WriteHeader(http.StatusFound)
 	}
 	h := u[2]
 	s := iutil.QueryAccessByShare(h)
 	if len(s) == 0 {
-		iutil.WriteResponse(r, w, "Not Found", "Public share code not found.", "")
+		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	return idata.Config.Root, "/" + strings.Join(u[3:], "/"), s, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
+	sp := strings.Split(s, "/")
+	dp, ok := idata.DataPaths[u[3]]
+	if !ok {
+		iutil.WriteResponse(r, w, "Not Found", "", "")
+		return "", "", nil, nil, nil, errors.New("")
+	}
+	if u[3] != sp[1] {
+		iutil.WriteResponse(r, w, "Not Found", "", "")
+		return "", "", nil, nil, nil, errors.New("")
+	}
+	return dp, "/" + strings.Join(u[4:], "/"), []string{"/" + strings.Join(sp[2:], "/")}, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
 }
 
 func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
