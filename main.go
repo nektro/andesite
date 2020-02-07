@@ -28,28 +28,17 @@ func main() {
 	idata.Version = Version
 	Log("Initializing Andesite " + idata.Version + "...")
 
-	flaEgCV := pflag.Int("version", idata.RequiredConfigVersion, "Config version to use.")
-	flagRoot := pflag.String("root", "", "Path of root directory for files")
-	flagPort := pflag.Int("port", 0, "Port to open server on")
-	flagBase := pflag.String("base", "", "Http Origin Path")
-	flagPublic := pflag.String("public", "", "Public root of files to serve")
-	flagSearch := pflag.Bool("enable-search", false, "Set to true to enable search database")
+	pflag.IntVar(&idata.Config.Version, "version", idata.RequiredConfigVersion, "Config version to use.")
+	pflag.StringVar(&idata.Config.Root, "root", "", "Path of root directory for files")
+	pflag.IntVar(&idata.Config.Port, "port", 0, "Port to open server on")
+	pflag.StringVar(&idata.Config.HTTPBase, "base", "", "Http Origin Path")
+	pflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
+	pflag.BoolVar(&idata.Config.SearchOn, "enable-search", false, "Set to true to enable search database")
 	flagDGS := pflag.String("discord-guild-id", "", "")
 	flagDBT := pflag.String("discord-bot-token", "", "")
 	etc.PreInit("andesite")
 
-	//
-	// parse options and find config
-
 	etc.Init("andesite", &idata.Config, "./files/", helperOA2SaveInfo)
-
-	//
-
-	idata.Config.Version = FirstNonZero(*flagCV, idata.Config.Version, 0)
-	idata.Config.Port = FirstNonZero(*flagPort, idata.Config.Port, 8000)
-	idata.Config.HTTPBase = FirstNonEmptyS(*flagBase, idata.Config.HTTPBase, "/")
-	idata.Config.Root = FirstNonEmptyS(*flagRoot, idata.Config.Root)
-	idata.Config.Public = FirstNonEmptyS(*flagPublic, idata.Config.Public)
 
 	//
 
@@ -74,12 +63,6 @@ func main() {
 			E(F("Current idata.Config.json version '%d' does not match required version '%d'.", idata.Config.Version, idata.RequiredConfigVersion)),
 			F("Visit https://github.com/nektro/andesite/blob/master/docs/config/v%d.md for more info.", idata.RequiredConfigVersion),
 		)
-	}
-
-	//
-
-	if *flagSearch {
-		idata.Config.SearchOn = true
 	}
 
 	//
