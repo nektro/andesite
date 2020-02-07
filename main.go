@@ -154,6 +154,7 @@ func main() {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
 		Log("Sharing private files from " + idata.Config.Root)
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
+		idata.DataPaths["files"] = idata.Config.Root
 
 		http.HandleFunc("/files/", iutil.Mw(handleDirectoryListing(handleFileListing)))
 		http.HandleFunc("/admin", iutil.Mw(handleAdmin))
@@ -176,6 +177,7 @@ func main() {
 		idata.Config.Public, _ = filepath.Abs(idata.Config.Public)
 		Log("Sharing public files from", idata.Config.Public)
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
+		idata.DataPaths["public"] = idata.Config.Public
 
 		http.HandleFunc("/public/", iutil.Mw(handleDirectoryListing(handlePublicListing)))
 	}
