@@ -12,7 +12,7 @@ import (
 
 	"github.com/aymerick/raymond"
 	etc "github.com/nektro/go.etc"
-	flag "github.com/spf13/pflag"
+	"github.com/spf13/pflag"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
@@ -28,14 +28,14 @@ func main() {
 	idata.Version = Version
 	Log("Initializing Andesite " + idata.Version + "...")
 
-	flagCV := flag.Int("version", idata.RequiredConfigVersion, "Config version to use.")
-	flagRoot := flag.String("root", "", "Path of root directory for files")
-	flagPort := flag.Int("port", 0, "Port to open server on")
-	flagBase := flag.String("base", "", "Http Origin Path")
-	flagPublic := flag.String("public", "", "Public root of files to serve")
-	flagSearch := flag.Bool("enable-search", false, "Set to true to enable search database")
-	flagDGS := flag.String("discord-guild-id", "", "")
-	flagDBT := flag.String("discord-bot-token", "", "")
+	flaEgCV := pflag.Int("version", idata.RequiredConfigVersion, "Config version to use.")
+	flagRoot := pflag.String("root", "", "Path of root directory for files")
+	flagPort := pflag.Int("port", 0, "Port to open server on")
+	flagBase := pflag.String("base", "", "Http Origin Path")
+	flagPublic := pflag.String("public", "", "Public root of files to serve")
+	flagSearch := pflag.Bool("enable-search", false, "Set to true to enable search database")
+	flagDGS := pflag.String("discord-guild-id", "", "")
+	flagDBT := pflag.String("discord-bot-token", "", "")
 	etc.PreInit("andesite")
 
 	//
