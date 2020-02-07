@@ -55,7 +55,7 @@
             <table class="ui sortable compact table">
                 <thead>
                     <th class="collapsing" data-sort-method="number"></th>
-                    <th class="collapsing" data-sort-method="none"></th>
+                    <th class="collapsing"></th>
                     <th class="collapsing">Name</th>
                     <th class="collapsing" data-sort-method="number">Last Modified</th>
                     <th class="collapsing" data-sort-method="filesize">Size</th>
@@ -64,7 +64,7 @@
                 <tbody>
                     <tr data-sort-method="none"><td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
                     {{#each files}}
-                    <tr><td>{{add_i @index 1}}</td><td><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td data-sort="{{mod_raw}}">{{mod}}</td><td>{{size}}</td><td></td></tr>
+                    <tr><td>{{add_i @index 1}}</td><td data-sort="{{is_file}}_{{name}}"><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td data-sort="{{mod_raw}}">{{mod}}</td><td>{{size}}</td><td></td></tr>
                     {{/each}}
                 </tbody>
             </table>
