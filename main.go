@@ -30,8 +30,8 @@ func main() {
 
 	pflag.IntVar(&idata.Config.Version, "version", idata.RequiredConfigVersion, "Config version to use.")
 	pflag.StringVar(&idata.Config.Root, "root", "", "Path of root directory for files")
-	pflag.IntVar(&idata.Config.Port, "port", 0, "Port to open server on")
-	pflag.StringVar(&idata.Config.HTTPBase, "base", "", "Http Origin Path")
+	pflag.IntVar(&idata.Config.Port, "port", 8000, "Port to open server on")
+	pflag.StringVar(&idata.Config.HTTPBase, "base", "/", "Http Origin Path")
 	pflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
 	pflag.BoolVar(&idata.Config.SearchOn, "enable-search", false, "Set to true to enable search database")
 	flagDGS := pflag.String("discord-guild-id", "", "")
