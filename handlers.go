@@ -390,6 +390,9 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fpath := r.PostForm.Get("path")
+	if !strings.HasSuffix(fpath, "/") {
+		fpath += "/"
+	}
 	//
 	etc.Database.QueryPrepared(true, "insert into shares values (?, ?, ?)", aid, ash, fpath)
 	iutil.WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ash, fpath))
