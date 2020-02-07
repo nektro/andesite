@@ -197,7 +197,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"version":   idata.Version,
 				"provider":  user.Provider,
 				"user":      user,
-				"path":      qpath,
+				"path":      r.URL.Path[len(idata.Config.HTTPBase)-1:],
 				"files":     data,
 				"admin":     user.Admin,
 				"base":      idata.Config.HTTPBase,

@@ -69,12 +69,10 @@
                 </tbody>
             </table>
         </div>
-        {{#if extras.user}}
         <div id="dlbox">
             {{#if user.PassKey}}<p>Download the contents of the entire folder using your passkey: <code>{{user.PassKey}}</code> (<a href="{{base}}regen_passkey">Regenerate Key</a>)</p>{{/if}}
-            <p><code>wget -m -np -c -R "index.html*"{{#if user.PassKey}} --user-agent "AndesiteUser/{{user.PassKey}}"{} "{{host}}/files{{path}}"</code></p>
-            <p><code>rclone copy --http-url="{{host}}/files{{path}}" :http: ./ -P{{#if user.PassKey}} --user-agent "AndesiteUser/{{user.PassKey}}"{{/if}}</code></p>
+            <p><code>wget -m -np -c -R "index.html*"{{#if user.PassKey}} --user-agent "AndesiteUser/{{user.PassKey}}"{{/if}} "{{host}}{{path}}"</code></p>
+            <p><code>rclone copy --http-url="{{host}}{{path}}" :http: ./ -P{{#if user.PassKey}} --user-agent "AndesiteUser/{{user.PassKey}}"{{/if}}</code></p>
         </div>
-        {{/if}}
     </body>
 </html>
