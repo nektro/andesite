@@ -267,9 +267,12 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		}
 	}
 	userAccess = iutil.FilterStr(userAccess, func(s string) bool {
-		return strings.HasPrefix(s, "/"+u[1]+"/")
+		return strings.HasPrefix(s, "/"+u[1]+"/") || s == "/"
 	})
 	userAccess = iutil.MapStr(userAccess, func(s string) string {
+		if s == "/" {
+			return s
+		}
 		return s[len(u[1])+1:]
 	})
 
