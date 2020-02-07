@@ -16,7 +16,6 @@ import (
 	"github.com/nektro/go-util/util"
 	discord "github.com/nektro/go.discord"
 	etc "github.com/nektro/go.etc"
-	oauth2 "github.com/nektro/go.oauth2"
 
 	. "github.com/nektro/go-util/alias"
 )
@@ -42,7 +41,7 @@ func WriteUserDenied(r *http.Request, w http.ResponseWriter, fileOrAdmin bool, s
 	if sessName != nil {
 		sessID := sess.Values["user"].(string)
 		provider := sess.Values["provider"].(string)
-		me += F(" %s%s (%s)", oauth2.ProviderIDMap[provider].NamePrefix, sessName.(string), sessID)
+		me += F(" %s@%s (%s)", sessName.(string), provider, sessID)
 	}
 
 	message := ""
