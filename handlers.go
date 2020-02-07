@@ -233,10 +233,11 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	if err != nil {
 		return "", "", nil, nil, nil, err
 	}
+	u := strings.Split(r.URL.Path, "/")
 
 	// get path
 	// remove /files
-	qpath := string(r.URL.Path[6:])
+	qpath := "/" + strings.Join(u[2:], "/")
 
 	userAccess := iutil.QueryAccess(user)
 	dc := idata.Config.GetDiscordClient()
@@ -265,6 +266,12 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 			}
 		}
 	}
+	userAccess = iutil.FilterStr(userAccess, func(s string) bool {
+		return strings.HasPrefix(s, "/"+u[1]+"/")
+	})
+	userAccess = iutil.MapStr(userAccess, func(s string) string {
+		return s[len(u[1])+1:]
+	})
 
 	return idata.Config.Root, qpath, userAccess, user, map[string]interface{}{
 		"user": user,
