@@ -6,13 +6,14 @@
 4. Configure a new site context for Andesite such as:
 ```caddy
 andesite.example.com {
-    proxy / http://localhost:8000/
-    transparent
+    proxy / http://localhost:8000/ {
+        transparent
+    }
 }
 ```
 
 ### Using HTTPS
-Modify your proxy setting to a block and add
+Add the following option to your ``proxy`` block:
 ```caddy
 header_upstream X-TLS-Enabled true
 ```
@@ -20,8 +21,9 @@ header_upstream X-TLS-Enabled true
 ### Serving from an HTTP base that is not `/`
 ```caddy
 example.com {
-    proxy /andesite http://localhost:8000/
-    transparent
+    proxy /andesite http://localhost:8000/ {
+        transparent
+    }
 }
 ```
 Notes:
