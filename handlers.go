@@ -189,6 +189,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 					"mod":     files[i].ModTime().UTC().String()[:19],
 					"ext":     ext[1:],
 					"mod_raw": strconv.FormatInt(files[i].ModTime().UTC().Unix(), 10),
+					"is_file": strconv.FormatBool(!files[i].IsDir()),
 				}
 				gi++
 			}
