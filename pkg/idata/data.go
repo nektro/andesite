@@ -13,7 +13,7 @@ const (
 
 var (
 	Version        = "vMASTER"
-	Config         *itypes.Config
+	Config         = new(itypes.Config)
 	HomedirPath, _ = homedir.Dir()
 	DataPaths      = map[string]string{}
 )
