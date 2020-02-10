@@ -141,20 +141,24 @@ func main() {
 		idata.DataPaths["files"] = idata.Config.Root
 
 		http.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing))
+		http.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
+		http.HandleFunc("/logout", handler.HandleLogout)
+		http.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing))
+
 		http.HandleFunc("/admin", handler.HandleAdmin)
+		http.HandleFunc("/admin/users", handler.HandleAdminUsers)
+
 		http.HandleFunc("/api/access/delete", handler.HandleAccessDelete)
 		http.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
 		http.HandleFunc("/api/access/create", handler.HandleAccessCreate)
-		http.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing))
+
 		http.HandleFunc("/api/share/create", handler.HandleShareCreate)
 		http.HandleFunc("/api/share/update", handler.HandleShareUpdate)
 		http.HandleFunc("/api/share/delete", handler.HandleShareDelete)
-		http.HandleFunc("/logout", handler.HandleLogout)
+
 		http.HandleFunc("/api/access_discord_role/create", handler.HandleDiscordRoleAccessCreate)
 		http.HandleFunc("/api/access_discord_role/update", handler.HandleDiscordRoleAccessUpdate)
 		http.HandleFunc("/api/access_discord_role/delete", handler.HandleDiscordRoleAccessDelete)
-		http.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
-		http.HandleFunc("/admin/users", handler.HandleAdminUsers)
 	}
 
 	if len(idata.Config.Public) > 0 {
