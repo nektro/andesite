@@ -165,10 +165,6 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	}
 	u := strings.Split(r.URL.Path, "/")
 
-	// get path
-	// remove /files
-	qpath := "/" + strings.Join(u[2:], "/")
-
 	userAccess := iutil.QueryAccess(user)
 	dc := idata.Config.GetDiscordClient()
 
@@ -206,17 +202,25 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		return s[len(u[1])+1:]
 	})
 
-	return idata.Config.Root, qpath, userAccess, user, map[string]interface{}{
+	dp, ok := idata.DataPathsPrv[u[1]]
+	if !ok {
+		http.NotFound(w, r)
+		return "", "", nil, nil, nil, errors.New("")
+	}
+	return dp + "/", "/" + strings.Join(u[2:], "/"), userAccess, user, map[string]interface{}{
 		"user": user,
 	}, nil
 }
 
 // handler for http://andesite/public/*
 func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
-	// remove /public
-	qpath := r.URL.Path[7:]
-
-	return idata.Config.Public, qpath, []string{"/"}, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
+	u := strings.Split(r.URL.Path, "/")
+	dp, ok := idata.DataPathsPub[u[1]]
+	if !ok {
+		http.NotFound(w, r)
+		return "", "", nil, nil, nil, errors.New("")
+	}
+	return dp + "/", "/" + strings.Join(u[2:], "/"), []string{"/"}, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/open/*
