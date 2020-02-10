@@ -140,8 +140,8 @@ func main() {
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 		idata.DataPaths["files"] = idata.Config.Root
 
-		http.HandleFunc("/admin", iutil.Mw(HandleAdmin))
 		http.HandleFunc("/files/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleFileListing)))
+		http.HandleFunc("/admin", iutil.Mw(handler.HandleAdmin))
 		http.HandleFunc("/api/access/delete", iutil.Mw(HandleAccessDelete))
 		http.HandleFunc("/api/access/update", iutil.Mw(HandleAccessUpdate))
 		http.HandleFunc("/api/access/create", iutil.Mw(HandleAccessCreate))
@@ -154,7 +154,7 @@ func main() {
 		http.HandleFunc("/api/access_discord_role/update", iutil.Mw(HandleDiscordRoleAccessUpdate))
 		http.HandleFunc("/api/access_discord_role/delete", iutil.Mw(HandleDiscordRoleAccessDelete))
 		http.HandleFunc("/regen_passkey", iutil.Mw(HandleRegenPasskey))
-		http.HandleFunc("/admin/users", iutil.Mw(HandleAdminUsers))
+		http.HandleFunc("/admin/users", iutil.Mw(handler.HandleAdminUsers))
 	}
 
 	if len(idata.Config.Public) > 0 {
