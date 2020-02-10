@@ -7,10 +7,9 @@ import (
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/iutil"
 
+	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
-
-	. "github.com/nektro/go-util/util"
 )
 
 func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
@@ -23,7 +22,7 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
 	sess.Save(r, w)
 	iutil.QueryAssertUserName(provider, id, name)
-	Log("[user-login]", provider, id, name)
+	util.Log("[user-login]", provider, id, name)
 }
 
 //
