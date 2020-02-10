@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/nektro/andesite/pkg/iutil"
+
 	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
 )
@@ -39,4 +40,14 @@ func HandleLogout(w http.ResponseWriter, r *http.Request) {
 	sess.Options.MaxAge = -1
 	sess.Save(r, w)
 	iutil.WriteLinkResponse(r, w, "Success", "Successfully logged out.", "Back Home", "./../")
+}
+
+func HandleRegenPasskey(w http.ResponseWriter, r *http.Request) {
+	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
+	if err != nil {
+		return
+	}
+	pk := iutil.GenerateNewUserPasskey(user.Snowflake)
+	etc.Database.Build().Up("users", "passkey", pk).Wh("snowflake", user.Snowflake).Exe()
+	iutil.WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+pk, "Return", "./files/")
 }

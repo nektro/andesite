@@ -1,26 +1,15 @@
 package main
 
 import (
-	"errors"
-	"fmt"
-	"io/ioutil"
-	"mime"
 	"net/http"
-	"os"
-	"path"
-	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
 
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
-	"github.com/valyala/fastjson"
 
-	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
 )
 
@@ -103,15 +92,4 @@ func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
 		"count":    len(a),
 		"results":  a,
 	})
-}
-
-//
-func HandleRegenPasskey(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
-	if err != nil {
-		return
-	}
-	pk := iutil.GenerateNewUserPasskey(user.Snowflake)
-	etc.Database.Build().Up("users", "passkey", pk).Wh("snowflake", user.Snowflake).Exe()
-	iutil.WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+pk, "Return", "./files/")
 }

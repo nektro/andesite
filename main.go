@@ -150,10 +150,10 @@ func main() {
 		http.HandleFunc("/api/share/update", iutil.Mw(handler.HandleShareUpdate))
 		http.HandleFunc("/api/share/delete", iutil.Mw(handler.HandleShareDelete))
 		http.HandleFunc("/logout", iutil.Mw(handler.HandleLogout))
-		http.HandleFunc("/regen_passkey", iutil.Mw(HandleRegenPasskey))
 		http.HandleFunc("/api/access_discord_role/create", iutil.Mw(handler.HandleDiscordRoleAccessCreate))
 		http.HandleFunc("/api/access_discord_role/update", iutil.Mw(handler.HandleDiscordRoleAccessUpdate))
 		http.HandleFunc("/api/access_discord_role/delete", iutil.Mw(handler.HandleDiscordRoleAccessDelete))
+		http.HandleFunc("/regen_passkey", iutil.Mw(handler.HandleRegenPasskey))
 		http.HandleFunc("/admin/users", iutil.Mw(handler.HandleAdminUsers))
 	}
 
