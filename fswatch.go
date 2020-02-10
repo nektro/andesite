@@ -11,8 +11,8 @@ import (
 	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/util"
+	dbstorage "github.com/nektro/go.dbstorage"
 	etc "github.com/nektro/go.etc"
 )
 
@@ -57,7 +57,7 @@ func initFsWatcher() {
 				r1 := strings.Replace(r0, string(filepath.Separator), "/", -1)
 				switch event.Op {
 				case fsnotify.Rename, fsnotify.Remove:
-					if sqlite.QueryHasRows(etc.Database.QueryPrepared(false, "select * from files where path = ?", r1)) {
+					if dbstorage.QueryHasRows(etc.Database.QueryPrepared(false, "select * from files where path = ?", r1)) {
 						etc.Database.QueryPrepared(true, "delete from files where path = ?", r1)
 					} else {
 						r2 := r1 + "/"
@@ -97,7 +97,7 @@ func wWatchDir(path string, fi os.FileInfo, err error) error {
 
 func wAddFile(path string, name string) {
 	pth := strings.Replace(path, string(filepath.Separator), "/", -1)
-	if sqlite.QueryHasRows(etc.Database.QueryPrepared(false, "select * from files where path = ?", pth)) {
+	if dbstorage.QueryHasRows(etc.Database.QueryPrepared(false, "select * from files where path = ?", pth)) {
 		return
 	}
 	id := etc.Database.QueryNextID("files")
