@@ -13,11 +13,11 @@ import (
 	"github.com/nektro/andesite/pkg/search"
 
 	"github.com/aymerick/raymond"
+	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
 	"github.com/spf13/pflag"
 
 	. "github.com/nektro/go-util/alias"
-	. "github.com/nektro/go-util/util"
 
 	_ "github.com/nektro/andesite/statik"
 )
@@ -28,7 +28,7 @@ var (
 
 func main() {
 	idata.Version = Version
-	Log("Initializing Andesite " + idata.Version + "...")
+	util.Log("Initializing Andesite " + idata.Version + "...")
 
 	pflag.IntVar(&idata.Config.Version, "version", idata.RequiredConfigVersion, "Config version to use.")
 	pflag.StringVar(&idata.Config.Root, "root", "", "Path of root directory for files")
@@ -61,7 +61,7 @@ func main() {
 		idata.Config.Version = 1
 	}
 	if idata.Config.Version != idata.RequiredConfigVersion {
-		DieOnError(
+		util.DieOnError(
 			E(F("Current idata.Config.json version '%d' does not match required version '%d'.", idata.Config.Version, idata.RequiredConfigVersion)),
 			F("Visit https://github.com/nektro/andesite/blob/master/docs/config/v%d.md for more info.", idata.RequiredConfigVersion),
 		)
@@ -89,7 +89,7 @@ func main() {
 		for k, v := range prefixes {
 			if strings.HasPrefix(item.Snowflake, v) {
 				sn := item.Snowflake[len(v):]
-				Log("[db-upgrade]", item.Snowflake, "is now", sn, "as", k)
+				util.Log("[db-upgrade]", item.Snowflake, "is now", sn, "as", k)
 				etc.Database.Build().Up("users", "snowflake", sn).Wh("id", item.IDS).Exe()
 				etc.Database.Build().Up("users", "provider", k).Wh("id", item.IDS).Exe()
 			}
@@ -99,17 +99,17 @@ func main() {
 	//
 	// graceful stop
 
-	RunOnClose(func() {
-		Log("Gracefully shutting down...")
+	util.RunOnClose(func() {
+		util.Log("Gracefully shutting down...")
 
-		Log("Saving database to disk")
+		util.Log("Saving database to disk")
 		etc.Database.Close()
 
 		if idata.Config.SearchOn {
 			search.Close()
 		}
 
-		Log("Done!")
+		util.Log("Done!")
 	})
 
 	//
@@ -136,8 +136,8 @@ func main() {
 
 	if len(idata.Config.Root) > 0 {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
-		Log("Sharing private files from " + idata.Config.Root)
-		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
+		util.Log("Sharing private files from " + idata.Config.Root)
+		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 		idata.DataPathsPrv["files"] = idata.Config.Root
 
 		http.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing))
@@ -163,8 +163,8 @@ func main() {
 
 	if len(idata.Config.Public) > 0 {
 		idata.Config.Public, _ = filepath.Abs(idata.Config.Public)
-		Log("Sharing public files from", idata.Config.Public)
-		DieOnError(Assert(DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
+		util.Log("Sharing public files from", idata.Config.Public)
+		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
 		idata.DataPathsPub["public"] = idata.Config.Public
 
 		http.HandleFunc("/public/", handler.HandleDirectoryListing(handler.HandlePublicListing))
@@ -183,5 +183,5 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
 	sess.Save(r, w)
 	iutil.QueryAssertUserName(provider, id, name)
-	Log("[user-login]", provider, id, name)
+	util.Log("[user-login]", provider, id, name)
 }

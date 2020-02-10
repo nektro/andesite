@@ -6,10 +6,10 @@ import (
 
 	"github.com/nektro/andesite/pkg/itypes"
 
+	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
 
 	. "github.com/nektro/go-util/alias"
-	. "github.com/nektro/go-util/util"
 )
 
 //
@@ -106,7 +106,7 @@ func QueryAssertUserName(provider, snowflake string, name string) {
 			etc.Database.Build().Up("users", "admin", "1").Wh("id", "1").Exe()
 			aid := etc.Database.QueryNextID("access")
 			etc.Database.QueryPrepared(true, F("insert into access values ('%d', '%d', '/')", aid, uid))
-			Log(F("Set user '%s's status to admin", snowflake))
+			util.Log(F("Set user '%s's status to admin", snowflake))
 		}
 	}
 }
