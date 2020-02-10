@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/nektro/andesite/pkg/handler"
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
@@ -139,12 +140,12 @@ func main() {
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 		idata.DataPaths["files"] = idata.Config.Root
 
-		http.HandleFunc("/files/", iutil.Mw(HandleDirectoryListing(HandleFileListing)))
 		http.HandleFunc("/admin", iutil.Mw(HandleAdmin))
+		http.HandleFunc("/files/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleFileListing)))
 		http.HandleFunc("/api/access/delete", iutil.Mw(HandleAccessDelete))
 		http.HandleFunc("/api/access/update", iutil.Mw(HandleAccessUpdate))
 		http.HandleFunc("/api/access/create", iutil.Mw(HandleAccessCreate))
-		http.HandleFunc("/open/", iutil.Mw(HandleDirectoryListing(HandleShareListing)))
+		http.HandleFunc("/open/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleShareListing)))
 		http.HandleFunc("/api/share/create", iutil.Mw(HandleShareCreate))
 		http.HandleFunc("/api/share/update", iutil.Mw(HandleShareUpdate))
 		http.HandleFunc("/api/share/delete", iutil.Mw(HandleShareDelete))
@@ -162,7 +163,7 @@ func main() {
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
 		idata.DataPaths["public"] = idata.Config.Public
 
-		http.HandleFunc("/public/", iutil.Mw(HandleDirectoryListing(HandlePublicListing)))
+		http.HandleFunc("/public/", iutil.Mw(handler.HandleDirectoryListing(handler.HandlePublicListing)))
 	}
 
 	etc.StartServer(idata.Config.Port)
