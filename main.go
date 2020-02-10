@@ -9,6 +9,7 @@ import (
 
 	"github.com/nektro/andesite/config"
 	"github.com/nektro/andesite/db"
+	"github.com/nektro/andesite/fs"
 	"github.com/nektro/andesite/handler"
 	"github.com/nektro/andesite/search"
 
@@ -22,12 +23,7 @@ import (
 	_ "github.com/nektro/andesite/statik"
 )
 
-var (
-	Version = "vMASTER"
-)
-
 func main() {
-	config.Version = Version
 	Log("Initializing Andesite " + config.Version + "...")
 
 	pflag.IntVar(&config.Config.Version, "version", config.RequiredConfigVersion, "Config version to use.")
@@ -159,8 +155,8 @@ func main() {
 		http.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
 		http.HandleFunc("/logout", handler.HandleLogout)
 
-		http.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing))
-		http.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing))
+		http.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing, fs.LocalStorage))
+		http.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing, fs.LocalStorage))
 	}
 
 	if len(config.Config.Public) > 0 {
@@ -169,7 +165,7 @@ func main() {
 		DieOnError(Assert(DoesDirectoryExist(config.Config.Public), "Public root directory does not exist. Aborting!"))
 		config.DataPaths["public"] = config.Config.Public
 
-		http.HandleFunc("/public/", handler.HandleDirectoryListing(handler.HandlePublicListing))
+		http.HandleFunc("/public/", handler.HandleDirectoryListing(handler.HandlePublicListing, fs.LocalStorage))
 	}
 
 	handlerWrapper := func(h http.Handler) http.Handler {

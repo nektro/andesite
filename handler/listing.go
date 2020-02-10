@@ -20,10 +20,13 @@ import (
 
 	"github.com/nektro/andesite/config"
 	"github.com/nektro/andesite/db"
+	"github.com/nektro/andesite/fs"
 	"github.com/nektro/andesite/util"
 )
 
-func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *db.UserRow, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
+type AccessHandler func(http.ResponseWriter, *http.Request) (fileRoot string, qpath string, uAccess []string, user *db.UserRow, extras map[string]interface{}, err error)
+
+func HandleDirectoryListing(getAccess AccessHandler, fs fs.Fs) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
 
@@ -35,7 +38,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 		}
 
 		// disallow path tricks
-		if strings.Contains(string(r.URL.Path), "..") {
+		if strings.Contains(r.URL.Path, "..") {
 			return
 		}
 
@@ -46,7 +49,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 		}
 
 		// valid path check
-		stat, err := os.Stat(fileRoot + qpath)
+		stat, err := fs.Stat(fileRoot + qpath)
 		if os.IsNotExist(err) {
 			// 404
 			util.WriteUserDenied(r, w, true, false)
@@ -149,9 +152,10 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			}
 
 			w.Header().Add("Content-Type", mime.TypeByExtension(path.Ext(qpath)))
-			file, _ := os.Open(fileRoot + qpath)
-			info, _ := os.Stat(fileRoot + qpath)
+			file, _ := fs.Open(fileRoot + qpath)
+			info, _ := fs.Stat(fileRoot + qpath)
 			http.ServeContent(w, r, info.Name(), info.ModTime(), file)
+			file.Close()
 		}
 	}
 }

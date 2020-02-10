@@ -12,7 +12,7 @@ const (
 
 var (
 	Version        = "vMASTER"
-	Config         = config{}
+	Config         = new(config)
 	HomedirPath, _ = homedir.Dir()
 	DataPaths      = map[string]string{}
 )

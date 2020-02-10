@@ -14,7 +14,7 @@ build_template() {
     version=${CIRCLE_BUILD_NUM-$date}
     tag=v$version-$(git log --format=%h -1)
     echo $tag-$GOOS-$GOARCH
-    go build -ldflags="-s -w -X main.Version=$tag" -o ./bin/andesite-$tag-$GOOS-$GOARCH$ext
+    go build -ldflags="-s -w -X config.Version=$tag" -o ./bin/andesite-$tag-$GOOS-$GOARCH$ext
 }
 
 init
