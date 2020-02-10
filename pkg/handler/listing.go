@@ -237,7 +237,7 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		return "", "", nil, nil, nil, errors.New("")
 	}
 	sp := strings.Split(s, "/")
-	dp, ok := idata.DataPaths[sp[1]]
+	dp, ok := idata.DataPathsPrv[sp[1]]
 	if !ok {
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")

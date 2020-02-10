@@ -15,5 +15,6 @@ var (
 	Version        = "vMASTER"
 	Config         = new(itypes.Config)
 	HomedirPath, _ = homedir.Dir()
-	DataPaths      = map[string]string{}
+	DataPathsPub   = map[string]string{}
+	DataPathsPrv   = map[string]string{}
 )
