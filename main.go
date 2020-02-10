@@ -3,19 +3,17 @@ package main
 import (
 	"net/http"
 	"net/url"
-	"path/filepath"
 	"strconv"
 	"strings"
-
-	"github.com/nektro/andesite/config"
-	"github.com/nektro/andesite/db"
-	"github.com/nektro/andesite/fs"
-	"github.com/nektro/andesite/handler"
-	"github.com/nektro/andesite/search"
 
 	"github.com/aymerick/raymond"
 	etc "github.com/nektro/go.etc"
 	"github.com/spf13/pflag"
+
+	"github.com/nektro/andesite/config"
+	"github.com/nektro/andesite/db"
+	"github.com/nektro/andesite/search"
+	"github.com/nektro/andesite/web"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
@@ -23,15 +21,17 @@ import (
 	_ "github.com/nektro/andesite/statik"
 )
 
-func main() {
-	Log("Initializing Andesite " + config.Version + "...")
-
+func init() {
 	pflag.IntVar(&config.Config.Version, "version", config.RequiredConfigVersion, "Config version to use.")
 	pflag.StringVar(&config.Config.Root, "root", "", "Path of root directory for files")
 	pflag.IntVar(&config.Config.Port, "port", 8000, "Port to open server on")
 	pflag.StringVar(&config.Config.HTTPBase, "base", "/", "Http Origin Path")
 	pflag.StringVar(&config.Config.Public, "public", "", "Public root of files to serve")
 	pflag.BoolVar(&config.Config.SearchOn, "enable-search", false, "Set to true to enable search database")
+}
+
+func main() {
+	Log("Initializing Andesite " + config.Version + "...")
 	flagDGS := pflag.String("discord-guild-id", "", "")
 	flagDBT := pflag.String("discord-bot-token", "", "")
 	etc.PreInit("andesite")
@@ -39,7 +39,6 @@ func main() {
 	etc.Init("andesite", &config.Config, "./files/", helperOA2SaveInfo)
 
 	//
-
 	for i, item := range config.Config.Clients {
 		if item.For == "discord" {
 			if len(*flagDGS) > 0 {
@@ -52,7 +51,6 @@ func main() {
 	}
 
 	//
-
 	if config.Config.Version == 0 {
 		config.Config.Version = 1
 	}
@@ -63,62 +61,21 @@ func main() {
 		)
 	}
 
-	//
 	// database initialization
+	db.Init()
 
-	etc.Database.CreateTableStruct("users", db.UserRow{})
-	etc.Database.CreateTableStruct("access", db.UserAccessRow{})
-	etc.Database.CreateTableStruct("shares", db.ShareRow{})
-	etc.Database.CreateTableStruct("shares_discord_role", db.DiscordRoleAccessRow{})
-
-	//
 	// database upgrade (removing db prefixes in favor of provider column)
+	db.Upgrade()
 
-	prefixes := map[string]string{
-		"reddit":    "1:",
-		"github":    "2:",
-		"google":    "3:",
-		"facebook":  "4:",
-		"microsoft": "5:",
-	}
-	for _, item := range db.QueryAllUsers() {
-		for k, v := range prefixes {
-			if strings.HasPrefix(item.Snowflake, v) {
-				sn := item.Snowflake[len(v):]
-				Log("[db-upgrade]", item.Snowflake, "is now", sn, "as", k)
-				etc.Database.Build().Up("users", "snowflake", sn).Wh("id", item.IDS).Exe()
-				etc.Database.Build().Up("users", "provider", k).Wh("id", item.IDS).Exe()
-			}
-		}
-	}
-
-	//
 	// graceful stop
+	RunOnClose(Shutdown)
 
-	RunOnClose(func() {
-		Log("Gracefully shutting down...")
-
-		Log("Saving database to disk")
-		etc.Database.Close()
-
-		if config.Config.SearchOn {
-			Log("Closing filesystem watcher")
-			search.Close()
-		}
-
-		Log("Done!")
-	})
-
-	//
 	// initialize filesystem watching
-
 	if config.Config.SearchOn {
 		go search.InitFsWatcher()
 	}
 
-	//
 	// handlebars helpers
-
 	raymond.RegisterHelper("url_name", func(x string) string {
 		return strings.Replace(url.PathEscape(x), "%2F", "/", -1)
 	})
@@ -126,46 +83,15 @@ func main() {
 		return a + b
 	})
 
-	//
 	// http server setup and launch
-
-	http.HandleFunc("/test", handler.HandleTest)
+	muxer := web.NewMuxer()
 
 	if len(config.Config.Root) > 0 {
-		config.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(config.Config.Root, "~", config.HomedirPath, -1)))
-		Log("Sharing private files from " + config.Config.Root)
-		DieOnError(Assert(DoesDirectoryExist(config.Config.Root), "Please pass a valid directory as a root parameter!"))
-		config.DataPaths["files"] = config.Config.Root
-
-		http.HandleFunc("/admin", handler.HandleAdmin)
-		http.HandleFunc("/admin/users", handler.HandleAdminUsers)
-
-		http.HandleFunc("/api/access/delete", handler.HandleAccessDelete)
-		http.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
-		http.HandleFunc("/api/access/create", handler.HandleAccessCreate)
-
-		http.HandleFunc("/api/share/create", handler.HandleShareCreate)
-		http.HandleFunc("/api/share/update", handler.HandleShareUpdate)
-		http.HandleFunc("/api/share/delete", handler.HandleShareDelete)
-
-		http.HandleFunc("/api/access_discord_role/create", handler.HandleDiscordRoleAccessCreate)
-		http.HandleFunc("/api/access_discord_role/update", handler.HandleDiscordRoleAccessUpdate)
-		http.HandleFunc("/api/access_discord_role/delete", handler.HandleDiscordRoleAccessDelete)
-
-		http.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
-		http.HandleFunc("/logout", handler.HandleLogout)
-
-		http.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing, fs.LocalStorage))
-		http.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing, fs.LocalStorage))
+		web.RegisterPrivate(muxer)
 	}
 
 	if len(config.Config.Public) > 0 {
-		config.Config.Public, _ = filepath.Abs(config.Config.Public)
-		Log("Sharing public files from", config.Config.Public)
-		DieOnError(Assert(DoesDirectoryExist(config.Config.Public), "Public root directory does not exist. Aborting!"))
-		config.DataPaths["public"] = config.Config.Public
-
-		http.HandleFunc("/public/", handler.HandleDirectoryListing(handler.HandlePublicListing, fs.LocalStorage))
+		web.RegisterPublic(muxer)
 	}
 
 	handlerWrapper := func(h http.Handler) http.Handler {
@@ -178,7 +104,7 @@ func main() {
 	p := strconv.Itoa(config.Config.Port)
 	Log("Initialization complete. Starting server on port " + p)
 
-	http.ListenAndServe(":"+p, handlerWrapper(http.DefaultServeMux))
+	http.ListenAndServe(":"+p, handlerWrapper(muxer))
 }
 
 func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
@@ -192,4 +118,18 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 	sess.Save(r, w)
 	db.QueryAssertUserName(provider, id, name)
 	Log("[user-login]", provider, id, name)
+}
+
+func Shutdown() {
+	Log("Gracefully shutting down...")
+
+	Log("Saving database to disk")
+	etc.Database.Close()
+
+	if config.Config.SearchOn {
+		Log("Closing filesystem watcher")
+		search.Close()
+	}
+
+	Log("Done!")
 }
