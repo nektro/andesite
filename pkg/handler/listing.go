@@ -214,7 +214,7 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 // handler for http://andesite/public/*
 func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
 	// remove /public
-	qpath := string(r.URL.Path[7:])
+	qpath := r.URL.Path[7:]
 	qaccess := []string{}
 
 	if len(idata.Config.Public) > 0 {
