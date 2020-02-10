@@ -77,7 +77,7 @@ func hGrabUser(r *http.Request, w http.ResponseWriter) (string, *itypes.UserRow,
 //
 
 // handler for http://andesite/test
-func handleTest(w http.ResponseWriter, r *http.Request) {
+func HandleTest(w http.ResponseWriter, r *http.Request) {
 	// sessions test and debug info
 	// increment number every refresh
 	sess := etc.GetSession(r)
@@ -95,7 +95,7 @@ func handleTest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, FullHost(r))
 }
 
-func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
+func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
 
@@ -229,7 +229,7 @@ func handleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 }
 
 // handler for http://andesite/files/*
-func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
+func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
 	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet, http.MethodHead}, false)
 	if err != nil {
 		return "", "", nil, nil, nil, err
@@ -283,7 +283,7 @@ func handleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 }
 
 // handler for http://andesite/public/*
-func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
+func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
 	// remove /public
 	qpath := string(r.URL.Path[7:])
 	qaccess := []string{}
@@ -295,7 +295,7 @@ func handlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 }
 
 // handler for http://andesite/admin
-func handleAdmin(w http.ResponseWriter, r *http.Request) {
+func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, true)
 	if err != nil {
 		return
@@ -316,7 +316,7 @@ func handleAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 // handler for http://andesite/api/access/delete
-func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
+func HandleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
@@ -332,7 +332,7 @@ func handleAccessDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 // handler for http://andesite/api/access/update
-func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
+func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
@@ -357,7 +357,7 @@ func handleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 // handler for http://andesite/api/access/create
-func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
+func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
@@ -378,7 +378,7 @@ func handleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	iutil.WriteAPIResponse(r, w, true, F("Created access for %s.", u.Name+"@"+u.Provider))
 }
 
-func handleShareCreate(w http.ResponseWriter, r *http.Request) {
+func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
 	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
@@ -398,7 +398,7 @@ func handleShareCreate(w http.ResponseWriter, r *http.Request) {
 	iutil.WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ash, fpath))
 }
 
-func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
+func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
 	u := strings.Split(r.URL.Path, "/")
 	if len(u) <= 3 {
 		w.Header().Add("Location", "../")
@@ -419,7 +419,7 @@ func handleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 	return dp + "/" + strings.Join(sp[2:], "/"), "/" + strings.Join(u[3:], "/"), []string{"/"}, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
 }
 
-func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
+func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
@@ -438,7 +438,7 @@ func handleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	iutil.WriteAPIResponse(r, w, true, "Successfully updated share path.")
 }
 
-func handleShareDelete(w http.ResponseWriter, r *http.Request) {
+func HandleShareDelete(w http.ResponseWriter, r *http.Request) {
 	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
@@ -457,7 +457,7 @@ func handleShareDelete(w http.ResponseWriter, r *http.Request) {
 	iutil.WriteAPIResponse(r, w, true, "Successfully deleted share link.")
 }
 
-func handleLogout(w http.ResponseWriter, r *http.Request) {
+func HandleLogout(w http.ResponseWriter, r *http.Request) {
 	sess, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
 	if err != nil {
 		return
@@ -468,7 +468,7 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	iutil.WriteLinkResponse(r, w, "Success", "Successfully logged out.", "Back Home", "./../")
 }
 
-func handleSearch(w http.ResponseWriter, r *http.Request) {
+func HandleSearch(w http.ResponseWriter, r *http.Request) {
 	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
 	if err != nil {
 		return
@@ -482,7 +482,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
+func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
 	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
 	if err != nil {
 		iutil.WriteJSON(w, map[string]interface{}{
@@ -533,7 +533,7 @@ func handleSearchAPI(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
+func HandleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
@@ -561,7 +561,7 @@ func handleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	iutil.WriteAPIResponse(r, w, true, F("Created access for %s / %s to %s.", gn, rn, apt))
 }
 
-func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
+func HandleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
@@ -593,7 +593,7 @@ func handleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	iutil.WriteAPIResponse(r, w, true, F("Successfully updated share path for %s / %s to %s.", gn, rn, qpt))
 }
 
-func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
+func HandleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
 	if err != nil {
 		return
@@ -615,7 +615,7 @@ func handleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 //
-func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
+func HandleRegenPasskey(w http.ResponseWriter, r *http.Request) {
 	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
 	if err != nil {
 		return
@@ -626,7 +626,7 @@ func handleRegenPasskey(w http.ResponseWriter, r *http.Request) {
 }
 
 //
-func handleAdminUsers(w http.ResponseWriter, r *http.Request) {
+func HandleAdminUsers(w http.ResponseWriter, r *http.Request) {
 	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, true)
 	if err != nil {
 		return

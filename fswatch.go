@@ -83,8 +83,8 @@ func initFsWatcher() {
 		}
 	}()
 
-	http.HandleFunc("/search", iutil.Mw(handleSearch))
-	http.HandleFunc("/api/search", iutil.Mw(handleSearchAPI))
+	http.HandleFunc("/search", iutil.Mw(HandleSearch))
+	http.HandleFunc("/api/search", iutil.Mw(HandleSearchAPI))
 }
 
 func wWatchDir(path string, fi os.FileInfo, err error) error {
