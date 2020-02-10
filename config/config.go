@@ -1,10 +1,23 @@
-package itypes
+package config
 
 import (
+	"github.com/mitchellh/go-homedir"
 	oauth2 "github.com/nektro/go.oauth2"
 )
 
-type Config struct {
+const (
+	RequiredConfigVersion = 2
+	DiscordAPI            = "https://discordapp.com/api/v6"
+)
+
+var (
+	Version        = "vMASTER"
+	Config         = config{}
+	HomedirPath, _ = homedir.Dir()
+	DataPaths      = map[string]string{}
+)
+
+type config struct {
 	Version   int               `json:"version"`
 	Root      string            `json:"root"`
 	Public    string            `json:"public"`
@@ -16,7 +29,7 @@ type Config struct {
 	Providers []oauth2.Provider `json:"providers"`
 }
 
-func (c *Config) GetDiscordClient() *oauth2.AppConf {
+func (c *config) GetDiscordClient() *oauth2.AppConf {
 	for _, item := range c.Clients {
 		if item.For == "discord" {
 			return &item

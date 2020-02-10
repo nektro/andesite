@@ -18,12 +18,12 @@ import (
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
 
-	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/itypes"
-	"github.com/nektro/andesite/pkg/iutil"
+	"github.com/nektro/andesite/config"
+	"github.com/nektro/andesite/db"
+	"github.com/nektro/andesite/util"
 )
 
-func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
+func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *db.UserRow, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
 
@@ -41,7 +41,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 		// disallow exploring dotfile folders
 		if strings.Contains(qpath, "/.") {
-			iutil.WriteUserDenied(r, w, true, false)
+			util.WriteUserDenied(r, w, true, false)
 			return
 		}
 
@@ -49,7 +49,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 		stat, err := os.Stat(fileRoot + qpath)
 		if os.IsNotExist(err) {
 			// 404
-			iutil.WriteUserDenied(r, w, true, false)
+			util.WriteUserDenied(r, w, true, false)
 			return
 		}
 
@@ -67,7 +67,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			files, _ := ioutil.ReadDir(fileRoot + qpath)
 
 			// hide dot files
-			files = iutil.Filter(files, func(x os.FileInfo) bool {
+			files = util.Filter(files, func(x os.FileInfo) bool {
 				return !strings.HasPrefix(x.Name(), ".")
 			})
 
@@ -75,7 +75,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			l1 := len(files)
 
 			// access check
-			files = iutil.Filter(files, func(x os.FileInfo) bool {
+			files = util.Filter(files, func(x os.FileInfo) bool {
 				ok := false
 				fpath := qpath + x.Name()
 				for _, item := range uAccess {
@@ -90,7 +90,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			l2 := len(files)
 
 			if l1 > 0 && l2 == 0 {
-				iutil.WriteUserDenied(r, w, true, false)
+				util.WriteUserDenied(r, w, true, false)
 				return
 			}
 
@@ -123,15 +123,15 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			}
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
-				"version":   idata.Version,
+				"version":   config.Version,
 				"provider":  user.Provider,
 				"user":      user,
-				"path":      r.URL.Path[len(idata.Config.HTTPBase)-1:],
+				"path":      r.URL.Path[len(config.Config.HTTPBase)-1:],
 				"files":     data,
 				"admin":     user.Admin,
-				"base":      idata.Config.HTTPBase,
+				"base":      config.Config.HTTPBase,
 				"name":      oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
-				"search_on": idata.Config.SearchOn,
+				"search_on": config.Config.SearchOn,
 				"host":      FullHost(r),
 				"extras":    extras,
 			})
@@ -144,7 +144,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				}
 			}
 			if can == false {
-				iutil.WriteUserDenied(r, w, true, false)
+				util.WriteUserDenied(r, w, true, false)
 				return
 			}
 
@@ -157,8 +157,8 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 }
 
 // handler for http://andesite/files/*
-func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet, http.MethodHead}, false)
+func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *db.UserRow, map[string]interface{}, error) {
+	_, user, err := db.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet, http.MethodHead}, false)
 	if err != nil {
 		return "", "", nil, nil, nil, err
 	}
@@ -168,14 +168,14 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	// remove /files
 	qpath := "/" + strings.Join(u[2:], "/")
 
-	userAccess := iutil.QueryAccess(user)
-	dc := idata.Config.GetDiscordClient()
+	userAccess := db.QueryAccess(user)
+	dc := config.Config.GetDiscordClient()
 
 	if user.Provider == "discord" && dc.Extra1 != "" && dc.Extra2 != "" {
-		dra := iutil.QueryAllDiscordRoleAccess()
+		dra := db.QueryAllDiscordRoleAccess()
 		var p fastjson.Parser
 
-		rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, dc.Extra1, user.Snowflake)
+		rurl := F("%s/guilds/%s/members/%s", config.DiscordAPI, dc.Extra1, user.Snowflake)
 		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
 		req.Header.Set("User-Agent", "nektro/andesite")
 		req.Header.Set("Authorization", "Bot "+dc.Extra2)
@@ -195,29 +195,29 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 			}
 		}
 	}
-	userAccess = iutil.FilterStr(userAccess, func(s string) bool {
+	userAccess = util.FilterStr(userAccess, func(s string) bool {
 		return strings.HasPrefix(s, "/"+u[1]+"/") || s == "/"
 	})
-	userAccess = iutil.MapStr(userAccess, func(s string) string {
+	userAccess = util.MapStr(userAccess, func(s string) string {
 		if s == "/" {
 			return s
 		}
 		return s[len(u[1])+1:]
 	})
 
-	return idata.Config.Root, qpath, userAccess, user, map[string]interface{}{
+	return config.Config.Root, qpath, userAccess, user, map[string]interface{}{
 		"user": user,
 	}, nil
 }
 
 // handler for http://andesite/public/*
-func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
+func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *db.UserRow, map[string]interface{}, error) {
 	// remove /public
 	qpath := string(r.URL.Path[7:])
 	qaccess := []string{}
 
-	if len(idata.Config.Public) > 0 {
+	if len(config.Config.Public) > 0 {
 		qaccess = append(qaccess, "/")
 	}
-	return idata.Config.Public, qpath, qaccess, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
+	return config.Config.Public, qpath, qaccess, &db.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
 }

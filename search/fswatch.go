@@ -7,13 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/iutil"
-
 	"github.com/fsnotify/fsnotify"
 	"github.com/nektro/go-util/sqlite"
 	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
+
+	"github.com/nektro/andesite/config"
 )
 
 //
@@ -48,7 +47,7 @@ func InitFsWatcher() {
 	watcher, _ = fsnotify.NewWatcher()
 	etc.Database.CreateTableStruct("files", WatchedFile{})
 
-	if err := filepath.Walk(idata.Config.Root, wWatchDir); err != nil {
+	if err := filepath.Walk(config.Config.Root, wWatchDir); err != nil {
 		util.LogError(err)
 	}
 
@@ -57,7 +56,7 @@ func InitFsWatcher() {
 			select {
 			case event := <-watcher.Events:
 				// util.Log("fsnotify", "event", event.Name, event.Op.String())
-				r0 := strings.TrimPrefix(event.Name, idata.Config.Root)
+				r0 := strings.TrimPrefix(event.Name, config.Config.Root)
 				r1 := strings.Replace(r0, string(filepath.Separator), "/", -1)
 				switch event.Op {
 				case fsnotify.Rename, fsnotify.Remove:
@@ -87,15 +86,15 @@ func InitFsWatcher() {
 		}
 	}()
 
-	http.HandleFunc("/search", iutil.Mw(handleSearch))
-	http.HandleFunc("/api/search", iutil.Mw(handleSearchAPI))
+	http.HandleFunc("/search", handleSearch)
+	http.HandleFunc("/api/search", handleSearchAPI)
 }
 
 func wWatchDir(path string, fi os.FileInfo, err error) error {
 	if fi.IsDir() {
 		return watcher.Add(path)
 	}
-	wAddFile(strings.TrimPrefix(path, idata.Config.Root), fi.Name())
+	wAddFile(strings.TrimPrefix(path, config.Config.Root), fi.Name())
 	return nil
 }
 

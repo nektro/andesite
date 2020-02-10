@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"strconv"
 	"strings"
 
+	"github.com/nektro/andesite/config"
+	"github.com/nektro/andesite/db"
 	"github.com/nektro/andesite/handler"
-	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/itypes"
-	"github.com/nektro/andesite/pkg/iutil"
 	"github.com/nektro/andesite/search"
 
 	"github.com/aymerick/raymond"
@@ -27,53 +27,53 @@ var (
 )
 
 func main() {
-	idata.Version = Version
-	Log("Initializing Andesite " + idata.Version + "...")
+	config.Version = Version
+	Log("Initializing Andesite " + config.Version + "...")
 
-	pflag.IntVar(&idata.Config.Version, "version", idata.RequiredConfigVersion, "Config version to use.")
-	pflag.StringVar(&idata.Config.Root, "root", "", "Path of root directory for files")
-	pflag.IntVar(&idata.Config.Port, "port", 8000, "Port to open server on")
-	pflag.StringVar(&idata.Config.HTTPBase, "base", "/", "Http Origin Path")
-	pflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
-	pflag.BoolVar(&idata.Config.SearchOn, "enable-search", false, "Set to true to enable search database")
+	pflag.IntVar(&config.Config.Version, "version", config.RequiredConfigVersion, "Config version to use.")
+	pflag.StringVar(&config.Config.Root, "root", "", "Path of root directory for files")
+	pflag.IntVar(&config.Config.Port, "port", 8000, "Port to open server on")
+	pflag.StringVar(&config.Config.HTTPBase, "base", "/", "Http Origin Path")
+	pflag.StringVar(&config.Config.Public, "public", "", "Public root of files to serve")
+	pflag.BoolVar(&config.Config.SearchOn, "enable-search", false, "Set to true to enable search database")
 	flagDGS := pflag.String("discord-guild-id", "", "")
 	flagDBT := pflag.String("discord-bot-token", "", "")
 	etc.PreInit("andesite")
 
-	etc.Init("andesite", &idata.Config, "./files/", helperOA2SaveInfo)
+	etc.Init("andesite", &config.Config, "./files/", helperOA2SaveInfo)
 
 	//
 
-	for i, item := range idata.Config.Clients {
+	for i, item := range config.Config.Clients {
 		if item.For == "discord" {
 			if len(*flagDGS) > 0 {
-				idata.Config.Clients[i].Extra1 = *flagDGS
+				config.Config.Clients[i].Extra1 = *flagDGS
 			}
 			if len(*flagDBT) > 0 {
-				idata.Config.Clients[i].Extra2 = *flagDBT
+				config.Config.Clients[i].Extra2 = *flagDBT
 			}
 		}
 	}
 
 	//
 
-	if idata.Config.Version == 0 {
-		idata.Config.Version = 1
+	if config.Config.Version == 0 {
+		config.Config.Version = 1
 	}
-	if idata.Config.Version != idata.RequiredConfigVersion {
+	if config.Config.Version != config.RequiredConfigVersion {
 		DieOnError(
-			E(F("Current idata.Config.json version '%d' does not match required version '%d'.", idata.Config.Version, idata.RequiredConfigVersion)),
-			F("Visit https://github.com/nektro/andesite/blob/master/docs/config/v%d.md for more info.", idata.RequiredConfigVersion),
+			E(F("Current config.Config.json version '%d' does not match required version '%d'.", config.Config.Version, config.RequiredConfigVersion)),
+			F("Visit https://github.com/nektro/andesite/blob/master/docs/config/v%d.md for more info.", config.RequiredConfigVersion),
 		)
 	}
 
 	//
 	// database initialization
 
-	etc.Database.CreateTableStruct("users", itypes.UserRow{})
-	etc.Database.CreateTableStruct("access", itypes.UserAccessRow{})
-	etc.Database.CreateTableStruct("shares", itypes.ShareRow{})
-	etc.Database.CreateTableStruct("shares_discord_role", itypes.DiscordRoleAccessRow{})
+	etc.Database.CreateTableStruct("users", db.UserRow{})
+	etc.Database.CreateTableStruct("access", db.UserAccessRow{})
+	etc.Database.CreateTableStruct("shares", db.ShareRow{})
+	etc.Database.CreateTableStruct("shares_discord_role", db.DiscordRoleAccessRow{})
 
 	//
 	// database upgrade (removing db prefixes in favor of provider column)
@@ -85,7 +85,7 @@ func main() {
 		"facebook":  "4:",
 		"microsoft": "5:",
 	}
-	for _, item := range iutil.QueryAllUsers() {
+	for _, item := range db.QueryAllUsers() {
 		for k, v := range prefixes {
 			if strings.HasPrefix(item.Snowflake, v) {
 				sn := item.Snowflake[len(v):]
@@ -105,7 +105,7 @@ func main() {
 		Log("Saving database to disk")
 		etc.Database.Close()
 
-		if idata.Config.SearchOn {
+		if config.Config.SearchOn {
 			Log("Closing filesystem watcher")
 			search.Close()
 		}
@@ -116,7 +116,7 @@ func main() {
 	//
 	// initialize filesystem watching
 
-	if idata.Config.SearchOn {
+	if config.Config.SearchOn {
 		go search.InitFsWatcher()
 	}
 
@@ -133,46 +133,56 @@ func main() {
 	//
 	// http server setup and launch
 
-	http.HandleFunc("/test", iutil.Mw(handler.HandleTest))
+	http.HandleFunc("/test", handler.HandleTest)
 
-	if len(idata.Config.Root) > 0 {
-		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
-		Log("Sharing private files from " + idata.Config.Root)
-		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
-		idata.DataPaths["files"] = idata.Config.Root
+	if len(config.Config.Root) > 0 {
+		config.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(config.Config.Root, "~", config.HomedirPath, -1)))
+		Log("Sharing private files from " + config.Config.Root)
+		DieOnError(Assert(DoesDirectoryExist(config.Config.Root), "Please pass a valid directory as a root parameter!"))
+		config.DataPaths["files"] = config.Config.Root
 
-		http.HandleFunc("/admin", iutil.Mw(handler.HandleAdmin))
-		http.HandleFunc("/admin/users", iutil.Mw(handler.HandleAdminUsers))
+		http.HandleFunc("/admin", handler.HandleAdmin)
+		http.HandleFunc("/admin/users", handler.HandleAdminUsers)
 
-		http.HandleFunc("/api/access/delete", iutil.Mw(handler.HandleAccessDelete))
-		http.HandleFunc("/api/access/update", iutil.Mw(handler.HandleAccessUpdate))
-		http.HandleFunc("/api/access/create", iutil.Mw(handler.HandleAccessCreate))
+		http.HandleFunc("/api/access/delete", handler.HandleAccessDelete)
+		http.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
+		http.HandleFunc("/api/access/create", handler.HandleAccessCreate)
 
-		http.HandleFunc("/api/share/create", iutil.Mw(handler.HandleShareCreate))
-		http.HandleFunc("/api/share/update", iutil.Mw(handler.HandleShareUpdate))
-		http.HandleFunc("/api/share/delete", iutil.Mw(handler.HandleShareDelete))
+		http.HandleFunc("/api/share/create", handler.HandleShareCreate)
+		http.HandleFunc("/api/share/update", handler.HandleShareUpdate)
+		http.HandleFunc("/api/share/delete", handler.HandleShareDelete)
 
-		http.HandleFunc("/api/access_discord_role/create", iutil.Mw(handler.HandleDiscordRoleAccessCreate))
-		http.HandleFunc("/api/access_discord_role/update", iutil.Mw(handler.HandleDiscordRoleAccessUpdate))
-		http.HandleFunc("/api/access_discord_role/delete", iutil.Mw(handler.HandleDiscordRoleAccessDelete))
+		http.HandleFunc("/api/access_discord_role/create", handler.HandleDiscordRoleAccessCreate)
+		http.HandleFunc("/api/access_discord_role/update", handler.HandleDiscordRoleAccessUpdate)
+		http.HandleFunc("/api/access_discord_role/delete", handler.HandleDiscordRoleAccessDelete)
 
-		http.HandleFunc("/regen_passkey", iutil.Mw(handler.HandleRegenPasskey))
-		http.HandleFunc("/logout", iutil.Mw(handler.HandleLogout))
+		http.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
+		http.HandleFunc("/logout", handler.HandleLogout)
 
-		http.HandleFunc("/files/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleFileListing)))
-		http.HandleFunc("/open/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleShareListing)))
+		http.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing))
+		http.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing))
 	}
 
-	if len(idata.Config.Public) > 0 {
-		idata.Config.Public, _ = filepath.Abs(idata.Config.Public)
-		Log("Sharing public files from", idata.Config.Public)
-		DieOnError(Assert(DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
-		idata.DataPaths["public"] = idata.Config.Public
+	if len(config.Config.Public) > 0 {
+		config.Config.Public, _ = filepath.Abs(config.Config.Public)
+		Log("Sharing public files from", config.Config.Public)
+		DieOnError(Assert(DoesDirectoryExist(config.Config.Public), "Public root directory does not exist. Aborting!"))
+		config.DataPaths["public"] = config.Config.Public
 
-		http.HandleFunc("/public/", iutil.Mw(handler.HandleDirectoryListing(handler.HandlePublicListing)))
+		http.HandleFunc("/public/", handler.HandleDirectoryListing(handler.HandlePublicListing))
 	}
 
-	etc.StartServer(idata.Config.Port)
+	handlerWrapper := func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Add("Server", "nektro/andesite")
+		})
+	}
+
+	DieOnError(Assert(IsPortAvailable(config.Config.Port), F("Binding to port %d failed.", config.Config.Port)), "It may be taken or you may not have permission to. Aborting!")
+	p := strconv.Itoa(config.Config.Port)
+	Log("Initialization complete. Starting server on port " + p)
+
+	http.ListenAndServe(":"+p, handlerWrapper(http.DefaultServeMux))
 }
 
 func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
@@ -184,6 +194,6 @@ func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, 
 	sess.Values[provider+"_expires_in"] = resp["expires_in"]
 	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
 	sess.Save(r, w)
-	iutil.QueryAssertUserName(provider, id, name)
+	db.QueryAssertUserName(provider, id, name)
 	Log("[user-login]", provider, id, name)
 }
