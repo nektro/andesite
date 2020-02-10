@@ -1,4 +1,4 @@
-package main
+package search
 
 import (
 	"database/sql"
@@ -38,12 +38,12 @@ var (
 	watcher *fsnotify.Watcher
 )
 
-func initFsWatcher() {
+func Init() {
 	// creates a new file watcher
 	watcher, _ = fsnotify.NewWatcher()
 	etc.Database.CreateTableStruct("files", WatchedFile{})
 
-	if err := filepath.Walk(idata.Config.Root, wWatchDir); err != nil {
+	if err := filepath.Walk(idata.Config.Root, WatchDir); err != nil {
 		util.LogError(err)
 	}
 
@@ -71,7 +71,7 @@ func initFsWatcher() {
 						etc.Database.QueryPrepared(true, "insert into files values (?, ?, ?)", i, r1, n)
 						util.Log("[file-index-add]", r1)
 					} else {
-						if err := filepath.Walk(event.Name, wWatchDir); err != nil {
+						if err := filepath.Walk(event.Name, WatchDir); err != nil {
 							util.LogError(err)
 						}
 					}
@@ -86,15 +86,20 @@ func initFsWatcher() {
 	http.HandleFunc("/api/search", HandleSearchAPI)
 }
 
-func wWatchDir(path string, fi os.FileInfo, err error) error {
+func Close() {
+	util.Log("Closing filesystem watcher")
+	watcher.Close()
+}
+
+func WatchDir(path string, fi os.FileInfo, err error) error {
 	if fi.IsDir() {
 		return watcher.Add(path)
 	}
-	wAddFile(strings.TrimPrefix(path, idata.Config.Root), fi.Name())
+	AddFile(strings.TrimPrefix(path, idata.Config.Root), fi.Name())
 	return nil
 }
 
-func wAddFile(path string, name string) {
+func AddFile(path string, name string) {
 	pth := strings.Replace(path, string(filepath.Separator), "/", -1)
 	if dbstorage.QueryHasRows(etc.Database.QueryPrepared(false, "select * from files where path = ?", pth)) {
 		return

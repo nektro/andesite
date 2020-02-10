@@ -10,6 +10,7 @@ import (
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
+	"github.com/nektro/andesite/pkg/search"
 
 	"github.com/aymerick/raymond"
 	etc "github.com/nektro/go.etc"
@@ -105,8 +106,7 @@ func main() {
 		etc.Database.Close()
 
 		if idata.Config.SearchOn {
-			Log("Closing filesystem watcher")
-			watcher.Close()
+			search.Close()
 		}
 
 		Log("Done!")
@@ -116,7 +116,7 @@ func main() {
 	// initialize filesystem watching
 
 	if idata.Config.SearchOn {
-		go initFsWatcher()
+		go search.Init()
 	}
 
 	//
