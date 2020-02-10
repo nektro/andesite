@@ -142,9 +142,9 @@ func main() {
 
 		http.HandleFunc("/files/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleFileListing)))
 		http.HandleFunc("/admin", iutil.Mw(handler.HandleAdmin))
-		http.HandleFunc("/api/access/delete", iutil.Mw(HandleAccessDelete))
-		http.HandleFunc("/api/access/update", iutil.Mw(HandleAccessUpdate))
-		http.HandleFunc("/api/access/create", iutil.Mw(HandleAccessCreate))
+		http.HandleFunc("/api/access/delete", iutil.Mw(handler.HandleAccessDelete))
+		http.HandleFunc("/api/access/update", iutil.Mw(handler.HandleAccessUpdate))
+		http.HandleFunc("/api/access/create", iutil.Mw(handler.HandleAccessCreate))
 		http.HandleFunc("/open/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleShareListing)))
 		http.HandleFunc("/api/share/create", iutil.Mw(HandleShareCreate))
 		http.HandleFunc("/api/share/update", iutil.Mw(HandleShareUpdate))
