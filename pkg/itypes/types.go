@@ -1,6 +1,8 @@
 package itypes
 
-import "net/http"
+import (
+	"net/http"
+)
 
 //
 type UserRow struct {
