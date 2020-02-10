@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/nektro/go-util/util"
@@ -83,8 +82,8 @@ func initFsWatcher() {
 		}
 	}()
 
-	http.HandleFunc("/search", iutil.Mw(HandleSearch))
-	http.HandleFunc("/api/search", iutil.Mw(HandleSearchAPI))
+	http.HandleFunc("/search", HandleSearch)
+	http.HandleFunc("/api/search", HandleSearchAPI)
 }
 
 func wWatchDir(path string, fi os.FileInfo, err error) error {

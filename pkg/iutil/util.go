@@ -20,10 +20,6 @@ import (
 	. "github.com/nektro/go-util/alias"
 )
 
-var (
-	Mw = ChainMiddleware(MwAddAttribution)
-)
-
 func Filter(stack []os.FileInfo, cb func(os.FileInfo) bool) []os.FileInfo {
 	result := []os.FileInfo{}
 	for _, item := range stack {
@@ -167,26 +163,6 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []
 	}
 
 	return sess, user, nil
-}
-
-// @from https://gist.github.com/gbbr/fa652db0bab132976620bcb7809fd89a
-func ChainMiddleware(mw ...itypes.Middleware) itypes.Middleware {
-	return func(final http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			last := final
-			for i := len(mw) - 1; i >= 0; i-- {
-				last = mw[i](last)
-			}
-			last(w, r)
-		}
-	}
-}
-
-func MwAddAttribution(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Server", "nektro/andesite")
-		next.ServeHTTP(w, r)
-	}
 }
 
 func WriteJSON(w http.ResponseWriter, data map[string]interface{}) {

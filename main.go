@@ -132,7 +132,7 @@ func main() {
 	//
 	// http server setup and launch
 
-	http.HandleFunc("/test", iutil.Mw(handler.HandleTest))
+	http.HandleFunc("/test", handler.HandleTest)
 
 	if len(idata.Config.Root) > 0 {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
@@ -140,21 +140,21 @@ func main() {
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 		idata.DataPaths["files"] = idata.Config.Root
 
-		http.HandleFunc("/files/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleFileListing)))
-		http.HandleFunc("/admin", iutil.Mw(handler.HandleAdmin))
-		http.HandleFunc("/api/access/delete", iutil.Mw(handler.HandleAccessDelete))
-		http.HandleFunc("/api/access/update", iutil.Mw(handler.HandleAccessUpdate))
-		http.HandleFunc("/api/access/create", iutil.Mw(handler.HandleAccessCreate))
-		http.HandleFunc("/open/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleShareListing)))
-		http.HandleFunc("/api/share/create", iutil.Mw(handler.HandleShareCreate))
-		http.HandleFunc("/api/share/update", iutil.Mw(handler.HandleShareUpdate))
-		http.HandleFunc("/api/share/delete", iutil.Mw(handler.HandleShareDelete))
-		http.HandleFunc("/logout", iutil.Mw(handler.HandleLogout))
-		http.HandleFunc("/api/access_discord_role/create", iutil.Mw(handler.HandleDiscordRoleAccessCreate))
-		http.HandleFunc("/api/access_discord_role/update", iutil.Mw(handler.HandleDiscordRoleAccessUpdate))
-		http.HandleFunc("/api/access_discord_role/delete", iutil.Mw(handler.HandleDiscordRoleAccessDelete))
-		http.HandleFunc("/regen_passkey", iutil.Mw(handler.HandleRegenPasskey))
-		http.HandleFunc("/admin/users", iutil.Mw(handler.HandleAdminUsers))
+		http.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing))
+		http.HandleFunc("/admin", handler.HandleAdmin)
+		http.HandleFunc("/api/access/delete", handler.HandleAccessDelete)
+		http.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
+		http.HandleFunc("/api/access/create", handler.HandleAccessCreate)
+		http.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing))
+		http.HandleFunc("/api/share/create", handler.HandleShareCreate)
+		http.HandleFunc("/api/share/update", handler.HandleShareUpdate)
+		http.HandleFunc("/api/share/delete", handler.HandleShareDelete)
+		http.HandleFunc("/logout", handler.HandleLogout)
+		http.HandleFunc("/api/access_discord_role/create", handler.HandleDiscordRoleAccessCreate)
+		http.HandleFunc("/api/access_discord_role/update", handler.HandleDiscordRoleAccessUpdate)
+		http.HandleFunc("/api/access_discord_role/delete", handler.HandleDiscordRoleAccessDelete)
+		http.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
+		http.HandleFunc("/admin/users", handler.HandleAdminUsers)
 	}
 
 	if len(idata.Config.Public) > 0 {
@@ -163,7 +163,7 @@ func main() {
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
 		idata.DataPaths["public"] = idata.Config.Public
 
-		http.HandleFunc("/public/", iutil.Mw(handler.HandleDirectoryListing(handler.HandlePublicListing)))
+		http.HandleFunc("/public/", handler.HandleDirectoryListing(handler.HandlePublicListing))
 	}
 
 	etc.StartServer(idata.Config.Port)
