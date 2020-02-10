@@ -131,7 +131,7 @@ func main() {
 	//
 	// http server setup and launch
 
-	http.HandleFunc("/test", iutil.Mw(HandleTest))
+	http.HandleFunc("/test", iutil.Mw(handler.HandleTest))
 
 	if len(idata.Config.Root) > 0 {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
@@ -148,7 +148,7 @@ func main() {
 		http.HandleFunc("/api/share/create", iutil.Mw(HandleShareCreate))
 		http.HandleFunc("/api/share/update", iutil.Mw(HandleShareUpdate))
 		http.HandleFunc("/api/share/delete", iutil.Mw(HandleShareDelete))
-		http.HandleFunc("/logout", iutil.Mw(HandleLogout))
+		http.HandleFunc("/logout", iutil.Mw(handler.HandleLogout))
 		http.HandleFunc("/api/access_discord_role/create", iutil.Mw(HandleDiscordRoleAccessCreate))
 		http.HandleFunc("/api/access_discord_role/update", iutil.Mw(HandleDiscordRoleAccessUpdate))
 		http.HandleFunc("/api/access_discord_role/delete", iutil.Mw(HandleDiscordRoleAccessDelete))

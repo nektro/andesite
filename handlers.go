@@ -76,25 +76,6 @@ func hGrabUser(r *http.Request, w http.ResponseWriter) (string, *itypes.UserRow,
 //
 //
 
-// handler for http://andesite/test
-func HandleTest(w http.ResponseWriter, r *http.Request) {
-	// sessions test and debug info
-	// increment number every refresh
-	sess := etc.GetSession(r)
-	i := sess.Values["int"]
-	if i == nil {
-		i = 0
-	}
-	j := i.(int)
-	sess.Values["int"] = j + 1
-	sess.Save(r, w)
-	fmt.Fprintln(w, strconv.Itoa(j))
-
-	fmt.Fprintln(w, "")
-	fmt.Fprintln(w, "~~ Host ~~")
-	fmt.Fprintln(w, FullHost(r))
-}
-
 func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
@@ -455,17 +436,6 @@ func HandleShareDelete(w http.ResponseWriter, r *http.Request) {
 	//
 	etc.Database.QueryPrepared(true, "delete from shares where id = ?", idS)
 	iutil.WriteAPIResponse(r, w, true, "Successfully deleted share link.")
-}
-
-func HandleLogout(w http.ResponseWriter, r *http.Request) {
-	sess, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
-	if err != nil {
-		return
-	}
-	//
-	sess.Options.MaxAge = -1
-	sess.Save(r, w)
-	iutil.WriteLinkResponse(r, w, "Success", "Successfully logged out.", "Back Home", "./../")
 }
 
 func HandleSearch(w http.ResponseWriter, r *http.Request) {
