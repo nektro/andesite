@@ -1,4 +1,4 @@
-package main
+package search
 
 import (
 	"database/sql"
@@ -39,7 +39,11 @@ var (
 	watcher *fsnotify.Watcher
 )
 
-func initFsWatcher() {
+func Close() error {
+	return watcher.Close()
+}
+
+func InitFsWatcher() {
 	// creates a new file watcher
 	watcher, _ = fsnotify.NewWatcher()
 	etc.Database.CreateTableStruct("files", WatchedFile{})

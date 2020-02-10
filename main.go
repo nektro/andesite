@@ -6,9 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/nektro/andesite/handler"
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
+	"github.com/nektro/andesite/search"
 
 	"github.com/aymerick/raymond"
 	etc "github.com/nektro/go.etc"
@@ -105,7 +107,7 @@ func main() {
 
 		if idata.Config.SearchOn {
 			Log("Closing filesystem watcher")
-			watcher.Close()
+			search.Close()
 		}
 
 		Log("Done!")
@@ -115,7 +117,7 @@ func main() {
 	// initialize filesystem watching
 
 	if idata.Config.SearchOn {
-		go initFsWatcher()
+		go search.InitFsWatcher()
 	}
 
 	//
@@ -131,7 +133,7 @@ func main() {
 	//
 	// http server setup and launch
 
-	http.HandleFunc("/test", iutil.Mw(handleTest))
+	http.HandleFunc("/test", iutil.Mw(handler.HandleTest))
 
 	if len(idata.Config.Root) > 0 {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
@@ -139,21 +141,26 @@ func main() {
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 		idata.DataPaths["files"] = idata.Config.Root
 
-		http.HandleFunc("/files/", iutil.Mw(handleDirectoryListing(handleFileListing)))
-		http.HandleFunc("/admin", iutil.Mw(handleAdmin))
-		http.HandleFunc("/api/access/delete", iutil.Mw(handleAccessDelete))
-		http.HandleFunc("/api/access/update", iutil.Mw(handleAccessUpdate))
-		http.HandleFunc("/api/access/create", iutil.Mw(handleAccessCreate))
-		http.HandleFunc("/open/", iutil.Mw(handleDirectoryListing(handleShareListing)))
-		http.HandleFunc("/api/share/create", iutil.Mw(handleShareCreate))
-		http.HandleFunc("/api/share/update", iutil.Mw(handleShareUpdate))
-		http.HandleFunc("/api/share/delete", iutil.Mw(handleShareDelete))
-		http.HandleFunc("/logout", iutil.Mw(handleLogout))
-		http.HandleFunc("/api/access_discord_role/create", iutil.Mw(handleDiscordRoleAccessCreate))
-		http.HandleFunc("/api/access_discord_role/update", iutil.Mw(handleDiscordRoleAccessUpdate))
-		http.HandleFunc("/api/access_discord_role/delete", iutil.Mw(handleDiscordRoleAccessDelete))
-		http.HandleFunc("/regen_passkey", iutil.Mw(handleRegenPasskey))
-		http.HandleFunc("/admin/users", iutil.Mw(handleAdminUsers))
+		http.HandleFunc("/admin", iutil.Mw(handler.HandleAdmin))
+		http.HandleFunc("/admin/users", iutil.Mw(handler.HandleAdminUsers))
+
+		http.HandleFunc("/api/access/delete", iutil.Mw(handler.HandleAccessDelete))
+		http.HandleFunc("/api/access/update", iutil.Mw(handler.HandleAccessUpdate))
+		http.HandleFunc("/api/access/create", iutil.Mw(handler.HandleAccessCreate))
+
+		http.HandleFunc("/api/share/create", iutil.Mw(handler.HandleShareCreate))
+		http.HandleFunc("/api/share/update", iutil.Mw(handler.HandleShareUpdate))
+		http.HandleFunc("/api/share/delete", iutil.Mw(handler.HandleShareDelete))
+
+		http.HandleFunc("/api/access_discord_role/create", iutil.Mw(handler.HandleDiscordRoleAccessCreate))
+		http.HandleFunc("/api/access_discord_role/update", iutil.Mw(handler.HandleDiscordRoleAccessUpdate))
+		http.HandleFunc("/api/access_discord_role/delete", iutil.Mw(handler.HandleDiscordRoleAccessDelete))
+
+		http.HandleFunc("/regen_passkey", iutil.Mw(handler.HandleRegenPasskey))
+		http.HandleFunc("/logout", iutil.Mw(handler.HandleLogout))
+
+		http.HandleFunc("/files/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleFileListing)))
+		http.HandleFunc("/open/", iutil.Mw(handler.HandleDirectoryListing(handler.HandleShareListing)))
 	}
 
 	if len(idata.Config.Public) > 0 {
@@ -162,8 +169,21 @@ func main() {
 		DieOnError(Assert(DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
 		idata.DataPaths["public"] = idata.Config.Public
 
-		http.HandleFunc("/public/", iutil.Mw(handleDirectoryListing(handlePublicListing)))
+		http.HandleFunc("/public/", iutil.Mw(handler.HandleDirectoryListing(handler.HandlePublicListing)))
 	}
 
 	etc.StartServer(idata.Config.Port)
+}
+
+func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
+	sess := etc.GetSession(r)
+	sess.Values["provider"] = provider
+	sess.Values["user"] = id
+	sess.Values["name"] = name
+	sess.Values[provider+"_access_token"] = resp["access_token"]
+	sess.Values[provider+"_expires_in"] = resp["expires_in"]
+	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
+	sess.Save(r, w)
+	iutil.QueryAssertUserName(provider, id, name)
+	Log("[user-login]", provider, id, name)
 }
