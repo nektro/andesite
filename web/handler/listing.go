@@ -26,7 +26,9 @@ import (
 
 type AccessHandler func(http.ResponseWriter, *http.Request) (fileRoot string, qpath string, uAccess []string, user *db.UserRow, extras map[string]interface{}, err error)
 
-func HandleDirectoryListing(getAccess AccessHandler, fs fs.Fs) func(http.ResponseWriter, *http.Request) {
+var FS fs.Fs = fs.LocalStorage
+
+func HandleDirectoryListing(getAccess AccessHandler) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
 
@@ -49,7 +51,7 @@ func HandleDirectoryListing(getAccess AccessHandler, fs fs.Fs) func(http.Respons
 		}
 
 		// valid path check
-		stat, err := fs.Stat(fileRoot + qpath)
+		stat, err := FS.Stat(fileRoot + qpath)
 		if os.IsNotExist(err) {
 			// 404
 			util.WriteUserDenied(r, w, true, false)
@@ -152,8 +154,8 @@ func HandleDirectoryListing(getAccess AccessHandler, fs fs.Fs) func(http.Respons
 			}
 
 			w.Header().Add("Content-Type", mime.TypeByExtension(path.Ext(qpath)))
-			file, _ := fs.Open(fileRoot + qpath)
-			info, _ := fs.Stat(fileRoot + qpath)
+			file, _ := FS.Open(fileRoot + qpath)
+			info, _ := FS.Stat(fileRoot + qpath)
 			http.ServeContent(w, r, info.Name(), info.ModTime(), file)
 			file.Close()
 		}

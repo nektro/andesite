@@ -3,17 +3,24 @@ package main
 import (
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/aymerick/raymond"
 	etc "github.com/nektro/go.etc"
+	"github.com/rclone/rclone/cmd"
+	"github.com/rclone/rclone/cmd/serve"
+	rFs "github.com/rclone/rclone/fs"
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"github.com/nektro/andesite/config"
 	"github.com/nektro/andesite/db"
+	"github.com/nektro/andesite/fs"
 	"github.com/nektro/andesite/search"
 	"github.com/nektro/andesite/web"
+	"github.com/nektro/andesite/web/handler"
 
 	. "github.com/nektro/go-util/alias"
 	. "github.com/nektro/go-util/util"
@@ -22,16 +29,63 @@ import (
 )
 
 func init() {
-	pflag.IntVar(&config.Config.Version, "version", config.RequiredConfigVersion, "Config version to use.")
-	pflag.StringVar(&config.Config.Root, "root", "", "Path of root directory for files")
-	pflag.IntVar(&config.Config.Port, "port", 8000, "Port to open server on")
-	pflag.StringVar(&config.Config.HTTPBase, "base", "/", "Http Origin Path")
-	pflag.StringVar(&config.Config.Public, "public", "", "Public root of files to serve")
-	pflag.BoolVar(&config.Config.SearchOn, "enable-search", false, "Set to true to enable search database")
+	flags := Command.Flags()
+
+	flags.IntVar(&config.Config.Version, "version", config.RequiredConfigVersion, "Config version to use.")
+	flags.IntVar(&config.Config.Port, "port", 8000, "Port to open server on")
+	flags.StringVar(&config.Config.HTTPBase, "base", "/", "Http Origin Path")
+	flags.StringVar(&config.Config.Public, "public", "", "Public root of files to serve")
+
+	serve.Command.AddCommand(Command)
 }
 
-func main() {
-	Log("Initializing Andesite " + config.Version + "...")
+// Command definition for cobra
+var Command = &cobra.Command{
+	Use:   "andesite remote:path",
+	Short: `Serve the remote over Andesite.`,
+	Run: func(command *cobra.Command, args []string) {
+		cmd.CheckArgs(1, 1, command, args)
+		f := cmd.NewFsSrc(args)
+		cmd.Run(false, true, command, func() error {
+
+			s := newServer()
+
+			handler.FS = &rcloneFs{
+				f,
+			}
+
+			err := s.ListenAndServe()
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+	},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		rFs.Logf(nil, "Gracefully shutting down...")
+
+		rFs.Logf(nil, "Saving database to disk")
+		etc.Database.Close()
+
+		rFs.Logf(nil, "Done!")
+	},
+}
+
+type rcloneFs struct {
+	rFs.Fs
+}
+
+func (r *rcloneFs) Stat(name string) (os.FileInfo, error) {
+	return r.Stat(name)
+}
+
+func (r *rcloneFs) Open(name string) (fs.FileHandle, error) {
+	return r.Open(name)
+}
+
+func newServer() *http.Server {
+	rFs.Logf(nil, "Initializing Andesite %s...", config.Version)
 	flagDGS := pflag.String("discord-guild-id", "", "")
 	flagDBT := pflag.String("discord-bot-token", "", "")
 	etc.PreInit("andesite")
@@ -67,9 +121,6 @@ func main() {
 	// database upgrade (removing db prefixes in favor of provider column)
 	db.Upgrade()
 
-	// graceful stop
-	RunOnClose(Shutdown)
-
 	// initialize filesystem watching
 	if config.Config.SearchOn {
 		go search.InitFsWatcher()
@@ -102,21 +153,10 @@ func main() {
 
 	DieOnError(Assert(IsPortAvailable(config.Config.Port), F("Binding to port %d failed.", config.Config.Port)), "It may be taken or you may not have permission to. Aborting!")
 	p := strconv.Itoa(config.Config.Port)
-	Log("Initialization complete. Starting server on port " + p)
+	rFs.Logf(nil, "Initialization complete. Starting server on port "+p)
 
-	http.ListenAndServe(":"+p, handlerWrapper(muxer))
-}
-
-func Shutdown() {
-	Log("Gracefully shutting down...")
-
-	Log("Saving database to disk")
-	etc.Database.Close()
-
-	if config.Config.SearchOn {
-		Log("Closing filesystem watcher")
-		search.Close()
+	return &http.Server{
+		Addr:    ":" + p,
+		Handler: handlerWrapper(muxer),
 	}
-
-	Log("Done!")
 }

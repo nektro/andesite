@@ -70,3 +70,16 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []
 
 	return sess, user, nil
 }
+
+func HelperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
+	sess := etc.GetSession(r)
+	sess.Values["provider"] = provider
+	sess.Values["user"] = id
+	sess.Values["name"] = name
+	sess.Values[provider+"_access_token"] = resp["access_token"]
+	sess.Values[provider+"_expires_in"] = resp["expires_in"]
+	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
+	sess.Save(r, w)
+	QueryAssertUserName(provider, id, name)
+	goUtil.Log("[user-login]", provider, id, name)
+}

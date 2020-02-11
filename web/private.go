@@ -8,7 +8,6 @@ import (
 	. "github.com/nektro/go-util/util"
 
 	"github.com/nektro/andesite/config"
-	"github.com/nektro/andesite/fs"
 	"github.com/nektro/andesite/web/handler"
 )
 
@@ -36,6 +35,6 @@ func RegisterPrivate(mux *http.ServeMux) {
 	mux.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
 	mux.HandleFunc("/logout", handler.HandleLogout)
 
-	mux.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing, fs.LocalStorage))
-	mux.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing, fs.LocalStorage))
+	mux.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing))
+	mux.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing))
 }
