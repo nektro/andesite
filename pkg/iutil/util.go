@@ -1,14 +1,13 @@
 package iutil
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 
+	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/itypes"
 
@@ -76,13 +75,6 @@ func WriteAPIResponse(r *http.Request, w http.ResponseWriter, good bool, message
 	WriteResponse(r, w, titlemsg, message, "Return to <a href='"+idata.Config.HTTPBase+"admin'>the dashboard</a>.")
 }
 
-func BoolToString(x bool) string {
-	if x {
-		return "1"
-	}
-	return "0"
-}
-
 func WriteResponse(r *http.Request, w http.ResponseWriter, title string, message string, link string) {
 	etc.WriteHandlebarsFile(r, w, "/response.hbs", map[string]interface{}{
 		"version": idata.Version,
@@ -145,7 +137,7 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []
 
 	pS := provID.(string)
 	uS := sessID.(string)
-	user, ok := QueryUserBySnowflake(pS, uS)
+	user, ok := db.QueryUserBySnowflake(pS, uS)
 
 	if !ok {
 		WriteResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+uS+"@"+pS+")", "")
@@ -169,12 +161,6 @@ func WriteJSON(w http.ResponseWriter, data map[string]interface{}) {
 	w.Header().Add("content-type", "application/json")
 	bytes, _ := json.Marshal(data)
 	w.Write(bytes)
-}
-
-func GenerateNewUserPasskey(snowflake string) string {
-	hash1 := md5.Sum([]byte(F("astheno.andesite.passkey.%s.%s", snowflake, T())))
-	hash2 := hex.EncodeToString(hash1[:])
-	return hash2[0:10]
 }
 
 func MakeDiscordRequest(endpoint string, body url.Values) []byte {
