@@ -111,10 +111,15 @@ func main() {
 		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 		idata.DataPathsPrv["files"] = idata.Config.Root
 	}
+	for _, item := range idata.Config.RootsPrv {
+		ab, err := filepath.Abs(item[1])
+		util.DieOnError(err)
+		idata.DataPathsPrv[item[0]] = ab
+	}
 	if len(idata.DataPathsPrv) > 0 {
 		for k, v := range idata.DataPathsPrv {
 			http.HandleFunc("/"+k+"/", handler.HandleDirectoryListing(handler.HandleFileListing))
-			util.Log("Sharing private files from:", v)
+			util.Log("Sharing private files as", k, "from ", v)
 		}
 
 		http.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
@@ -123,6 +128,7 @@ func main() {
 
 		http.HandleFunc("/admin", handler.HandleAdmin)
 		http.HandleFunc("/admin/users", handler.HandleAdminUsers)
+		http.HandleFunc("/admin/roots", handler.HandleAdminRoots)
 
 		http.HandleFunc("/api/access/create", handler.HandleAccessCreate)
 		http.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
@@ -142,10 +148,15 @@ func main() {
 		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
 		idata.DataPathsPub["public"] = idata.Config.Public
 	}
+	for _, item := range idata.Config.RootsPub {
+		ab, err := filepath.Abs(item[1])
+		util.DieOnError(err)
+		idata.DataPathsPub[item[0]] = ab
+	}
 	if len(idata.DataPathsPub) > 0 {
 		for k, v := range idata.DataPathsPub {
 			http.HandleFunc("/"+k+"/", handler.HandleDirectoryListing(handler.HandlePublicListing))
-			util.Log("Sharing public files from:", v)
+			util.Log("Sharing public files as", k, "from ", v)
 		}
 	}
 

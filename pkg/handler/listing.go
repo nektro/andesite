@@ -204,25 +204,24 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 		return s[len(u[1])+1:]
 	})
 
-	dp, ok := idata.DataPathsPrv[u[1]]
-	if !ok {
-		http.NotFound(w, r)
+	dp, qpath, err := processListingURL(idata.DataPathsPrv, r.URL.Path)
+	if err != nil {
+		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	return dp + "/", "/" + strings.Join(u[2:], "/"), userAccess, user, map[string]interface{}{
+	return dp, qpath, userAccess, user, map[string]interface{}{
 		"user": user,
 	}, nil
 }
 
 // handler for http://andesite/public/*
 func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
-	u := strings.Split(r.URL.Path, "/")
-	dp, ok := idata.DataPathsPub[u[1]]
-	if !ok {
-		http.NotFound(w, r)
+	dp, qpath, err := processListingURL(idata.DataPathsPub, r.URL.Path)
+	if err != nil {
+		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	return dp + "/", "/" + strings.Join(u[2:], "/"), []string{"/"}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
+	return dp, qpath, []string{"/"}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/open/*
@@ -232,29 +231,15 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		w.Header().Add("Location", "../")
 		w.WriteHeader(http.StatusFound)
 	}
-	h := u[2]
-	s := db.QueryAccessByShare(h)
+	s := db.QueryAccessByShare(u[2])
 	if len(s) == 0 {
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	sp := strings.Split(s, "/")
-	dp, ok := idata.DataPathsPrv[sp[1]]
-	if !ok {
+	dp, ua, err := findRootForShareAccess(s)
+	if err != nil {
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	var rd, ua string
-	st := dp + "/" + strings.Join(sp[2:], "/")
-	//
-	if strings.HasSuffix(st, "/") {
-		rd = st
-		ua = "/"
-
-	} else {
-		rd = filepath.Dir(st) + "/"
-		ua = st[len(rd)-1:]
-	}
-	//
-	return rd, "/" + strings.Join(u[3:], "/"), []string{ua}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
+	return dp, "/" + strings.Join(u[3:], "/"), []string{ua}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
 }

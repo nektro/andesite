@@ -17,6 +17,8 @@ type Config struct {
 	SearchOff []string          `json:"search_off"`
 	Verbose   bool              `json:"verbose"`
 	VerboseFS bool              `json:"verbose_fsdb"`
+	RootsPub  [][]string        `json:"roots_public"`
+	RootsPrv  [][]string        `json:"roots_private"`
 }
 
 func (c *Config) GetDiscordClient() *oauth2.AppConf {
