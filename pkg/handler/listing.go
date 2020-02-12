@@ -25,7 +25,7 @@ import (
 	. "github.com/nektro/go-util/alias"
 )
 
-func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
+func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
 
@@ -158,7 +158,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 }
 
 // handler for http://andesite/files/*
-func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
+func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
 	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet, http.MethodHead}, false)
 	if err != nil {
 		return "", "", nil, nil, nil, err
@@ -213,18 +213,18 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 }
 
 // handler for http://andesite/public/*
-func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
+func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
 	u := strings.Split(r.URL.Path, "/")
 	dp, ok := idata.DataPathsPub[u[1]]
 	if !ok {
 		http.NotFound(w, r)
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	return dp + "/", "/" + strings.Join(u[2:], "/"), []string{"/"}, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
+	return dp + "/", "/" + strings.Join(u[2:], "/"), []string{"/"}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/open/*
-func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.UserRow, map[string]interface{}, error) {
+func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
 	u := strings.Split(r.URL.Path, "/")
 	if len(u) <= 3 {
 		w.Header().Add("Location", "../")
@@ -242,5 +242,5 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	return dp + "/" + strings.Join(sp[2:], "/"), "/" + strings.Join(u[3:], "/"), []string{"/"}, &itypes.UserRow{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
+	return dp + "/" + strings.Join(sp[2:], "/"), "/" + strings.Join(u[3:], "/"), []string{"/"}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
 }

@@ -5,7 +5,7 @@ import (
 )
 
 //
-type UserRow struct {
+type User struct {
 	ID        int64 `json:"id"`
 	IDS       string
 	Snowflake string `json:"snowflake" sqlite:"text"`
@@ -17,21 +17,21 @@ type UserRow struct {
 }
 
 //
-type UserAccessRow struct {
+type UserAccess struct {
 	ID   int64  `json:"id"`
 	User int64  `json:"user" sqlite:"int"`
 	Path string `json:"path" sqlite:"text"`
 }
 
 //
-type ShareRow struct {
+type Share struct {
 	ID   int64  `json:"id"`
 	Hash string `json:"hash" sqlite:"text"` // character(32)
 	Path string `json:"path" sqlite:"text"`
 }
 
 //
-type DiscordRoleAccessRow struct {
+type DiscordRoleAccess struct {
 	ID        int64  `json:"id"`
 	GuildID   string `json:"guild_snowflake" sqlite:"text"`
 	RoleID    string `json:"role_snowflake" sqlite:"text"`

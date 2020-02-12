@@ -18,10 +18,10 @@ var (
 
 func Init() {
 	DB = etc.Database
-	DB.CreateTableStruct("users", itypes.UserRow{})
-	DB.CreateTableStruct("access", itypes.UserAccessRow{})
-	DB.CreateTableStruct("shares", itypes.ShareRow{})
-	DB.CreateTableStruct("shares_discord_role", itypes.DiscordRoleAccessRow{})
+	DB.CreateTableStruct("users", itypes.User{})
+	DB.CreateTableStruct("access", itypes.UserAccess{})
+	DB.CreateTableStruct("shares", itypes.Share{})
+	DB.CreateTableStruct("shares_discord_role", itypes.DiscordRoleAccess{})
 
 	FS = dbstorage.ConnectSqlite(etc.DataRoot() + "/files.db")
 	FS.CreateTableStruct("files", itypes.File{})
