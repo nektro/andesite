@@ -22,7 +22,7 @@ func ScanUser(rows *sql.Rows) itypes.User {
 	return v
 }
 
-func ScanAccessRow(rows *sql.Rows) itypes.UserAccess {
+func ScanUserAccess(rows *sql.Rows) itypes.UserAccess {
 	var v itypes.UserAccess
 	rows.Scan(&v.ID, &v.User, &v.Path)
 	return v
@@ -41,7 +41,7 @@ func QueryAccess(user *itypes.User) []string {
 	result := []string{}
 	rows := etc.Database.Build().Se("*").Fr("access").Wh("user", user.IDS).Exe()
 	for rows.Next() {
-		result = append(result, ScanAccessRow(rows).Path)
+		result = append(result, ScanUserAccess(rows).Path)
 	}
 	rows.Close()
 	return result
@@ -72,7 +72,7 @@ func QueryAllAccess() []map[string]interface{} {
 	rows := etc.Database.Build().Se("*").Fr("access").Exe()
 	accs := []itypes.UserAccess{}
 	for rows.Next() {
-		accs = append(accs, ScanAccessRow(rows))
+		accs = append(accs, ScanUserAccess(rows))
 	}
 	rows.Close()
 	for _, uar := range accs {
