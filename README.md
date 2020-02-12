@@ -13,16 +13,15 @@ Share folders in an Open Directory without making your entire server public. Man
 ## Getting Started
 These instructions will help you get the project up and running. To obtain the binary you will use to run the app, follow the [Development](#development) or [Deployment](#deployment) sections for futher direction. Below, are general directions for all builds.
 
-
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `--root` | `string` | none. | Path of root directory for `/files/`. |
-| `--public` | `string` | none. | Path of root directory for `/public/`. |
-| `--port` | `int` | `8000` | Port for web server to bind to. |
-| `--base` | `string` | `/` | HTTP path of app root. |
 ### Options
 Use these to configure your Andesite instance. All are optional. "Name" refers to the name of the CLI flag that may be used. "Config Name" refers to the key name inside of your `config.json`. More on that later.
 
+| Name | Config Name | Type | Default | Description |
+|------|-------------|------|---------|-------------|
+| `--root` | `"root"` | `string` | none. | Path of root directory for `/files/`. |
+| `--public` | `"public"` | `string` | none. | Path of root directory for `/public/`. |
+| `--port` | `"port"` | `int` | `8000` | Port for web server to bind to. |
+| `--base` | `"base"` | `string` | `/` | HTTP path of app root. |
 ### Creating Credentials
 In order to create a "closed directory" with Andesite, you will need to create an app on your Identity Provider(s) of choice. See the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) docs for more detailed info on this process on where to go and what data you'll need.
 
@@ -65,10 +64,10 @@ $ ./andesite
 ### Discord Guild/Role Access Grant
 Due to a limitation in the Discord API, in order to determine if a user has a role on a specific server, you must use a bot. To get started, go to https://discordapp.com/developers/applications/ and add a Bot user to your app and copy down the Bot Token. Now, to be able to give file/folder access to entire roles, we are going to be using more flags:
 
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `--discord-guild-id` | `string` | none. | Guild Snowflake. |
-| `--discord-bot-token` | `string` | none. | Bot Token. |
+| Name | Config Name | Type | Default | Description |
+|------|-------------|------|---------|-------------|
+| `--discord-guild-id` | `"clients[for.discord].extra_1"` | `string` | none. | [Guild Snowflake](https://discordapp.com/developers/docs/resources/guild). |
+| `--discord-bot-token` | `"clients[for.discord].extra_2"` | `string` | none. | [Bot Token](https://discordapp.com/developers/docs/reference#authentication). |
 
 Enabling these values will add a section to `http://andesite/admin` that you can input the role snowflakes and the path you are granting.
 
