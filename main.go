@@ -56,8 +56,6 @@ func main() {
 		}
 	}
 
-	//
-
 	if idata.Config.Version == 0 {
 		idata.Config.Version = 1
 	}
@@ -131,7 +129,7 @@ func main() {
 	})
 
 	//
-	// http server setup and launch
+	// http server setup
 
 	http.HandleFunc("/test", handler.HandleTest)
 
@@ -170,6 +168,9 @@ func main() {
 
 		http.HandleFunc("/public/", handler.HandleDirectoryListing(handler.HandlePublicListing))
 	}
+
+	//
+	// start http server
 
 	etc.StartServer(idata.Config.Port)
 }
