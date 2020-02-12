@@ -161,7 +161,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 // handler for http://andesite/files/*
 func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet, http.MethodHead}, false)
+	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet, http.MethodHead}, true, false, true)
 	if err != nil {
 		return "", "", nil, nil, nil, err
 	}

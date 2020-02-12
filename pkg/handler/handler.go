@@ -33,7 +33,7 @@ func HandleTest(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/logout
 func HandleLogout(w http.ResponseWriter, r *http.Request) {
-	sess, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
+	sess, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, false, true)
 	if err != nil {
 		return
 	}
@@ -44,7 +44,7 @@ func HandleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleRegenPasskey(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
+	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, false, true)
 	if err != nil {
 		return
 	}

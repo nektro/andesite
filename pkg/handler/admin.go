@@ -13,7 +13,7 @@ import (
 
 // handler for http://andesite/admin
 func HandleAdmin(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, true)
+	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/admin/users
 func HandleAdminUsers(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, true)
+	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -49,7 +49,7 @@ func HandleAdminUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleAdminRoots(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, true)
+	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, true, true)
 	if err != nil {
 		return
 	}

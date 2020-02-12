@@ -15,7 +15,7 @@ import (
 )
 
 func HandleSearch(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
+	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, false, false, true)
 	if err != nil {
 		return
 	}
@@ -29,7 +29,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodGet}, false)
+	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, false, false, false)
 	if err != nil {
 		iutil.WriteJSON(w, map[string]interface{}{
 			"response": "bad",

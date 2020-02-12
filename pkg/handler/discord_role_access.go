@@ -14,7 +14,7 @@ import (
 )
 
 func HandleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -42,7 +42,7 @@ func HandleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -74,7 +74,7 @@ func HandleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}

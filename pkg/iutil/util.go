@@ -98,11 +98,13 @@ func ContainsAll(mp url.Values, keys ...string) bool {
 	return true
 }
 
-func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []string, requireAdmin bool) (*sessions.Session, *itypes.User, error) {
+func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requireLogin bool, requireAdmin bool, doOutput bool) (*sessions.Session, *itypes.User, error) {
 	if !util.Contains(methods, r.Method) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Add("Allow", F("%v", methods))
-		WriteAPIResponse(r, w, false, "This action requires using HTTP "+F("%v", methods))
+		if doOutput {
+			WriteAPIResponse(r, w, false, "This action requires using HTTP "+F("%v", methods))
+		}
 		return nil, nil, E("")
 	}
 
@@ -110,7 +112,7 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []
 	provID := sess.Values["provider"]
 	sessID := sess.Values["user"]
 
-	if sessID == nil {
+	if requireLogin && sessID == nil {
 		pk := ""
 
 		if len(pk) == 0 {
@@ -123,34 +125,51 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []
 			pk = r.Header.Get("x-passkey")
 		}
 		if len(pk) == 0 {
-			WriteUserDenied(r, w, true, true)
+			if doOutput {
+				WriteUserDenied(r, w, true, true)
+			}
 			return nil, nil, E("not logged in and no passkey found")
 		}
 		kq := etc.Database.Build().Se("*").Fr("users").Wh("passkey", pk).Exe()
 		if !kq.Next() {
-			WriteUserDenied(r, w, true, true)
+			if doOutput {
+				WriteUserDenied(r, w, true, true)
+			}
 			return nil, nil, E("invalid passkey")
 		}
-		sessID = itypes.ScanUser(kq).Snowflake
+		u := itypes.ScanUser(kq)
+		provID = u.Provider
+		sessID = u.Snowflake
 		kq.Close()
 	}
-
 	pS := provID.(string)
 	uS := sessID.(string)
 	user, ok := db.QueryUserBySnowflake(pS, uS)
 
-	if !ok {
-		WriteResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+uS+"@"+pS+")", "")
-		return nil, nil, E("")
-	}
-	if requireAdmin && !user.Admin {
-		WriteAPIResponse(r, w, false, "This action requires being a site administrator. ("+uS+"@"+pS+")")
-		return nil, nil, E("")
+	if requireLogin {
+		if !ok {
+			if doOutput {
+				WriteResponse(r, w, "Access Denied", "This action requires being a member of this server. ("+uS+"@"+pS+")", "")
+			}
+			return nil, nil, E("")
+		}
+		if requireAdmin && !user.Admin {
+			if doOutput {
+				WriteAPIResponse(r, w, false, "This action requires being a site administrator. ("+uS+"@"+pS+")")
+			}
+			return nil, nil, E("")
+		}
+	} else {
+		if !ok {
+			user = &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}
+		}
 	}
 
 	err := r.ParseForm()
 	if err != nil {
-		WriteAPIResponse(r, w, false, "Error parsing form data")
+		if doOutput {
+			WriteAPIResponse(r, w, false, "Error parsing form data")
+		}
 		return nil, nil, E("")
 	}
 

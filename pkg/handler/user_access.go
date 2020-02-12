@@ -12,7 +12,7 @@ import (
 
 // handler for http://andesite/api/access/create
 func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/update
 func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -59,7 +59,7 @@ func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/delete
 func HandleAccessDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}

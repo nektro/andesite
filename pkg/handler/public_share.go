@@ -13,7 +13,7 @@ import (
 )
 
 func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -30,7 +30,7 @@ func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -49,7 +49,7 @@ func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleShareDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrapRequireLogin(r, w, []string{http.MethodPost}, true)
+	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
