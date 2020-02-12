@@ -22,6 +22,7 @@ Use these to configure your Andesite instance. All are optional. "Name" refers t
 | `--public` | `"public"` | `string` | none. | Path of root directory for `/public/`. |
 | `--port` | `"port"` | `int` | `8000` | Port for web server to bind to. |
 | `--base` | `"base"` | `string` | `/` | HTTP path of app root. |
+| `--config` | n/a. | `string` | `~/.config/andesite/config.json` | The path to the `config.json` file used for app configuration. |
 ### Creating Credentials
 In order to create a "closed directory" with Andesite, you will need to create an app on your Identity Provider(s) of choice. See the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) docs for more detailed info on this process on where to go and what data you'll need.
 
