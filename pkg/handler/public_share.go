@@ -47,7 +47,7 @@ func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	aph := r.PostForm.Get("path")
-	// //
+	//
 	etc.Database.Build().Up("shares", "path", aph).Wh("id", idS).Exe()
 	iutil.WriteAPIResponse(r, w, true, "Successfully updated share path.")
 }
