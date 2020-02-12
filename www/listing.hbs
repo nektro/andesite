@@ -45,9 +45,7 @@
     <body class="page-listing">
         <div class="ui main menu">
             <div class="header item">Welcome, {{user.Name}}@{{user.Provider}}</div>
-            {{#if search_on}}
             <div class="item"><a href="{{base}}search"><i class="search icon"></i> Search</a></div>
-            {{/if}}
             {{#if admin}}
             <div class="item"><a href="{{base}}admin">Admin Panel</a></div>
             {{/if}}
