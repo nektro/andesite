@@ -72,23 +72,7 @@ func main() {
 	//
 	// database upgrade (removing db prefixes in favor of provider column)
 
-	prefixes := map[string]string{
-		"reddit":    "1:",
-		"github":    "2:",
-		"google":    "3:",
-		"facebook":  "4:",
-		"microsoft": "5:",
-	}
-	for _, item := range iutil.QueryAllUsers() {
-		for k, v := range prefixes {
-			if strings.HasPrefix(item.Snowflake, v) {
-				sn := item.Snowflake[len(v):]
-				util.Log("[db-upgrade]", item.Snowflake, "is now", sn, "as", k)
-				etc.Database.Build().Up("users", "snowflake", sn).Wh("id", item.IDS).Exe()
-				etc.Database.Build().Up("users", "provider", k).Wh("id", item.IDS).Exe()
-			}
-		}
-	}
+	db.Upgrade()
 
 	//
 	// graceful stop
