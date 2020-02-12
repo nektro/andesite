@@ -14,6 +14,7 @@ type Config struct {
 	Clients   []oauth2.AppConf  `json:"clients"`
 	Providers []oauth2.Provider `json:"providers"`
 	SearchOn  []string          `json:"search_on"`
+	SearchOff []string          `json:"search_off"`
 }
 
 func (c *Config) GetDiscordClient() *oauth2.AppConf {

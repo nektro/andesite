@@ -78,3 +78,12 @@ func insertFile(f *itypes.File) {
 	db.FS.QueryPrepared(true, "insert into "+cTbl+" values (?,?,?,?,?)", id, f.Root, f.Path, f.Size, f.ModTime)
 	db.FS.Build().Ins(cTbl).Unlock()
 }
+
+func DeInit(mp map[string]string, rt string) {
+	_, ok := mp[rt]
+	if !ok {
+		return
+	}
+	db.FS.QueryPrepared(true, "delete from files where root = ?", rt)
+	util.Log("fsdb:", rt+":", "removed.")
+}

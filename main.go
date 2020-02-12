@@ -37,6 +37,7 @@ func main() {
 	pflag.StringVar(&idata.Config.HTTPBase, "base", "/", "Http Origin Path")
 	pflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
 	pflag.StringArrayVar(&idata.Config.SearchOn, "enable-search", []string{}, "Set to a root ID to enable file search for that directory.")
+	pflag.StringArrayVar(&idata.Config.SearchOff, "disable-search", []string{}, "Set to a root ID to disable file search for that directory.")
 	flagDGS := pflag.String("discord-guild-id", "", "")
 	flagDBT := pflag.String("discord-bot-token", "", "")
 	etc.PreInit()
@@ -67,6 +68,7 @@ func main() {
 	}
 
 	idata.Config.SearchOn = stringsu.Depupe(idata.Config.SearchOn)
+	idata.Config.SearchOff = stringsu.Depupe(idata.Config.SearchOff)
 
 	//
 	// database initialization
@@ -148,6 +150,12 @@ func main() {
 		for _, item := range idata.Config.SearchOn {
 			go fsdb.Init(idata.DataPathsPub, item)
 			go fsdb.Init(idata.DataPathsPrv, item)
+		}
+	}
+	if len(idata.Config.SearchOff) > 0 {
+		for _, item := range idata.Config.SearchOff {
+			fsdb.DeInit(idata.DataPathsPub, item)
+			fsdb.DeInit(idata.DataPathsPrv, item)
 		}
 	}
 
