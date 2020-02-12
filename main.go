@@ -10,7 +10,6 @@ import (
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
-	"github.com/nektro/andesite/pkg/search"
 
 	"github.com/aymerick/raymond"
 	"github.com/nektro/go-util/util"
@@ -36,7 +35,6 @@ func main() {
 	pflag.IntVar(&idata.Config.Port, "port", 8000, "Port to open server on")
 	pflag.StringVar(&idata.Config.HTTPBase, "base", "/", "Http Origin Path")
 	pflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
-	pflag.BoolVar(&idata.Config.SearchOn, "enable-search", false, "Set to true to enable search database")
 	flagDGS := pflag.String("discord-guild-id", "", "")
 	flagDBT := pflag.String("discord-bot-token", "", "")
 	etc.PreInit()
@@ -104,19 +102,8 @@ func main() {
 		util.Log("Saving database to disk")
 		etc.Database.Close()
 
-		if idata.Config.SearchOn {
-			search.Close()
-		}
-
 		util.Log("Done!")
 	})
-
-	//
-	// initialize filesystem watching
-
-	if idata.Config.SearchOn {
-		go search.Init()
-	}
 
 	//
 	// handlebars helpers

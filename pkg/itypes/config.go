@@ -11,7 +11,6 @@ type Config struct {
 	Port      int               `json:"port"`
 	Themes    []string          `json:"themes"`
 	HTTPBase  string            `json:"base"`
-	SearchOn  bool              `json:"search_on"`
 	Clients   []oauth2.AppConf  `json:"clients"`
 	Providers []oauth2.Provider `json:"providers"`
 }
