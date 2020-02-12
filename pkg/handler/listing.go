@@ -242,5 +242,17 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	return dp + "/" + strings.Join(sp[2:], "/"), "/" + strings.Join(u[3:], "/"), []string{"/"}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
+	var rd, ua string
+	st := dp + "/" + strings.Join(sp[2:], "/")
+	//
+	if strings.HasSuffix(st, "/") {
+		rd = st
+		ua = "/"
+
+	} else {
+		rd = filepath.Dir(st) + "/"
+		ua = st[len(rd)-1:]
+	}
+	//
+	return rd, "/" + strings.Join(u[3:], "/"), []string{ua}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
 }
