@@ -40,6 +40,8 @@ func main() {
 	pflag.StringArrayVar(&idata.Config.SearchOff, "disable-search", []string{}, "Set to a root ID to disable file search for that directory.")
 	flagDGS := pflag.String("discord-guild-id", "", "")
 	flagDBT := pflag.String("discord-bot-token", "", "")
+	pflag.BoolVar(&idata.Config.Verbose, "verbose", false, "")
+	pflag.BoolVar(&idata.Config.VerboseFS, "fsdb-verbose", false, "")
 	etc.PreInit()
 
 	etc.Init("andesite", &idata.Config, "./files/", db.SaveOAuth2InfoCb)

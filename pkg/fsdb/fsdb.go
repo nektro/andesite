@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/nektro/andesite/pkg/db"
+	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/itypes"
 
 	"github.com/karrick/godirwalk"
@@ -89,6 +90,10 @@ func insertFile(f *itypes.File) {
 	id := db.FS.QueryNextID(cTbl)
 	db.FS.QueryPrepared(true, "insert into "+cTbl+" values (?,?,?,?,?,?,?,?,?,?,?)", id, f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
 	db.FS.Build().Ins(cTbl).Unlock()
+	//
+	if idata.Config.VerboseFS {
+		util.Log("fsdb:", "add:", id, f.Path)
+	}
 }
 
 func DeInit(mp map[string]string, rt string) {

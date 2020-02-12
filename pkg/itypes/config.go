@@ -15,6 +15,8 @@ type Config struct {
 	Providers []oauth2.Provider `json:"providers"`
 	SearchOn  []string          `json:"search_on"`
 	SearchOff []string          `json:"search_off"`
+	Verbose   bool              `json:"verbose"`
+	VerboseFS bool              `json:"verbose_fsdb"`
 }
 
 func (c *Config) GetDiscordClient() *oauth2.AppConf {

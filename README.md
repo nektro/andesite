@@ -25,6 +25,8 @@ Use these to configure your Andesite instance. All are optional. "Name" refers t
 | `--config` | n/a. | `string` | `~/.config/andesite/config.json` | The path to the `config.json` file used for app configuration. |
 | `--enable-search` | `"search_on"` | `string[]` | none. | Names of roots to scan and add to the file database. |
 | `--disable-search` | `"search_off"` | `string[]` | none. | Names of roots to remove from the file database. |
+| `--verbose` | `"verbose"` | `boolean` | `false` | Set to true to enable verbose logging. |
+| `--fsdb-verobose` | `"verbose_fsdb"` | `boolean` | `false` | Set to true to enable verbose fsdb logging. |
 
 > Note: for `--enable-search` and `--disable-search`, sending values to these flags will trigger a background scan of the root directory you point it at (whether that be `public`, `files`, etc). As such, unless content is changed or updated, it is not necessary to pass these flags across multiple runs of the app.
 
