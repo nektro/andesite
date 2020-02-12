@@ -161,7 +161,7 @@ func main() {
 	}
 
 	if len(idata.Config.Public) > 0 {
-		idata.Config.Public, _ = filepath.Abs(idata.Config.Public)
+		idata.Config.Public, _ = filepath.Abs(filepath.Clean(strings.ReplaceAll(idata.Config.Public, "~", idata.HomedirPath)))
 		util.Log("Sharing public files from", idata.Config.Public)
 		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
 		idata.DataPathsPub["public"] = idata.Config.Public
