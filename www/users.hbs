@@ -14,14 +14,18 @@
         <style>
             body > div { margin: 1em; }
             table tbody tr { line-height: 1; }
+            .ui.menu { margin: 0; }
         </style>
     </head>
     <body class="page-users">
         <div class="ui main menu">
             <div class="header item">Welcome, {{user.Name}}@{{user.Provider}}</div>
-            <div class="item"><a href="./../admin">Admin Panel</a></div>
             <div class="item"><a href="./../files/">Back to Files</a></div>
             <div class="right item">Powered by&nbsp;<a href="https://github.com/nektro/andesite" target="_blank">Andesite</a>&nbsp;<code>{{version}}</code></div>
+        </div>
+        <div class="ui main menu">
+            <div class="item"><a href="./../admin">Access</a></div>
+            <div class="item"><a href="./../admin/users">Users</a></div>
         </div>
         <div>
             <h1 class="ui header">Instance Users</h1>
