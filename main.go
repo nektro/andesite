@@ -147,9 +147,9 @@ func main() {
 		http.HandleFunc("/admin", handler.HandleAdmin)
 		http.HandleFunc("/admin/users", handler.HandleAdminUsers)
 
-		http.HandleFunc("/api/access/delete", handler.HandleAccessDelete)
-		http.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
 		http.HandleFunc("/api/access/create", handler.HandleAccessCreate)
+		http.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
+		http.HandleFunc("/api/access/delete", handler.HandleAccessDelete)
 
 		http.HandleFunc("/api/share/create", handler.HandleShareCreate)
 		http.HandleFunc("/api/share/update", handler.HandleShareUpdate)
