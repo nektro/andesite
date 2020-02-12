@@ -230,6 +230,10 @@ func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 
 // handler for http://andesite/open/*
 func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
+	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet, http.MethodHead}, false, false, true)
+	if err != nil {
+		return "", "", nil, nil, nil, err
+	}
 	u := strings.Split(r.URL.Path, "/")
 	if len(u) <= 3 {
 		w.Header().Add("Location", "../")
@@ -245,5 +249,5 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	return dp, "/" + strings.Join(u[3:], "/"), []string{ua}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, nil, nil
+	return dp, "/" + strings.Join(u[3:], "/"), []string{ua}, user, nil, nil
 }
