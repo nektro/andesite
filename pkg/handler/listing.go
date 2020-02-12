@@ -216,12 +216,16 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 
 // handler for http://andesite/public/*
 func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
+	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodHead, http.MethodGet}, false, false, true)
+	if err != nil {
+		return "", "", nil, nil, nil, err
+	}
 	dp, qpath, err := processListingURL(idata.DataPathsPub, r.URL.Path)
 	if err != nil {
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	return dp, qpath, []string{"/"}, &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}, map[string]interface{}{}, nil
+	return dp, qpath, []string{"/"}, user, map[string]interface{}{}, nil
 }
 
 // handler for http://andesite/open/*
