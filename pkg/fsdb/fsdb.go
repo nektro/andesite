@@ -41,6 +41,12 @@ func Init(mp map[string]string, rt string) {
 				upathS,
 				s.Size(), "",
 				s.ModTime().UTC().Unix(), "",
+				hash("MD5", osPathname),
+				hash("SHA1", osPathname),
+				hash("SHA256", osPathname),
+				hash("SHA512", osPathname),
+				hash("SHA3_512", osPathname),
+				hash("BLAKE2b_512", osPathname),
 			})
 			return nil
 		},
@@ -70,12 +76,18 @@ func insertFile(f *itypes.File) {
 		s := strconv.FormatInt(oldF[0].ID, 10)
 		db.FS.Build().Up(cTbl, "size", strconv.FormatInt(f.Size, 10)).Wh("id", s).Exe()
 		db.FS.Build().Up(cTbl, "mod_time", strconv.FormatInt(f.ModTime, 10)).Wh("id", s).Exe()
+		db.FS.Build().Up(cTbl, "hash_md5", f.MD5).Wh("id", s).Exe()
+		db.FS.Build().Up(cTbl, "hash_sha1", f.SHA1).Wh("id", s).Exe()
+		db.FS.Build().Up(cTbl, "hash_sha256", f.SHA256).Wh("id", s).Exe()
+		db.FS.Build().Up(cTbl, "hash_sha512", f.SHA512).Wh("id", s).Exe()
+		db.FS.Build().Up(cTbl, "hash_sha3", f.SHA3).Wh("id", s).Exe()
+		db.FS.Build().Up(cTbl, "hash_blake2b", f.BLAKE2b).Wh("id", s).Exe()
 		return
 	}
 	// File does not exist, add
 	db.FS.Build().Ins(cTbl).Lock()
 	id := db.FS.QueryNextID(cTbl)
-	db.FS.QueryPrepared(true, "insert into "+cTbl+" values (?,?,?,?,?)", id, f.Root, f.Path, f.Size, f.ModTime)
+	db.FS.QueryPrepared(true, "insert into "+cTbl+" values (?,?,?,?,?,?,?,?,?,?,?)", id, f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
 	db.FS.Build().Ins(cTbl).Unlock()
 }
 
