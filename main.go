@@ -10,7 +10,6 @@ import (
 	"github.com/nektro/andesite/pkg/fsdb"
 	"github.com/nektro/andesite/pkg/handler"
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/aymerick/raymond"
 	"github.com/nektro/go-util/arrays/stringsu"
@@ -42,7 +41,7 @@ func main() {
 	flagDBT := pflag.String("discord-bot-token", "", "")
 	etc.PreInit()
 
-	etc.Init("andesite", &idata.Config, "./files/", helperOA2SaveInfo)
+	etc.Init("andesite", &idata.Config, "./files/", db.SaveOAuth2InfoCb)
 
 	//
 
@@ -73,9 +72,6 @@ func main() {
 	// database initialization
 
 	db.Init()
-
-	//
-	// database upgrade (removing db prefixes in favor of provider column)
 
 	db.Upgrade()
 
@@ -149,7 +145,6 @@ func main() {
 	http.HandleFunc("/api/search", handler.HandleSearchAPI)
 
 	if len(idata.Config.SearchOn) > 0 {
-
 		for _, item := range idata.Config.SearchOn {
 			go fsdb.Init(idata.DataPathsPub, item)
 			go fsdb.Init(idata.DataPathsPrv, item)
@@ -160,17 +155,4 @@ func main() {
 	// start http server
 
 	etc.StartServer(idata.Config.Port)
-}
-
-func helperOA2SaveInfo(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
-	sess := etc.GetSession(r)
-	sess.Values["provider"] = provider
-	sess.Values["user"] = id
-	sess.Values["name"] = name
-	sess.Values[provider+"_access_token"] = resp["access_token"]
-	sess.Values[provider+"_expires_in"] = resp["expires_in"]
-	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
-	sess.Save(r, w)
-	iutil.QueryAssertUserName(provider, id, name)
-	util.Log("[user-login]", provider, id, name)
 }
