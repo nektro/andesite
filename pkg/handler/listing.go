@@ -97,7 +97,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				return
 			}
 
-			data := make([]map[string]string, len(files))
+			data := make([]map[string]interface{}, len(files))
 			gi := 0
 			for i := 0; i < len(files); i++ {
 				name := files[i].Name()
@@ -114,13 +114,13 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				if len(ext) == 0 {
 					ext = ".asc"
 				}
-				data[gi] = map[string]string{
+				data[gi] = map[string]interface{}{
 					"name":    a,
 					"size":    util.ByteCountIEC(files[i].Size()),
 					"mod":     files[i].ModTime().UTC().String()[:19],
 					"ext":     ext[1:],
 					"mod_raw": strconv.FormatInt(files[i].ModTime().UTC().Unix(), 10),
-					"is_file": strconv.FormatBool(!files[i].IsDir()),
+					"is_file": !files[i].IsDir(),
 				}
 				gi++
 			}
