@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/handler"
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/aymerick/raymond"
@@ -67,10 +67,7 @@ func main() {
 	//
 	// database initialization
 
-	etc.Database.CreateTableStruct("users", itypes.UserRow{})
-	etc.Database.CreateTableStruct("access", itypes.UserAccessRow{})
-	etc.Database.CreateTableStruct("shares", itypes.ShareRow{})
-	etc.Database.CreateTableStruct("shares_discord_role", itypes.DiscordRoleAccessRow{})
+	db.Init()
 
 	//
 	// database upgrade (removing db prefixes in favor of provider column)
