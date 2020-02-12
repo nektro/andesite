@@ -16,6 +16,10 @@ var (
 	FS dbstorage.Database
 )
 
+var (
+	CanSearch bool
+)
+
 func Init() {
 	DB = etc.Database
 	DB.CreateTableStruct("users", itypes.User{})
@@ -25,6 +29,7 @@ func Init() {
 
 	FS = dbstorage.ConnectSqlite(etc.DataRoot() + "/files.db")
 	FS.CreateTableStruct("files", itypes.File{})
+	CanSearch = FS.QueryNextID("files") > 1
 }
 
 func Upgrade() {

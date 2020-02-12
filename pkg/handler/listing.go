@@ -126,16 +126,17 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			}
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
-				"version":  idata.Version,
-				"provider": user.Provider,
-				"user":     user,
-				"path":     r.URL.Path[len(idata.Config.HTTPBase)-1:],
-				"files":    data,
-				"admin":    user.Admin,
-				"base":     idata.Config.HTTPBase,
-				"name":     oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
-				"host":     util.FullHost(r),
-				"extras":   extras,
+				"version":    idata.Version,
+				"provider":   user.Provider,
+				"user":       user,
+				"can_search": db.CanSearch,
+				"path":       r.URL.Path[len(idata.Config.HTTPBase)-1:],
+				"files":      data,
+				"admin":      user.Admin,
+				"base":       idata.Config.HTTPBase,
+				"name":       oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
+				"host":       util.FullHost(r),
+				"extras":     extras,
 			})
 		} else {
 			// access check
