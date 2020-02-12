@@ -195,3 +195,11 @@ func FetchDiscordGuild(guild string) DiscordGuild {
 	json.Unmarshal(bys, &dg)
 	return dg
 }
+
+func MapToArray(mp map[string]string) [][]string {
+	result := [][]string{}
+	for k, v := range mp {
+		result = append(result, []string{k, v})
+	}
+	return result
+}

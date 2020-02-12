@@ -15,6 +15,7 @@
             body > div { margin: 1em; }
             table tbody tr { line-height: 1; }
             .ui.menu { margin: 0; }
+            .ui.table > thead > tr > th { white-space: nowrap; }
         </style>
     </head>
     <body class="page-users">
@@ -29,26 +30,34 @@
             <div class="item"><a href="./../admin/roots">Roots</a></div>
         </div>
         <div>
-            <h1 class="ui header">Instance Users</h1>
+            <h1 class="ui header">Instance Data Paths</h1>
+            <h3>Public Roots</h3>
+            <p>Anyone may access these directories and files.</p>
             <table class="ui compact table">
                 <thead>
-                    <th>ID</th>
-                    <th>Provider</th>
-                    <th>Snowflake</th>
-                    <th>Name</th>
-                    <th>JoinedOn</th>
-                    <th>Admin</th>
+                    <tr>
+                        <th>Access Path</th>
+                        <th>Local Path</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    {{#each users}}
+                    {{#each roots_public}}
+                    <tr><td class="collapsing"><a href="./../{{lookup this 0}}/"><code>/{{lookup this 0}}/</code></a></td><td><code>{{lookup this 1}}/</code></td></tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <h3>Private Roots</h3>
+            <p>Users must be explicitly given access to view/download files.</p>
+            <table class="ui compact table">
+                <thead>
                     <tr>
-                        <td>{{ID}}</td>
-                        <td>{{Provider}}</td>
-                        <td>{{Snowflake}}</td>
-                        <td>{{Name}}</td>
-                        <td>{{JoinedOn}}</td>
-                        <td>{{Admin}}</td>
+                        <th>Access Path</th>
+                        <th>Local Path</th>
                     </tr>
+                </thead>
+                <tbody>
+                    {{#each roots_private}}
+                    <tr><td class="collapsing"><a href="./../{{lookup this 0}}/"><code>/{{lookup this 0}}/</code></a></td><td><code>{{lookup this 1}}/</code></td></tr>
                     {{/each}}
                 </tbody>
             </table>

@@ -45,6 +45,7 @@
     <body class="page-listing">
         <div class="ui main menu">
             <div class="header item">Welcome, {{user.Name}}@{{user.Provider}}</div>
+            <div class="item"><a href="{{base}}">Home</a></div>
             {{#if can_search}}
             <div class="item"><a href="{{base}}search"><i class="search icon"></i> Search</a></div>
             {{/if}}
