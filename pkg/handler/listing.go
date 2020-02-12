@@ -16,6 +16,7 @@ import (
 	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
 
+	"github.com/nektro/go-util/arrays/stringsu"
 	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
@@ -192,10 +193,10 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 			}
 		}
 	}
-	userAccess = iutil.FilterStr(userAccess, func(s string) bool {
+	userAccess = stringsu.Filter(userAccess, func(s string) bool {
 		return strings.HasPrefix(s, "/"+u[1]+"/") || s == "/"
 	})
-	userAccess = iutil.MapStr(userAccess, func(s string) string {
+	userAccess = stringsu.Map(userAccess, func(s string) string {
 		if s == "/" {
 			return s
 		}
