@@ -26,7 +26,7 @@ var (
 )
 
 func main() {
-	idata.Version = Version
+	idata.Version = etc.FixBareVersion(Version)
 	util.Log("Initializing Andesite " + idata.Version + "...")
 	etc.AppID = "andesite"
 
