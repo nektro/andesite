@@ -142,8 +142,13 @@ func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requ
 		sessID = u.Snowflake
 		kq.Close()
 	}
-	pS := provID.(string)
-	uS := sessID.(string)
+	var pS, uS string
+	if provID != nil {
+		pS = provID.(string)
+	}
+	if sessID != nil {
+		uS = sessID.(string)
+	}
 	user, ok := db.QueryUserBySnowflake(pS, uS)
 
 	if requireLogin {
