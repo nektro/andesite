@@ -108,11 +108,15 @@ func main() {
 
 	if len(idata.Config.Root) > 0 {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.ReplaceAll(idata.Config.Root, "~", idata.HomedirPath)))
-		util.Log("Sharing private files from " + idata.Config.Root)
 		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 		idata.DataPathsPrv["files"] = idata.Config.Root
+	}
+	if len(idata.DataPathsPrv) > 0 {
+		for k, v := range idata.DataPathsPrv {
+			http.HandleFunc("/"+k+"/", handler.HandleDirectoryListing(handler.HandleFileListing))
+			util.Log("Sharing private files from:", v)
+		}
 
-		http.HandleFunc("/files/", handler.HandleDirectoryListing(handler.HandleFileListing))
 		http.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
 		http.HandleFunc("/logout", handler.HandleLogout)
 		http.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing))
@@ -135,11 +139,14 @@ func main() {
 
 	if len(idata.Config.Public) > 0 {
 		idata.Config.Public, _ = filepath.Abs(filepath.Clean(strings.ReplaceAll(idata.Config.Public, "~", idata.HomedirPath)))
-		util.Log("Sharing public files from", idata.Config.Public)
 		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
 		idata.DataPathsPub["public"] = idata.Config.Public
-
-		http.HandleFunc("/public/", handler.HandleDirectoryListing(handler.HandlePublicListing))
+	}
+	if len(idata.DataPathsPub) > 0 {
+		for k, v := range idata.DataPathsPub {
+			http.HandleFunc("/"+k+"/", handler.HandleDirectoryListing(handler.HandlePublicListing))
+			util.Log("Sharing public files from:", v)
+		}
 	}
 
 	//
