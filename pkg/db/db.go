@@ -13,6 +13,7 @@ import (
 
 var (
 	DB dbstorage.Database
+	FS dbstorage.Database
 )
 
 func Init() {
@@ -21,6 +22,9 @@ func Init() {
 	DB.CreateTableStruct("access", itypes.UserAccessRow{})
 	DB.CreateTableStruct("shares", itypes.ShareRow{})
 	DB.CreateTableStruct("shares_discord_role", itypes.DiscordRoleAccessRow{})
+
+	FS = dbstorage.ConnectSqlite(etc.DataRoot() + "/files.db")
+	FS.CreateTableStruct("files", itypes.File{})
 }
 
 func Upgrade() {

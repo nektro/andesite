@@ -10,6 +10,14 @@ import (
 	. "github.com/nektro/go-util/alias"
 )
 
+func hGrabQueryString(r *http.Request, w http.ResponseWriter, name string) (string, error) {
+	v := r.URL.Query().Get(name)
+	if len(v) == 0 {
+		return v, E("")
+	}
+	return v, nil
+}
+
 func hGrabID(r *http.Request, w http.ResponseWriter) (string, int64, error) {
 	if !iutil.ContainsAll(r.PostForm, "id") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")

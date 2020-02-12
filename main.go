@@ -7,11 +7,13 @@ import (
 	"strings"
 
 	"github.com/nektro/andesite/pkg/db"
+	"github.com/nektro/andesite/pkg/fsdb"
 	"github.com/nektro/andesite/pkg/handler"
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/aymerick/raymond"
+	"github.com/nektro/go-util/arrays/stringsu"
 	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
 	"github.com/spf13/pflag"
@@ -35,6 +37,7 @@ func main() {
 	pflag.IntVar(&idata.Config.Port, "port", 8000, "Port to open server on")
 	pflag.StringVar(&idata.Config.HTTPBase, "base", "/", "Http Origin Path")
 	pflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
+	pflag.StringArrayVar(&idata.Config.SearchOn, "enable-search", []string{}, "Set to a root ID to enable file search for that directory.")
 	flagDGS := pflag.String("discord-guild-id", "", "")
 	flagDBT := pflag.String("discord-bot-token", "", "")
 	etc.PreInit()
@@ -63,6 +66,8 @@ func main() {
 			F("Visit https://github.com/nektro/andesite/blob/master/docs/config/v%d.md for more info.", idata.RequiredConfigVersion),
 		)
 	}
+
+	idata.Config.SearchOn = stringsu.Depupe(idata.Config.SearchOn)
 
 	//
 	// database initialization
@@ -135,6 +140,20 @@ func main() {
 		idata.DataPathsPub["public"] = idata.Config.Public
 
 		http.HandleFunc("/public/", handler.HandleDirectoryListing(handler.HandlePublicListing))
+	}
+
+	//
+	// initialize file database in background
+
+	http.HandleFunc("/search", handler.HandleSearch)
+	http.HandleFunc("/api/search", handler.HandleSearchAPI)
+
+	if len(idata.Config.SearchOn) > 0 {
+
+		for _, item := range idata.Config.SearchOn {
+			go fsdb.Init(idata.DataPathsPub, item)
+			go fsdb.Init(idata.DataPathsPrv, item)
+		}
 	}
 
 	//

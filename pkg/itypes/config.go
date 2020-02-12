@@ -13,6 +13,7 @@ type Config struct {
 	HTTPBase  string            `json:"base"`
 	Clients   []oauth2.AppConf  `json:"clients"`
 	Providers []oauth2.Provider `json:"providers"`
+	SearchOn  []string          `json:"search_on"`
 }
 
 func (c *Config) GetDiscordClient() *oauth2.AppConf {

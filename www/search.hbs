@@ -25,11 +25,17 @@
                 $(".ui.search").search({
                     apiSettings: {
                         url: "./api/search?q={query}",
-                    },
-                    fields: {
-                        results: "results",
-                        title: "name",
-                        description: "path",
+                        onResponse: function(api_response) {
+                            return {
+                                results: api_response.results.map(function(v) {
+                                    return {
+                                        title: v.path,
+                                        description: v.html_modtime + " || " + v.html_size,
+                                        url: v.path,
+                                    };
+                                }),
+                            }
+                        },
                     },
                     maxResults: 25,
                     showNoResults: true,
