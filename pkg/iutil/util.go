@@ -139,7 +139,7 @@ func ApiBootstrapRequireLogin(r *http.Request, w http.ResponseWriter, methods []
 			WriteUserDenied(r, w, true, true)
 			return nil, nil, E("invalid passkey")
 		}
-		sessID = ScanUser(kq).Snowflake
+		sessID = itypes.ScanUser(kq).Snowflake
 		kq.Close()
 	}
 

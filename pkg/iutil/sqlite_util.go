@@ -1,7 +1,6 @@
 package iutil
 
 import (
-	"database/sql"
 	"strconv"
 
 	"github.com/nektro/andesite/pkg/itypes"
@@ -12,36 +11,11 @@ import (
 	. "github.com/nektro/go-util/alias"
 )
 
-//
-//
-
-func ScanUser(rows *sql.Rows) itypes.User {
-	var v itypes.User
-	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey, &v.Provider)
-	v.IDS = strconv.FormatInt(v.ID, 10)
-	return v
-}
-
-func ScanUserAccess(rows *sql.Rows) itypes.UserAccess {
-	var v itypes.UserAccess
-	rows.Scan(&v.ID, &v.User, &v.Path)
-	return v
-}
-
-func ScanShare(rows *sql.Rows) itypes.Share {
-	var v itypes.Share
-	rows.Scan(&v.ID, &v.Hash, &v.Path)
-	return v
-}
-
-//
-//
-
 func QueryAccess(user *itypes.User) []string {
 	result := []string{}
 	rows := etc.Database.Build().Se("*").Fr("access").Wh("user", user.IDS).Exe()
 	for rows.Next() {
-		result = append(result, ScanUserAccess(rows).Path)
+		result = append(result, itypes.ScanUserAccess(rows).Path)
 	}
 	rows.Close()
 	return result
@@ -52,7 +26,7 @@ func QueryUserBySnowflake(provider, snowflake string) (*itypes.User, bool) {
 	if !rows.Next() {
 		return nil, false
 	}
-	ur := ScanUser(rows)
+	ur := itypes.ScanUser(rows)
 	rows.Close()
 	return &ur, true
 }
@@ -62,7 +36,7 @@ func QueryUserByID(id int64) (*itypes.User, bool) {
 	if !rows.Next() {
 		return nil, false
 	}
-	ur := ScanUser(rows)
+	ur := itypes.ScanUser(rows)
 	rows.Close()
 	return &ur, true
 }
@@ -72,7 +46,7 @@ func QueryAllAccess() []map[string]interface{} {
 	rows := etc.Database.Build().Se("*").Fr("access").Exe()
 	accs := []itypes.UserAccess{}
 	for rows.Next() {
-		accs = append(accs, ScanUserAccess(rows))
+		accs = append(accs, itypes.ScanUserAccess(rows))
 	}
 	rows.Close()
 	for _, uar := range accs {
@@ -115,7 +89,7 @@ func QueryAllShares() []map[string]string {
 	var result []map[string]string
 	rows := etc.Database.Build().Se("*").Fr("shares").Exe()
 	for rows.Next() {
-		sr := ScanShare(rows)
+		sr := itypes.ScanShare(rows)
 		result = append(result, map[string]string{
 			"id":   strconv.FormatInt(sr.ID, 10),
 			"hash": sr.Hash,
@@ -130,7 +104,7 @@ func QueryAllSharesByCode(code string) []itypes.Share {
 	shrs := []itypes.Share{}
 	rows := etc.Database.Build().Se("*").Fr("shares").Wh("hash", code).Exe()
 	for rows.Next() {
-		shrs = append(shrs, ScanShare(rows))
+		shrs = append(shrs, itypes.ScanShare(rows))
 	}
 	rows.Close()
 	return shrs
@@ -169,7 +143,7 @@ func QueryAllUsers() []itypes.User {
 	result := []itypes.User{}
 	q := etc.Database.Build().Se("*").Fr("users").Exe()
 	for q.Next() {
-		result = append(result, ScanUser(q))
+		result = append(result, itypes.ScanUser(q))
 	}
 	return result
 }
