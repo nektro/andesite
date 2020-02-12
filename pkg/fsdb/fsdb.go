@@ -88,12 +88,11 @@ func insertFile(f *itypes.File) {
 	// File does not exist, add
 	db.FS.Build().Ins(cTbl).Lock()
 	id := db.FS.QueryNextID(cTbl)
-	db.FS.QueryPrepared(true, "insert into "+cTbl+" values (?,?,?,?,?,?,?,?,?,?,?)", id, f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
-	db.FS.Build().Ins(cTbl).Unlock()
-	//
 	if idata.Config.VerboseFS {
 		util.Log("fsdb:", "add:", id, f.Path)
 	}
+	db.FS.QueryPrepared(true, "insert into "+cTbl+" values (?,?,?,?,?,?,?,?,?,?,?)", id, f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
+	db.FS.Build().Ins(cTbl).Unlock()
 }
 
 func DeInit(mp map[string]string, rt string) {
