@@ -134,7 +134,7 @@ func main() {
 	http.HandleFunc("/test", handler.HandleTest)
 
 	if len(idata.Config.Root) > 0 {
-		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.Replace(idata.Config.Root, "~", idata.HomedirPath, -1)))
+		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.ReplaceAll(idata.Config.Root, "~", idata.HomedirPath)))
 		util.Log("Sharing private files from " + idata.Config.Root)
 		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Root), "Please pass a valid directory as a root parameter!"))
 		idata.DataPathsPrv["files"] = idata.Config.Root
