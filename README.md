@@ -29,12 +29,13 @@ Here you can also fill out a picture and description that will be displayed duri
 
 Once you have finished the app creation process you should now have a Client ID and Client Secret. These are passed into Andesite through flags as well.
 
+The Identity Provider IDs used below can be found in the table in the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#creating-credentials) documentation under the "Short Code" column.
+
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `--auth-{IDP-ID}-id` | `string` | none. | Client ID. |
 | `--auth-{IDP-ID}-secret` | `string` | none. | Client Secret. |
 
-The Identity Provider IDs can be found from the table in the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) documentation.
 
 ## Deployment
 Pre-compiled binaries can be obtained from https://github.com/nektro/andesite/releases/latest.
