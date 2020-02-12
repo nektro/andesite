@@ -29,6 +29,7 @@ var (
 func main() {
 	idata.Version = Version
 	util.Log("Initializing Andesite " + idata.Version + "...")
+	etc.AppID = "andesite"
 
 	pflag.IntVar(&idata.Config.Version, "version", idata.RequiredConfigVersion, "Config version to use.")
 	pflag.StringVar(&idata.Config.Root, "root", "", "Path of root directory for files")
@@ -38,7 +39,7 @@ func main() {
 	pflag.BoolVar(&idata.Config.SearchOn, "enable-search", false, "Set to true to enable search database")
 	flagDGS := pflag.String("discord-guild-id", "", "")
 	flagDBT := pflag.String("discord-bot-token", "", "")
-	etc.PreInit("andesite")
+	etc.PreInit()
 
 	etc.Init("andesite", &idata.Config, "./files/", helperOA2SaveInfo)
 
