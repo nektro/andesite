@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
 
@@ -43,7 +44,7 @@ func hGrabUser(r *http.Request, w http.ResponseWriter) (string, *itypes.User, er
 		iutil.WriteAPIResponse(r, w, false, "User parameter must be an integer")
 		return a, nil, E("")
 	}
-	u, ok := iutil.QueryUserByID(n)
+	u, ok := db.QueryUserByID(n)
 	if !ok {
 		iutil.WriteLinkResponse(r, w, "Unable to find User", "Invalid user ID.", "Return", "./../../admin")
 		return a, nil, E("")

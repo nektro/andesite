@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
@@ -165,11 +166,11 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	}
 	u := strings.Split(r.URL.Path, "/")
 
-	userAccess := iutil.QueryAccess(user)
+	userAccess := db.QueryAccess(user)
 	dc := idata.Config.GetDiscordClient()
 
 	if user.Provider == "discord" && dc.Extra1 != "" && dc.Extra2 != "" {
-		dra := iutil.QueryAllDiscordRoleAccess()
+		dra := db.QueryAllDiscordRoleAccess()
 		var p fastjson.Parser
 
 		rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, dc.Extra1, user.Snowflake)
@@ -231,7 +232,7 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		w.WriteHeader(http.StatusFound)
 	}
 	h := u[2]
-	s := iutil.QueryAccessByShare(h)
+	s := db.QueryAccessByShare(h)
 	if len(s) == 0 {
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/iutil"
 
@@ -85,7 +86,7 @@ func HandleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	dra := iutil.QueryDiscordRoleAccess(qID)
+	dra := db.QueryDiscordRoleAccess(qID)
 	if dra == nil {
 		return
 	}

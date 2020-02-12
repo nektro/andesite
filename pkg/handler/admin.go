@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/iutil"
 
@@ -24,10 +25,10 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 		"name":                  oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 		"auth":                  oauth2.ProviderIDMap[user.Provider].ID,
 		"discord_role_share_on": len(dc.Extra1) > 0 && len(dc.Extra2) > 0,
-		"users":                 iutil.QueryAllUsers(),
-		"accesses":              iutil.QueryAllAccess(),
-		"shares":                iutil.QueryAllShares(),
-		"discord_shares":        iutil.QueryAllDiscordRoleAccess(),
+		"users":                 db.QueryAllUsers(),
+		"accesses":              db.QueryAllAccess(),
+		"shares":                db.QueryAllShares(),
+		"discord_shares":        db.QueryAllDiscordRoleAccess(),
 	})
 }
 
@@ -43,6 +44,6 @@ func HandleAdminUsers(w http.ResponseWriter, r *http.Request) {
 		"base":    idata.Config.HTTPBase,
 		"name":    oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 		"auth":    oauth2.ProviderIDMap[user.Provider].ID,
-		"users":   iutil.QueryAllUsers(),
+		"users":   db.QueryAllUsers(),
 	})
 }

@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/nektro/andesite/pkg/itypes"
-	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/nektro/go-util/util"
 	dbstorage "github.com/nektro/go.dbstorage"
@@ -36,7 +35,7 @@ func Upgrade() {
 		"facebook":  "4:",
 		"microsoft": "5:",
 	}
-	for _, item := range iutil.QueryAllUsers() {
+	for _, item := range QueryAllUsers() {
 		for k, v := range prefixes {
 			if strings.HasPrefix(item.Snowflake, v) {
 				sn := item.Snowflake[len(v):]
@@ -57,6 +56,6 @@ func SaveOAuth2InfoCb(w http.ResponseWriter, r *http.Request, provider string, i
 	sess.Values[provider+"_expires_in"] = resp["expires_in"]
 	sess.Values[provider+"_refresh_token"] = resp["refresh_token"]
 	sess.Save(r, w)
-	iutil.QueryAssertUserName(provider, id, name)
+	QueryAssertUserName(provider, id, name)
 	util.Log("[user-login]", provider, id, name)
 }
