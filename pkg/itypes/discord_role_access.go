@@ -1,6 +1,5 @@
 package itypes
 
-//
 type DiscordRoleAccess struct {
 	ID        int64  `json:"id"`
 	GuildID   string `json:"guild_snowflake" sqlite:"text"`
