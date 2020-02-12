@@ -1,13 +1,6 @@
 package itypes
 
 //
-type UserAccess struct {
-	ID   int64  `json:"id"`
-	User int64  `json:"user" sqlite:"int"`
-	Path string `json:"path" sqlite:"text"`
-}
-
-//
 type Share struct {
 	ID   int64  `json:"id"`
 	Hash string `json:"hash" sqlite:"text"` // character(32)
