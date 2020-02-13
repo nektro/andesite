@@ -93,6 +93,7 @@ func insertFile(f *itypes.File) {
 	}
 	db.FS.QueryPrepared(true, "insert into "+cTbl+" values (?,?,?,?,?,?,?,?,?,?,?)", id, f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
 	db.FS.Build().Ins(cTbl).Unlock()
+	db.CanSearch = db.FS.QueryNextID("files") > 1
 }
 
 func DeInit(mp map[string]string, rt string) {
@@ -102,4 +103,5 @@ func DeInit(mp map[string]string, rt string) {
 	}
 	db.FS.QueryPrepared(true, "delete from files where root = ?", rt)
 	util.Log("fsdb:", rt+":", "removed.")
+	db.CanSearch = db.FS.QueryNextID("files") > 1
 }
