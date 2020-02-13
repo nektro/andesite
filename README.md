@@ -69,7 +69,7 @@ Pre-compiled binaries can be obtained from https://github.com/nektro/andesite/re
 ### Installing
 Run
 ```
-$ go get -u github.com/nektro/andesite
+$ go get -v -u github.com/nektro/andesite
 ```
 and then make your way to `$GOPATH/src/github.com/nektro/andesite/`.
 
