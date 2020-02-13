@@ -18,12 +18,16 @@
         <!---->
         <style>
             body { overflow-x: visible; }
-            body > div { margin: 1em; }
+            body > div:not(.modals) { margin: 1em; }
             table.table { font-family: 'Source Code Pro', 'Courier New', monospace; }
             table.table tr td { white-space: nowrap; padding: .2em .7em !important; }
             table.table tr td:nth-child(5) { text-align: right; }
             #dlbox { background-color: #dedede; border-radius: .25em; padding: 1em; }
             p code { background-color: #ccc; border-radius: .2em; padding: .25em; }
+            table tr td i.info.icon { cursor: pointer; }
+            .ui.basic.modal { width: 100vw; }
+            .ui.basic.modal h4 { margin: 0 1em; }
+            .ui.modal .content > div { margin: 1em 0; }
         </style>
         <script>
             (function() {
@@ -37,6 +41,24 @@
                     }
                     new Tablesort(document.querySelector("table"), {
                         descending: false,
+                    });
+                    const mel = document.querySelector(".modal .content").children;
+                    $("table tr td i.info.icon").click(function(e) {
+                        const f = e.target.parentElement.parentElement.children[3].firstElementChild.pathname;
+                        const url = "{{base}}api/search?q="+f;
+                        fetch(url).then(x => x.json()).then(x => {
+                            if (x.count === 0) {
+                                return
+                            }
+                            mel[0].parentElement.parentElement.children[1].textContent = x.results[0].path;
+                            mel[0].children[0].children[1].value = x.results[0].hash_md5;
+                            mel[1].children[0].children[1].value = x.results[0].hash_sha1;
+                            mel[2].children[0].children[1].value = x.results[0].hash_sha256;
+                            mel[3].children[0].children[1].value = x.results[0].hash_sha512;
+                            mel[4].children[0].children[1].value = x.results[0].hash_sha3;
+                            mel[5].children[0].children[1].value = x.results[0].hash_blake2b;
+                            $(".ui.basic.modal").modal("show");
+                        })
                     });
                 })
             })();
@@ -63,6 +85,7 @@
             <table class="ui sortable compact table">
                 <thead>
                     <th class="collapsing" data-sort-method="number"></th>
+                    <th class="collapsing" data-sort-method="none"></th>
                     <th class="collapsing"></th>
                     <th class="collapsing">Name</th>
                     <th class="collapsing" data-sort-method="number">Last Modified</th>
@@ -70,9 +93,9 @@
                     <th data-sort-method="none"></th>
                 </thead>
                 <tbody>
-                    <tr data-sort-method="none"><td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
+                    <tr data-sort-method="none"><td></td><td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
                     {{#each files}}
-                    <tr><td>{{add_i @index 1}}</td><td data-sort="{{is_file}}_{{name}}"><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td data-sort="{{mod_raw}}">{{mod}}</td><td>{{size}}</td><td></td></tr>
+                    <tr><td>{{add_i @index 1}}</td><td>{{#if is_file}}<i class="info circle icon"></i>{{/if}}</td><td data-sort="{{is_file}}_{{name}}"><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td data-sort="{{mod_raw}}">{{mod}}</td><td>{{size}}</td><td></td></tr>
                     {{/each}}
                 </tbody>
             </table>
@@ -81,6 +104,18 @@
             {{#if user.PassKey}}<p>Download the contents of the entire folder using your passkey: <code>{{user.PassKey}}</code> (<a href="{{base}}regen_passkey">Regenerate Key</a>)</p>{{/if}}
             <p><code>wget -m -np -c -R "index.html*"{{#if user.PassKey}} --user-agent "AndesiteUser/{{user.PassKey}}"{{/if}} "{{host}}{{path}}"</code></p>
             <p><code>rclone copy --http-url="{{host}}{{path}}" :http: ./ -P{{#if user.PassKey}} --user-agent "AndesiteUser/{{user.PassKey}}"{{/if}}</code></p>
+        </div>
+        <div class="ui basic modal">
+            <div class="ui icon header"><i class="hashtag icon"></i> File Details</div>
+            <h4></h4>
+            <div class="content">
+                <div><div class="ui fluid labeled input"><div class="ui label">MD5</div><input type="text" readonly=""></div></div>
+                <div><div class="ui fluid labeled input"><div class="ui label">SHA1</div><input type="text" readonly=""></div></div>
+                <div><div class="ui fluid labeled input"><div class="ui label">SHA256</div><input type="text" readonly=""></div></div>
+                <div><div class="ui fluid labeled input"><div class="ui label">SHA512</div><input type="text" readonly=""></div></div>
+                <div><div class="ui fluid labeled input"><div class="ui label">SHA3_512</div><input type="text" readonly=""></div></div>
+                <div><div class="ui fluid labeled input"><div class="ui label">Blake2b_512</div><input type="text" readonly=""></div></div>
+            </div>
         </div>
     </body>
 </html>
