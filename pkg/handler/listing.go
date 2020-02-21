@@ -49,7 +49,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 		}
 
 		// valid path check
-		stat, err := os.Stat(fileRoot + qpath)
+		stat, err := os.Lstat(fileRoot + qpath)
 		if os.IsNotExist(err) {
 			// 404
 			iutil.WriteUserDenied(r, w, true, false)
@@ -102,8 +102,19 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			for i := 0; i < len(files); i++ {
 				name := files[i].Name()
 				a := ""
-				if files[i].IsDir() || files[i].Mode()&os.ModeSymlink != 0 {
+				if files[i].IsDir() {
 					a = name + "/"
+				} else if files[i].Mode()&os.ModeSymlink != 0 {
+					// resolve link, then do this again
+					realpath, _ := os.Readlink(fileRoot + qpath + files[i].Name())
+
+					files[i], _ = os.Lstat(realpath)
+
+					if files[i].IsDir() {
+						a = name + "/"
+					} else {
+						a = name
+					}
 				} else {
 					a = name
 				}
@@ -114,6 +125,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				if len(ext) == 0 {
 					ext = ".asc"
 				}
+
 				data[gi] = map[string]interface{}{
 					"name":    a,
 					"size":    util.ByteCountIEC(files[i].Size()),
