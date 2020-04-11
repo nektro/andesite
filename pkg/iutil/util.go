@@ -228,3 +228,13 @@ func MapToArray(mp map[string]string) [][]string {
 	}
 	return result
 }
+
+func Combine(mps ...map[string]string) map[string]string {
+	result := map[string]string{}
+	for _, item := range mps {
+		for k, v := range item {
+			result[k] = v
+		}
+	}
+	return result
+}
