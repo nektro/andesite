@@ -135,7 +135,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"version":    idata.Version,
 				"provider":   user.Provider,
 				"user":       user,
-				"can_search": db.CanSearch,
+				"can_search": db.CanSearch(pth),
 				"path":       pth,
 				"files":      data,
 				"admin":      user.Admin,

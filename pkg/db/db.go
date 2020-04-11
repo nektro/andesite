@@ -17,7 +17,7 @@ var (
 )
 
 var (
-	CanSearch bool
+	searchCache = map[string]bool{}
 )
 
 func Init() {
@@ -29,7 +29,6 @@ func Init() {
 
 	FS = dbstorage.ConnectSqlite(etc.DataRoot() + "/files.db")
 	FS.CreateTableStruct("files", itypes.File{})
-	CanSearch = FS.QueryNextID("files") > 1
 }
 
 func Upgrade() {
@@ -71,4 +70,15 @@ func FolderSize(p string) (size int64, count int64) {
 	defer rows.Close()
 	rows.Scan(&size, &count)
 	return
+}
+
+func CanSearch(p string) bool {
+	b, ok := searchCache[p]
+	if ok {
+		return b
+	}
+	_, count := FolderSize(p)
+	b = count > 0
+	searchCache[p] = b
+	return b
 }

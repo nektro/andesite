@@ -92,7 +92,6 @@ func insertFile(f *itypes.File) {
 	if idata.Config.VerboseFS {
 		util.Log("fsdb:", "add:", id, f.Path)
 	}
-	db.CanSearch = db.FS.QueryNextID("files") > 1
 	db.FS.Build().Ins(cTbl, id, f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b).Exe()
 	dbstorage.InsertsLock.Unlock()
 }
@@ -104,5 +103,4 @@ func DeInit(mp map[string]string, rt string) {
 	}
 	db.FS.Build().Del("files").Wh("root", rt).Exe()
 	util.Log("fsdb:", rt+":", "removed.")
-	db.CanSearch = db.FS.QueryNextID("files") > 1
 }
