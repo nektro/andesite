@@ -12,6 +12,7 @@ import (
 	"github.com/nektro/andesite/pkg/itypes"
 
 	"github.com/gorilla/sessions"
+	"github.com/nektro/go-util/arrays/stringsu"
 	"github.com/nektro/go-util/util"
 	discord "github.com/nektro/go.discord"
 	etc "github.com/nektro/go.etc"
@@ -99,7 +100,7 @@ func ContainsAll(mp url.Values, keys ...string) bool {
 }
 
 func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requireLogin bool, requireAdmin bool, doOutput bool) (*sessions.Session, *itypes.User, error) {
-	if !util.Contains(methods, r.Method) {
+	if !stringsu.Contains(methods, r.Method) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Add("Allow", F("%v", methods))
 		if doOutput {
