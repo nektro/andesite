@@ -113,7 +113,7 @@
                     <th data-sort-method="none"></th>
                 </thead>
                 <tbody>
-                    <tr data-sort-method="none"><td></td><td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
+                    <tr data-sort-method="none">{{#if can_search}}<td></td>{{/if}}<td></td><td></td><td><a href="../">Parent Directory</a></td><td></td><td></td><td></td></tr>
                     {{#each files}}
                     <tr><td>{{add_i @index 1}}</td>{{#if can_search}}<td>{{#if is_file}}<i class="info circle icon"></i>{{/if}}</td>{{/if}}<td data-sort="{{is_file}}_{{name}}"><span class="fiv-sqo fiv-icon-{{ext}}"></span></td><td><a href="{{url_name name}}">{{name}}</a></td><td data-sort="{{mod_raw}}">{{mod}}</td><td>{{size}}</td><td></td></tr>
                     {{/each}}
