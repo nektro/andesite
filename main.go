@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"net/url"
 	"path/filepath"
 	"strings"
@@ -104,7 +103,9 @@ func main() {
 	//
 	// http server setup
 
-	http.HandleFunc("/test", handler.HandleTest)
+	r := etc.Router
+
+	r.HandleFunc("/test", handler.HandleTest)
 
 	if len(idata.Config.Root) > 0 {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.ReplaceAll(idata.Config.Root, "~", idata.HomedirPath)))
@@ -118,29 +119,29 @@ func main() {
 	}
 	if len(idata.DataPathsPrv) > 0 {
 		for k, v := range idata.DataPathsPrv {
-			http.HandleFunc("/"+k+"/", handler.HandleDirectoryListing(handler.HandleFileListing))
+			r.PathPrefix("/" + k + "/").HandlerFunc(handler.HandleDirectoryListing(handler.HandleFileListing))
 			util.Log("Sharing private files as", k, "from ", v)
 		}
 
-		http.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
-		http.HandleFunc("/logout", handler.HandleLogout)
-		http.HandleFunc("/open/", handler.HandleDirectoryListing(handler.HandleShareListing))
+		r.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
+		r.HandleFunc("/logout", handler.HandleLogout)
+		r.PathPrefix("/open/").HandlerFunc(handler.HandleDirectoryListing(handler.HandleShareListing))
 
-		http.HandleFunc("/admin", handler.HandleAdmin)
-		http.HandleFunc("/admin/users", handler.HandleAdminUsers)
-		http.HandleFunc("/admin/roots", handler.HandleAdminRoots)
+		r.HandleFunc("/admin", handler.HandleAdmin)
+		r.HandleFunc("/admin/users", handler.HandleAdminUsers)
+		r.HandleFunc("/admin/roots", handler.HandleAdminRoots)
 
-		http.HandleFunc("/api/access/create", handler.HandleAccessCreate)
-		http.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
-		http.HandleFunc("/api/access/delete", handler.HandleAccessDelete)
+		r.HandleFunc("/api/access/create", handler.HandleAccessCreate)
+		r.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
+		r.HandleFunc("/api/access/delete", handler.HandleAccessDelete)
 
-		http.HandleFunc("/api/share/create", handler.HandleShareCreate)
-		http.HandleFunc("/api/share/update", handler.HandleShareUpdate)
-		http.HandleFunc("/api/share/delete", handler.HandleShareDelete)
+		r.HandleFunc("/api/share/create", handler.HandleShareCreate)
+		r.HandleFunc("/api/share/update", handler.HandleShareUpdate)
+		r.HandleFunc("/api/share/delete", handler.HandleShareDelete)
 
-		http.HandleFunc("/api/access_discord_role/create", handler.HandleDiscordRoleAccessCreate)
-		http.HandleFunc("/api/access_discord_role/update", handler.HandleDiscordRoleAccessUpdate)
-		http.HandleFunc("/api/access_discord_role/delete", handler.HandleDiscordRoleAccessDelete)
+		r.HandleFunc("/api/access_discord_role/create", handler.HandleDiscordRoleAccessCreate)
+		r.HandleFunc("/api/access_discord_role/update", handler.HandleDiscordRoleAccessUpdate)
+		r.HandleFunc("/api/access_discord_role/delete", handler.HandleDiscordRoleAccessDelete)
 	}
 
 	if len(idata.Config.Public) > 0 {
@@ -155,7 +156,7 @@ func main() {
 	}
 	if len(idata.DataPathsPub) > 0 {
 		for k, v := range idata.DataPathsPub {
-			http.HandleFunc("/"+k+"/", handler.HandleDirectoryListing(handler.HandlePublicListing))
+			r.PathPrefix("/" + k + "/").HandlerFunc(handler.HandleDirectoryListing(handler.HandlePublicListing))
 			util.Log("Sharing public files as", k, "from ", v)
 		}
 	}
@@ -163,8 +164,8 @@ func main() {
 	//
 	// initialize file database in background
 
-	http.HandleFunc("/search", handler.HandleSearch)
-	http.HandleFunc("/api/search", handler.HandleSearchAPI)
+	r.HandleFunc("/search", handler.HandleSearch)
+	r.HandleFunc("/api/search", handler.HandleSearchAPI)
 
 	if len(idata.Config.SearchOn) > 0 {
 		for _, item := range idata.Config.SearchOn {
