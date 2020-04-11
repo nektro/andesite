@@ -124,13 +124,14 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				}
 				gi++
 			}
+			pth := r.URL.Path[len(idata.Config.HTTPBase)-1:]
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
 				"version":    idata.Version,
 				"provider":   user.Provider,
 				"user":       user,
 				"can_search": db.CanSearch,
-				"path":       r.URL.Path[len(idata.Config.HTTPBase)-1:],
+				"path":       pth,
 				"files":      data,
 				"admin":      user.Admin,
 				"base":       idata.Config.HTTPBase,
