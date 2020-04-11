@@ -82,6 +82,17 @@
         <div>
             <h1 class="ui header">Index of {{path}}</h1>
             <div class="ui divider"></div>
+            {{#if can_search}}
+            <div class="ui icon message">
+                <i class="folder open icon"></i>
+                <div class="content">
+                    <div class="header">Directory size:</div>
+                    <p>{{dir_size}}</p>
+                    <div class="header">File count (including subdirectories):</div>
+                    <p>{{file_total}}</p>
+                </div>
+            </div>
+            {{/if}}
             <div class="ui icon message">
                 <i class="folder icon"></i>
                 <div class="content">

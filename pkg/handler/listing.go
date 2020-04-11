@@ -31,6 +31,7 @@ import (
 func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
+		fileRoot, _ = filepath.Abs(fileRoot)
 
 		w.Header().Add("access-control-allow-origin", "*")
 
@@ -128,6 +129,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			}
 			pth := r.URL.Path[len(idata.Config.HTTPBase)-1:]
 			printer := message.NewPrinter(language.English)
+			dsize, fcount := db.FolderSize(pth)
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
 				"version":    idata.Version,
@@ -142,6 +144,8 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"host":       util.FullHost(r),
 				"extras":     extras,
 				"file_count": printer.Sprintf("%d", len(files)),
+				"dir_size":   util.ByteCountIEC(dsize),
+				"file_total": printer.Sprintf("%d", fcount),
 			})
 		} else {
 			// access check
