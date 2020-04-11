@@ -19,7 +19,7 @@ func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	aid := etc.Database.QueryNextID("shares")
-	ash := util.Hash("MD5", []byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(aid, 10), util.GetIsoDateTime())))[:12]
+	ash := util.Hash("MD5", []byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(aid, 10), T())))[:12]
 	if !iutil.ContainsAll(r.PostForm, "path") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
