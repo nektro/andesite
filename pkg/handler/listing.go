@@ -16,6 +16,8 @@ import (
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 
 	"github.com/nektro/go-util/arrays/stringsu"
 	"github.com/nektro/go-util/util"
@@ -125,6 +127,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				gi++
 			}
 			pth := r.URL.Path[len(idata.Config.HTTPBase)-1:]
+			printer := message.NewPrinter(language.English)
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
 				"version":    idata.Version,
@@ -138,6 +141,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"name":       oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
 				"host":       util.FullHost(r),
 				"extras":     extras,
+				"file_count": printer.Sprintf("%d", len(files)),
 			})
 		} else {
 			// access check
