@@ -61,8 +61,7 @@ func QueryAllAccess() []map[string]interface{} {
 }
 
 func QueryDoAddUser(id int64, provider string, snowflake string, admin bool, name string) {
-	DB.QueryPrepared(true, F("insert into users values ('%d', '%s', '%s', ?, '%s', '', ?)", id, snowflake, strconv.Itoa(util.Btoi(admin)), T()), name, provider)
-	DB.Build().Up("users", "passkey", GenerateNewUserPasskey(snowflake)).Wh("snowflake", snowflake).Exe()
+	DB.Build().Ins("users", id, snowflake, strconv.Itoa(util.Btoi(admin)), name, T(), GenerateNewUserPasskey(snowflake), provider).Exe()
 }
 
 func GenerateNewUserPasskey(snowflake string) string {
@@ -82,7 +81,7 @@ func QueryAssertUserName(provider, snowflake string, name string) {
 			// always admin first user
 			DB.Build().Up("users", "admin", "1").Wh("id", "1").Exe()
 			aid := DB.QueryNextID("access")
-			DB.QueryPrepared(true, F("insert into access values ('%d', '%d', '/')", aid, uid))
+			DB.Build().Ins("access", aid, uid, "/").Exe()
 			util.Log(F("Set user '%s's status to admin", snowflake))
 		}
 	}

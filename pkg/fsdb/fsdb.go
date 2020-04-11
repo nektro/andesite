@@ -13,6 +13,7 @@ import (
 
 	"github.com/karrick/godirwalk"
 	"github.com/nektro/go-util/util"
+	dbstorage "github.com/nektro/go.dbstorage"
 )
 
 const (
@@ -86,14 +87,14 @@ func insertFile(f *itypes.File) {
 		return
 	}
 	// File does not exist, add
-	db.FS.Build().Ins(cTbl).Lock()
+	dbstorage.InsertsLock.Lock()
 	id := db.FS.QueryNextID(cTbl)
 	if idata.Config.VerboseFS {
 		util.Log("fsdb:", "add:", id, f.Path)
 	}
-	db.FS.QueryPrepared(true, "insert into "+cTbl+" values (?,?,?,?,?,?,?,?,?,?,?)", id, f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
-	db.FS.Build().Ins(cTbl).Unlock()
 	db.CanSearch = db.FS.QueryNextID("files") > 1
+	db.FS.Build().Ins(cTbl, id, f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b).Exe()
+	dbstorage.InsertsLock.Unlock()
 }
 
 func DeInit(mp map[string]string, rt string) {
@@ -101,7 +102,7 @@ func DeInit(mp map[string]string, rt string) {
 	if !ok {
 		return
 	}
-	db.FS.QueryPrepared(true, "delete from files where root = ?", rt)
+	db.FS.Build().Del("files").Wh("root", rt).Exe()
 	util.Log("fsdb:", rt+":", "removed.")
 	db.CanSearch = db.FS.QueryNextID("files") > 1
 }

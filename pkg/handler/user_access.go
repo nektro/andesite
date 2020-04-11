@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/iutil"
 
 	etc "github.com/nektro/go.etc"
@@ -28,7 +29,7 @@ func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	apt := r.PostForm.Get("path")
 	//
-	etc.Database.QueryPrepared(true, "insert into access values (?, ?, ?)", aid, uS, apt)
+	db.DB.Build().Ins("access", aid, uS, apt).Exe()
 	iutil.WriteAPIResponse(r, w, true, F("Created access for %s.", u.Name+"@"+u.Provider))
 }
 
@@ -69,6 +70,6 @@ func HandleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	etc.Database.QueryPrepared(true, "delete from access where id = ?", idS)
+	db.DB.Build().Del("access").Wh("id", idS).Exe()
 	iutil.WriteAPIResponse(r, w, true, "Removed access "+idS+".")
 }

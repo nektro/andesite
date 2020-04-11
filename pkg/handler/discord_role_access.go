@@ -37,7 +37,7 @@ func HandleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		iutil.WriteAPIResponse(r, w, false, "Unable to fetch role metadata from Discord API.")
 		return
 	}
-	etc.Database.QueryPrepared(true, "insert into shares_discord_role values (?, ?, ?, ?, ?, ?)", aid, ags, agr, apt, gn, rn)
+	db.DB.Build().Ins("shares_discord_role", aid, ags, agr, apt, gn, rn).Exe()
 	iutil.WriteAPIResponse(r, w, true, F("Created access for %s / %s to %s.", gn, rn, apt))
 }
 
@@ -90,6 +90,6 @@ func HandleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	if dra == nil {
 		return
 	}
-	etc.Database.QueryPrepared(true, "delete from shares_discord_role where id = ?", qID)
+	db.DB.Build().Del("shares_discord_role").Wh("id", strconv.FormatInt(qID, 10)).Exe()
 	iutil.WriteAPIResponse(r, w, true, F("Successfully deleted access for %s / %s to %s.", dra.GuildName, dra.RoleName, dra.Path))
 }

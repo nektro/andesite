@@ -45,7 +45,7 @@ func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	fa1 := fsdb.NewFiles(db.FS.QueryPrepared(false, "select * from files where path like '%'||?||'%' limit 25", q))
+	fa1 := fsdb.NewFiles(db.FS.Build().Se("*").Fr("files").WR("path", "like", "'%'||?||'%'", true, q).Lm(25).Exe())
 	ua := db.QueryAccess(user)
 	fa2 := []itypes.File{}
 	//

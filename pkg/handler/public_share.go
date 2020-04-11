@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/nektro/go-util/util"
@@ -25,7 +26,7 @@ func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	fpath := r.PostForm.Get("path")
 	//
-	etc.Database.QueryPrepared(true, "insert into shares values (?, ?, ?)", aid, ash, fpath)
+	db.DB.Build().Ins("shares", aid, ash, fpath).Exe()
 	iutil.WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ash, fpath))
 }
 
@@ -63,6 +64,6 @@ func HandleShareDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	etc.Database.QueryPrepared(true, "delete from shares where id = ?", idS)
+	db.DB.Build().Del("shares").Wh("id", idS).Exe()
 	iutil.WriteAPIResponse(r, w, true, "Successfully deleted share link.")
 }
