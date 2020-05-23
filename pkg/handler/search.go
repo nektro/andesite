@@ -44,6 +44,12 @@ func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
 			q.WR("path", "like", "'%'||?||'%'", true, qq)
 		}
 	}
+	for _, item := range []string{"md5", "sha1", "sha256", "sha512", "sha3", "blake2b"} {
+		qh := r.Form.Get(item)
+		if len(qh) > 0 {
+			q.Wh("hash_"+item, qh)
+		}
+	}
 	fa1 := fsdb.NewFiles(q.Lm(25).Exe())
 	ua := db.QueryAccess(user)
 	fa2 := []itypes.File{}
