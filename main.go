@@ -14,6 +14,7 @@ import (
 	"github.com/nektro/go-util/arrays/stringsu"
 	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
+	"github.com/nektro/go.etc/htp"
 	"github.com/spf13/pflag"
 
 	. "github.com/nektro/go-util/alias"
@@ -103,9 +104,7 @@ func main() {
 	//
 	// http server setup
 
-	r := etc.Router
-
-	r.HandleFunc("/test", handler.HandleTest)
+	htp.Register("/test", "GET", handler.HandleTest)
 
 	if len(idata.Config.Root) > 0 {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.ReplaceAll(idata.Config.Root, "~", idata.HomedirPath)))
@@ -119,29 +118,29 @@ func main() {
 	}
 	if len(idata.DataPathsPrv) > 0 {
 		for k, v := range idata.DataPathsPrv {
-			r.PathPrefix("/" + k + "/").HandlerFunc(handler.HandleDirectoryListing(handler.HandleFileListing))
+			htp.Register("/"+k+"/*", "GET", handler.HandleDirectoryListing(handler.HandleFileListing))
 			util.Log("Sharing private files as", k, "from ", v)
 		}
 
-		r.HandleFunc("/regen_passkey", handler.HandleRegenPasskey)
-		r.HandleFunc("/logout", handler.HandleLogout)
-		r.PathPrefix("/open/").HandlerFunc(handler.HandleDirectoryListing(handler.HandleShareListing))
+		htp.Register("/regen_passkey", "GET", handler.HandleRegenPasskey)
+		htp.Register("/logout", "GET", handler.HandleLogout)
+		htp.Register("/open/*", "GET", handler.HandleDirectoryListing(handler.HandleShareListing))
 
-		r.HandleFunc("/admin", handler.HandleAdmin)
-		r.HandleFunc("/admin/users", handler.HandleAdminUsers)
-		r.HandleFunc("/admin/roots", handler.HandleAdminRoots)
+		htp.Register("/admin", "GET", handler.HandleAdmin)
+		htp.Register("/admin/users", "GET", handler.HandleAdminUsers)
+		htp.Register("/admin/roots", "GET", handler.HandleAdminRoots)
 
-		r.HandleFunc("/api/access/create", handler.HandleAccessCreate)
-		r.HandleFunc("/api/access/update", handler.HandleAccessUpdate)
-		r.HandleFunc("/api/access/delete", handler.HandleAccessDelete)
+		htp.Register("/api/access/create", "POST", handler.HandleAccessCreate)
+		htp.Register("/api/access/update", "POST", handler.HandleAccessUpdate)
+		htp.Register("/api/access/delete", "POST", handler.HandleAccessDelete)
 
-		r.HandleFunc("/api/share/create", handler.HandleShareCreate)
-		r.HandleFunc("/api/share/update", handler.HandleShareUpdate)
-		r.HandleFunc("/api/share/delete", handler.HandleShareDelete)
+		htp.Register("/api/share/create", "POST", handler.HandleShareCreate)
+		htp.Register("/api/share/update", "POST", handler.HandleShareUpdate)
+		htp.Register("/api/share/delete", "POST", handler.HandleShareDelete)
 
-		r.HandleFunc("/api/access_discord_role/create", handler.HandleDiscordRoleAccessCreate)
-		r.HandleFunc("/api/access_discord_role/update", handler.HandleDiscordRoleAccessUpdate)
-		r.HandleFunc("/api/access_discord_role/delete", handler.HandleDiscordRoleAccessDelete)
+		htp.Register("/api/access_discord_role/create", "POST", handler.HandleDiscordRoleAccessCreate)
+		htp.Register("/api/access_discord_role/update", "POST", handler.HandleDiscordRoleAccessUpdate)
+		htp.Register("/api/access_discord_role/delete", "POST", handler.HandleDiscordRoleAccessDelete)
 	}
 
 	if len(idata.Config.Public) > 0 {
@@ -156,7 +155,7 @@ func main() {
 	}
 	if len(idata.DataPathsPub) > 0 {
 		for k, v := range idata.DataPathsPub {
-			r.PathPrefix("/" + k + "/").HandlerFunc(handler.HandleDirectoryListing(handler.HandlePublicListing))
+			htp.Register("/"+k+"/*", "GET", handler.HandleDirectoryListing(handler.HandlePublicListing))
 			util.Log("Sharing public files as", k, "from ", v)
 		}
 	}
@@ -164,8 +163,8 @@ func main() {
 	//
 	// initialize file database in background
 
-	r.HandleFunc("/search", handler.HandleSearch)
-	r.HandleFunc("/api/search", handler.HandleSearchAPI)
+	htp.Register("/search", "GET", handler.HandleSearch)
+	htp.Register("/api/search", "GET", handler.HandleSearchAPI)
 
 	if len(idata.Config.SearchOn) > 0 {
 		for _, item := range idata.Config.SearchOn {
