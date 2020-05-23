@@ -37,15 +37,14 @@ func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	q, err := hGrabQueryString(r, w, "q")
-	if err != nil {
-		iutil.WriteJSON(w, map[string]interface{}{
-			"response": "bad",
-			"message":  "'q' parameter is required",
-		})
-		return
+	q := db.FS.Build().Se("*").Fr("files")
+	{
+		qq := r.Form.Get("q")
+		if len(qq) > 0 {
+			q.WR("path", "like", "'%'||?||'%'", true, qq)
+		}
 	}
-	fa1 := fsdb.NewFiles(db.FS.Build().Se("*").Fr("files").WR("path", "like", "'%'||?||'%'", true, q).Lm(25).Exe())
+	fa1 := fsdb.NewFiles(q.Lm(25).Exe())
 	ua := db.QueryAccess(user)
 	fa2 := []itypes.File{}
 	//
