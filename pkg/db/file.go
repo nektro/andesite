@@ -60,6 +60,11 @@ func (File) All() []*File {
 // searchers
 //
 
+func (File) ByPath(path string) (*File, bool) {
+	ur, ok := dbstorage.ScanFirst(File{}.b().Wh("path", path), File{}).(*File)
+	return ur, ok
+}
+
 //
 // modifiers
 //
