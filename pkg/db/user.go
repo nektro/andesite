@@ -37,3 +37,19 @@ func (User) ScanAll(q dbstorage.QueryBuilder) []*User {
 	}
 	return res
 }
+
+func (User) b() dbstorage.QueryBuilder {
+	return DB.Build().Se("*").Fr(ctUser)
+}
+
+func (User) All() []*User {
+	return User{}.ScanAll(User{}.b())
+}
+
+//
+// searchers
+//
+
+//
+// modifiers
+//

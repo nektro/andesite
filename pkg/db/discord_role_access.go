@@ -36,3 +36,19 @@ func (DiscordRoleAccess) ScanAll(q dbstorage.QueryBuilder) []*DiscordRoleAccess 
 	}
 	return res
 }
+
+func (DiscordRoleAccess) b() dbstorage.QueryBuilder {
+	return DB.Build().Se("*").Fr(ctDiscordRoleAccess)
+}
+
+func (DiscordRoleAccess) All() []*DiscordRoleAccess {
+	return DiscordRoleAccess{}.ScanAll(DiscordRoleAccess{}.b())
+}
+
+//
+// searchers
+//
+
+//
+// modifiers
+//

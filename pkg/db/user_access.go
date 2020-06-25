@@ -33,3 +33,18 @@ func (UserAccess) ScanAll(q dbstorage.QueryBuilder) []*UserAccess {
 	}
 	return res
 }
+
+func (UserAccess) b() dbstorage.QueryBuilder {
+	return DB.Build().Se("*").Fr(ctUserAccess)
+}
+
+func (UserAccess) All() []*UserAccess {
+	return UserAccess{}.ScanAll(UserAccess{}.b())
+}
+
+//
+// searchers
+//
+//
+// modifiers
+//

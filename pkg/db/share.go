@@ -33,3 +33,19 @@ func (Share) ScanAll(q dbstorage.QueryBuilder) []*Share {
 	}
 	return res
 }
+
+func (Share) b() dbstorage.QueryBuilder {
+	return DB.Build().Se("*").Fr(ctShare)
+}
+
+func (Share) All() []*Share {
+	return Share{}.ScanAll(Share{}.b())
+}
+
+//
+// searchers
+//
+
+//
+// modifiers
+//

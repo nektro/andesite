@@ -47,3 +47,19 @@ func (File) ScanAll(q dbstorage.QueryBuilder) []*File {
 	}
 	return res
 }
+
+func (File) b() dbstorage.QueryBuilder {
+	return FS.Build().Se("*").Fr(ctFile)
+}
+
+func (File) All() []*File {
+	return File{}.ScanAll(File{}.b())
+}
+
+//
+// searchers
+//
+
+//
+// modifiers
+//
