@@ -13,15 +13,16 @@ import (
 	"github.com/aymerick/raymond"
 	"github.com/nektro/go-util/arrays/stringsu"
 	"github.com/nektro/go-util/util"
+	"github.com/nektro/go-util/vflag"
 	etc "github.com/nektro/go.etc"
 	"github.com/nektro/go.etc/htp"
-	"github.com/spf13/pflag"
 
 	. "github.com/nektro/go-util/alias"
 
 	_ "github.com/nektro/andesite/statik"
 )
 
+// version var overwritten by build_all.sh
 var (
 	Version = "vMASTER"
 )
@@ -31,17 +32,17 @@ func main() {
 	util.Log("Initializing Andesite " + idata.Version + "...")
 	etc.AppID = "andesite"
 
-	pflag.IntVar(&idata.Config.Version, "version", idata.RequiredConfigVersion, "Config version to use.")
-	pflag.StringVar(&idata.Config.Root, "root", "", "Path of root directory for files")
-	pflag.IntVar(&idata.Config.Port, "port", 8000, "Port to open server on")
-	pflag.StringVar(&idata.Config.HTTPBase, "base", "/", "Http Origin Path")
-	pflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
-	pflag.StringArrayVar(&idata.Config.SearchOn, "enable-search", []string{}, "Set to a root ID to enable file search for that directory.")
-	pflag.StringArrayVar(&idata.Config.SearchOff, "disable-search", []string{}, "Set to a root ID to disable file search for that directory.")
-	flagDGS := pflag.String("discord-guild-id", "", "")
-	flagDBT := pflag.String("discord-bot-token", "", "")
-	pflag.BoolVar(&idata.Config.Verbose, "verbose", false, "")
-	pflag.BoolVar(&idata.Config.VerboseFS, "fsdb-verbose", false, "")
+	vflag.IntVar(&idata.Config.Version, "version", idata.RequiredConfigVersion, "Config version to use.")
+	vflag.StringVar(&idata.Config.Root, "root", "", "Path of root directory for files")
+	vflag.IntVar(&idata.Config.Port, "port", 8000, "Port to open server on")
+	vflag.StringVar(&idata.Config.HTTPBase, "base", "/", "Http Origin Path")
+	vflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
+	vflag.StringArrayVar(&idata.Config.SearchOn, "enable-search", []string{}, "Set to a root ID to enable file search for that directory.")
+	vflag.StringArrayVar(&idata.Config.SearchOff, "disable-search", []string{}, "Set to a root ID to disable file search for that directory.")
+	flagDGS := vflag.String("discord-guild-id", "", "")
+	flagDBT := vflag.String("discord-bot-token", "", "")
+	vflag.BoolVar(&idata.Config.Verbose, "verbose", false, "")
+	vflag.BoolVar(&idata.Config.VerboseFS, "fsdb-verbose", false, "")
 	etc.PreInit()
 
 	etc.Init("andesite", &idata.Config, "./files/", db.SaveOAuth2InfoCb)
