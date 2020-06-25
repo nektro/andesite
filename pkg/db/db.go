@@ -64,8 +64,8 @@ func SaveOAuth2InfoCb(w http.ResponseWriter, r *http.Request, provider string, i
 
 func FolderSize(p string) (size int64, count int64) {
 	rows := FS.Build().Se("sum(size), count(*)").Fr("files").WR("path", "like", "?||'%'", true, p).Exe()
-	rows.Next()
 	defer rows.Close()
+	rows.Next()
 	rows.Scan(&size, &count)
 	return
 }
