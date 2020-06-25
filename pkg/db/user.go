@@ -68,3 +68,12 @@ func (User) ByID(id int64) (*User, bool) {
 //
 // modifiers
 //
+
+func (v *User) GetAccess() []string {
+	res := []string{}
+	arr := UserAccess{}.ByUser(v)
+	for _, item := range arr {
+		res = append(res, item.Path)
+	}
+	return res
+}

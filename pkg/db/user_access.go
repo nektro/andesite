@@ -45,6 +45,11 @@ func (UserAccess) All() []*UserAccess {
 //
 // searchers
 //
+
+func (UserAccess) ByUser(user *User) []*UserAccess {
+	return UserAccess{}.ScanAll(UserAccess{}.b().Wh("user", user.IDS))
+}
+
 //
 // modifiers
 //
