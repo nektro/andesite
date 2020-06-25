@@ -46,6 +46,11 @@ func (Share) All() []*Share {
 // searchers
 //
 
+func (Share) ByCode(c string) (*Share, bool) {
+	ur, ok := dbstorage.ScanFirst(Share{}.b().Wh("hash", c), Share{}).(*Share)
+	return ur, ok
+}
+
 //
 // modifiers
 //
