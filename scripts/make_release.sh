@@ -9,6 +9,7 @@ init() {
         -t ${GITHUB_TOKEN} \
         -u ${CIRCLE_PROJECT_USERNAME} \
         -r ${CIRCLE_PROJECT_REPONAME} \
+        -b "$(./scripts/changelog.sh)" \
         "$tag" \
         "./bin/"
 }
