@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/nektro/andesite/pkg/db"
-	"github.com/nektro/andesite/pkg/fsdb"
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/iutil"
 
@@ -49,8 +48,8 @@ func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
 			q.Wh("hash_"+item, qh)
 		}
 	}
-	fa1 := fsdb.NewFiles(q.Lm(25).Exe())
-	ua := db.QueryAccess(user)
+	fa1 := db.File{}.ScanAll(q.Lm(25))
+	ua := user.GetAccess()
 	fa2 := []*db.File{}
 	//
 	for _, item := range fa1 {

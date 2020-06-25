@@ -43,7 +43,7 @@ func hGrabUser(r *http.Request, w http.ResponseWriter) (string, *db.User, error)
 		iutil.WriteAPIResponse(r, w, false, "User parameter must be an integer")
 		return a, nil, E("")
 	}
-	u, ok := db.QueryUserByID(n)
+	u, ok := db.User{}.ByID(n)
 	if !ok {
 		iutil.WriteLinkResponse(r, w, "Unable to find User", "Invalid user ID.", "Return", "./../../admin")
 		return a, nil, E("")

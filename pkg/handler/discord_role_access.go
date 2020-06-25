@@ -86,8 +86,8 @@ func HandleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	dra := db.QueryDiscordRoleAccess(qID)
-	if dra == nil {
+	dra, ok := db.DiscordRoleAccess{}.ByID(qID)
+	if !ok {
 		return
 	}
 	db.DB.Build().Del("shares_discord_role").Wh("id", strconv.FormatInt(qID, 10)).Exe()

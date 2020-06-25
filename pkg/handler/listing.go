@@ -185,11 +185,11 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 	}
 	u := strings.Split(r.URL.Path, "/")
 
-	userAccess := db.QueryAccess(user)
+	userAccess := user.GetAccess()
 	dc := idata.Config.GetDiscordClient()
 
 	if user.Provider == "discord" && dc.Extra1 != "" && dc.Extra2 != "" {
-		dra := db.QueryAllDiscordRoleAccess()
+		dra := db.DiscordRoleAccess{}.All()
 		var p fastjson.Parser
 
 		rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, dc.Extra1, user.Snowflake)
@@ -257,12 +257,12 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		w.Header().Add("Location", "../")
 		w.WriteHeader(http.StatusFound)
 	}
-	s := db.QueryAccessByShare(u[2])
-	if len(s) == 0 {
+	s, ok := db.Share{}.ByCode(u[2])
+	if !ok {
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	dp, ua, err := findRootForShareAccess(s)
+	dp, ua, err := findRootForShareAccess(s.Hash)
 	if err != nil {
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")

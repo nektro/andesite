@@ -1,7 +1,6 @@
 package fsdb
 
 import (
-	"database/sql"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -37,7 +36,7 @@ func Init(mp map[string]string, rt string) {
 				return nil
 			}
 			insertFile(&db.File{
-				0,
+				0, "0",
 				rt,
 				upathS,
 				s.Size(), "",
@@ -57,24 +56,15 @@ func Init(mp map[string]string, rt string) {
 	util.Log("fsdb:", rt+":", "scan complete.")
 }
 
-func NewFiles(rows *sql.Rows) []*db.File {
-	r := []*db.File{}
-	for rows.Next() {
-		r = append(r, db.ScanFile(rows))
-	}
-	rows.Close()
-	return r
-}
-
 func insertFile(f *db.File) {
-	oldF := NewFiles(db.FS.Build().Se("*").Fr(cTbl).Wh("path", f.Path).Exe())
-	if len(oldF) > 0 {
-		if oldF[0].ModTime == f.ModTime {
+	oldF, ok := db.File{}.ByPath(f.Path)
+	if ok {
+		if oldF.ModTime == f.ModTime {
 			// File exists and ModTime has not changed, skip
 			return
 		}
 		// File exists but ModTime changed, updated
-		s := strconv.FormatInt(oldF[0].ID, 10)
+		s := oldF.IDS
 		db.FS.Build().Up(cTbl, "size", strconv.FormatInt(f.Size, 10)).Wh("id", s).Exe()
 		db.FS.Build().Up(cTbl, "mod_time", strconv.FormatInt(f.ModTime, 10)).Wh("id", s).Exe()
 		db.FS.Build().Up(cTbl, "hash_md5", f.MD5).Wh("id", s).Exe()
