@@ -5,7 +5,7 @@ jobs:
   build:
     working_directory: /home/circleci/andesite
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.14
     steps:
       - checkout
       - run: go get -v .
