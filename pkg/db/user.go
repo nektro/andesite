@@ -50,6 +50,21 @@ func (User) All() []*User {
 // searchers
 //
 
+func (User) BySnowflake(provider, snowflake string) (*User, bool) {
+	ur, ok := dbstorage.ScanFirst(User{}.b().Wh("provider", provider).Wh("snowflake", snowflake), User{}).(*User)
+	return ur, ok
+}
+
+func (User) ByPasskey(pk string) (*User, bool) {
+	ur, ok := dbstorage.ScanFirst(User{}.b().Wh("passkey", pk), User{}).(*User)
+	return ur, ok
+}
+
+func (User) ByID(id int64) (*User, bool) {
+	ur, ok := dbstorage.ScanFirst(User{}.b().Wh("id", strconv.FormatInt(id, 10)), User{}).(*User)
+	return ur, ok
+}
+
 //
 // modifiers
 //
