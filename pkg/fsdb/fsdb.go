@@ -104,3 +104,9 @@ func DeInit(mp map[string]string, rt string) {
 	db.FS.Build().Del("files").Wh("root", rt).Exe()
 	util.Log("fsdb:", rt+":", "removed.")
 }
+
+func hash(algo string, pathS string) string {
+	f, _ := os.Open(pathS)
+	defer f.Close()
+	return util.HashStream(algo, f)
+}
