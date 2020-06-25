@@ -3,12 +3,12 @@
 version: 2.1
 jobs:
   build:
-    working_directory: /go/src/github.com/nektro/andesite
+    working_directory: /home/circleci/andesite
     docker:
       - image: circleci/golang:1.12
     steps:
       - checkout
-      - run: go get -v -u .
+      - run: go get -v .
       - run: go test -v .
       - run: ./scripts/build_all.sh
       - store_artifacts:
