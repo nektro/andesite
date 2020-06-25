@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/nektro/andesite/pkg/itypes"
-
 	"github.com/nektro/go-util/util"
 	dbstorage "github.com/nektro/go.dbstorage"
 	etc "github.com/nektro/go.etc"
@@ -22,13 +20,13 @@ var (
 
 func Init() {
 	DB = etc.Database
-	DB.CreateTableStruct("users", itypes.User{})
-	DB.CreateTableStruct("access", itypes.UserAccess{})
-	DB.CreateTableStruct("shares", itypes.Share{})
-	DB.CreateTableStruct("shares_discord_role", itypes.DiscordRoleAccess{})
+	DB.CreateTableStruct("users", User{})
+	DB.CreateTableStruct("access", UserAccess{})
+	DB.CreateTableStruct("shares", Share{})
+	DB.CreateTableStruct("shares_discord_role", DiscordRoleAccess{})
 
 	FS = dbstorage.ConnectSqlite(etc.DataRoot() + "/files.db")
-	FS.CreateTableStruct("files", itypes.File{})
+	FS.CreateTableStruct("files", File{})
 }
 
 func Upgrade() {
