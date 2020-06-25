@@ -52,7 +52,7 @@ func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	fa1 := fsdb.NewFiles(q.Lm(25).Exe())
 	ua := db.QueryAccess(user)
-	fa2 := []itypes.File{}
+	fa2 := []*itypes.File{}
 	//
 	for _, item := range fa1 {
 		if _, ok := idata.DataPathsPub[item.Root]; ok {

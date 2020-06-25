@@ -16,9 +16,9 @@ type User struct {
 	Provider  string `json:"provider" sqlite:"text"`
 }
 
-func ScanUser(rows *sql.Rows) User {
+func ScanUser(rows *sql.Rows) *User {
 	var v User
 	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey, &v.Provider)
 	v.IDS = strconv.FormatInt(v.ID, 10)
-	return v
+	return &v
 }

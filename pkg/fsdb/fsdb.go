@@ -58,8 +58,8 @@ func Init(mp map[string]string, rt string) {
 	util.Log("fsdb:", rt+":", "scan complete.")
 }
 
-func NewFiles(rows *sql.Rows) []itypes.File {
-	r := []itypes.File{}
+func NewFiles(rows *sql.Rows) []*itypes.File {
+	r := []*itypes.File{}
 	for rows.Next() {
 		r = append(r, itypes.ScanFile(rows))
 	}

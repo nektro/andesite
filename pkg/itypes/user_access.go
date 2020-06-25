@@ -10,8 +10,8 @@ type UserAccess struct {
 	Path string `json:"path" sqlite:"text"`
 }
 
-func ScanUserAccess(rows *sql.Rows) UserAccess {
+func ScanUserAccess(rows *sql.Rows) *UserAccess {
 	var v UserAccess
 	rows.Scan(&v.ID, &v.User, &v.Path)
-	return v
+	return &v
 }

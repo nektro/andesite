@@ -10,8 +10,8 @@ type Share struct {
 	Path string `json:"path" sqlite:"text"`
 }
 
-func ScanShare(rows *sql.Rows) Share {
+func ScanShare(rows *sql.Rows) *Share {
 	var v Share
 	rows.Scan(&v.ID, &v.Hash, &v.Path)
-	return v
+	return &v
 }

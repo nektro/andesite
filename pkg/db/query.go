@@ -27,7 +27,7 @@ func QueryUserBySnowflake(provider, snowflake string) (*itypes.User, bool) {
 	}
 	ur := itypes.ScanUser(rows)
 	rows.Close()
-	return &ur, true
+	return ur, true
 }
 
 func QueryUserByID(id int64) (*itypes.User, bool) {
@@ -37,13 +37,13 @@ func QueryUserByID(id int64) (*itypes.User, bool) {
 	}
 	ur := itypes.ScanUser(rows)
 	rows.Close()
-	return &ur, true
+	return ur, true
 }
 
 func QueryAllAccess() []map[string]interface{} {
 	var result []map[string]interface{}
 	rows := DB.Build().Se("*").Fr("access").Exe()
-	accs := []itypes.UserAccess{}
+	accs := []*itypes.UserAccess{}
 	for rows.Next() {
 		accs = append(accs, itypes.ScanUserAccess(rows))
 	}
@@ -102,8 +102,8 @@ func QueryAllShares() []map[string]string {
 	return result
 }
 
-func QueryAllSharesByCode(code string) []itypes.Share {
-	shrs := []itypes.Share{}
+func QueryAllSharesByCode(code string) []*itypes.Share {
+	shrs := []*itypes.Share{}
 	rows := DB.Build().Se("*").Fr("shares").Wh("hash", code).Exe()
 	for rows.Next() {
 		shrs = append(shrs, itypes.ScanShare(rows))
@@ -141,8 +141,8 @@ func QueryDiscordRoleAccess(id int64) *itypes.DiscordRoleAccess {
 	return nil
 }
 
-func QueryAllUsers() []itypes.User {
-	result := []itypes.User{}
+func QueryAllUsers() []*itypes.User {
+	result := []*itypes.User{}
 	q := DB.Build().Se("*").Fr("users").Exe()
 	for q.Next() {
 		result = append(result, itypes.ScanUser(q))
