@@ -20,3 +20,16 @@ func (v Share) Scan(rows *sql.Rows) dbstorage.Scannable {
 	v.IDS = strconv.FormatInt(v.ID, 10)
 	return &v
 }
+
+func (Share) ScanAll(q dbstorage.QueryBuilder) []*Share {
+	arr := dbstorage.ScanAll(q, Share{})
+	res := []*Share{}
+	for _, item := range arr {
+		o, ok := item.(*Share)
+		if !ok {
+			continue
+		}
+		res = append(res, o)
+	}
+	return res
+}

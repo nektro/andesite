@@ -34,3 +34,16 @@ func (v File) Scan(rows *sql.Rows) dbstorage.Scannable {
 	v.ModTimeS = time.Unix(v.ModTime, -1).UTC().String()[:19]
 	return &v
 }
+
+func (File) ScanAll(q dbstorage.QueryBuilder) []*File {
+	arr := dbstorage.ScanAll(q, File{})
+	res := []*File{}
+	for _, item := range arr {
+		o, ok := item.(*File)
+		if !ok {
+			continue
+		}
+		res = append(res, o)
+	}
+	return res
+}

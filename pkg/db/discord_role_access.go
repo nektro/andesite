@@ -23,3 +23,16 @@ func (v DiscordRoleAccess) Scan(rows *sql.Rows) dbstorage.Scannable {
 	v.IDS = strconv.FormatInt(v.ID, 10)
 	return &v
 }
+
+func (DiscordRoleAccess) ScanAll(q dbstorage.QueryBuilder) []*DiscordRoleAccess {
+	arr := dbstorage.ScanAll(q, DiscordRoleAccess{})
+	res := []*DiscordRoleAccess{}
+	for _, item := range arr {
+		o, ok := item.(*DiscordRoleAccess)
+		if !ok {
+			continue
+		}
+		res = append(res, o)
+	}
+	return res
+}

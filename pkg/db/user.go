@@ -24,3 +24,16 @@ func (v User) Scan(rows *sql.Rows) dbstorage.Scannable {
 	v.IDS = strconv.FormatInt(v.ID, 10)
 	return &v
 }
+
+func (User) ScanAll(q dbstorage.QueryBuilder) []*User {
+	arr := dbstorage.ScanAll(q, User{})
+	res := []*User{}
+	for _, item := range arr {
+		o, ok := item.(*User)
+		if !ok {
+			continue
+		}
+		res = append(res, o)
+	}
+	return res
+}
