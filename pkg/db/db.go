@@ -45,7 +45,7 @@ func Upgrade() {
 		"facebook":  "4:",
 		"microsoft": "5:",
 	}
-	for _, item := range QueryAllUsers() {
+	for _, item := range (User{}.All()) {
 		for k, v := range prefixes {
 			if strings.HasPrefix(item.Snowflake, v) {
 				sn := item.Snowflake[len(v):]
