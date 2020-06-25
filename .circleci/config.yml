@@ -10,6 +10,8 @@ jobs:
       - image: circleci/golang:1.14
     steps:
       - checkout
+      - run: go version
+      - run: go env
       - run: go get -v .
       - run: go test -v .
       - run: ./scripts/build_all.sh
