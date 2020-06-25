@@ -9,7 +9,6 @@ import (
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/itypes"
 
 	"github.com/gorilla/sessions"
 	"github.com/nektro/go-util/arrays/stringsu"
@@ -99,7 +98,7 @@ func ContainsAll(mp url.Values, keys ...string) bool {
 	return true
 }
 
-func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requireLogin bool, requireAdmin bool, doOutput bool) (*sessions.Session, *itypes.User, error) {
+func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requireLogin bool, requireAdmin bool, doOutput bool) (*sessions.Session, *db.User, error) {
 	if !stringsu.Contains(methods, r.Method) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Add("Allow", F("%v", methods))
@@ -138,7 +137,7 @@ func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requ
 			}
 			return nil, nil, E("invalid passkey")
 		}
-		u := itypes.ScanUser(kq)
+		u := db.ScanUser(kq)
 		provID = u.Provider
 		sessID = u.Snowflake
 		kq.Close()
@@ -167,7 +166,7 @@ func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requ
 		}
 	} else {
 		if !ok {
-			user = &itypes.User{ID: -1, Name: "Guest", Provider: r.Host}
+			user = &db.User{ID: -1, Name: "Guest", Provider: r.Host}
 		}
 	}
 

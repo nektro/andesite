@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/nektro/andesite/pkg/db"
-	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
 
 	. "github.com/nektro/go-util/alias"
@@ -33,7 +32,7 @@ func hGrabID(r *http.Request, w http.ResponseWriter) (string, int64, error) {
 	return a, n, nil
 }
 
-func hGrabUser(r *http.Request, w http.ResponseWriter) (string, *itypes.User, error) {
+func hGrabUser(r *http.Request, w http.ResponseWriter) (string, *db.User, error) {
 	if !iutil.ContainsAll(r.PostForm, "user") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return "", nil, E("")

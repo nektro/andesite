@@ -14,7 +14,6 @@ import (
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
@@ -28,7 +27,7 @@ import (
 	. "github.com/nektro/go-util/alias"
 )
 
-func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
+func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (string, string, []string, *db.User, map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileRoot, qpath, uAccess, user, extras, err := getAccess(w, r)
 		fileRoot, _ = filepath.Abs(fileRoot)
@@ -179,7 +178,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 }
 
 // handler for http://andesite/files/*
-func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
+func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *db.User, map[string]interface{}, error) {
 	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet, http.MethodHead}, true, false, true)
 	if err != nil {
 		return "", "", nil, nil, nil, err
@@ -234,7 +233,7 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 }
 
 // handler for http://andesite/public/*
-func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
+func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *db.User, map[string]interface{}, error) {
 	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodHead, http.MethodGet}, false, false, true)
 	if err != nil {
 		return "", "", nil, nil, nil, err
@@ -248,7 +247,7 @@ func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 }
 
 // handler for http://andesite/open/*
-func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *itypes.User, map[string]interface{}, error) {
+func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *db.User, map[string]interface{}, error) {
 	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet, http.MethodHead}, false, false, true)
 	if err != nil {
 		return "", "", nil, nil, nil, err

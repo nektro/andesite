@@ -7,7 +7,6 @@ import (
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/fsdb"
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/itypes"
 	"github.com/nektro/andesite/pkg/iutil"
 
 	etc "github.com/nektro/go.etc"
@@ -52,7 +51,7 @@ func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	fa1 := fsdb.NewFiles(q.Lm(25).Exe())
 	ua := db.QueryAccess(user)
-	fa2 := []*itypes.File{}
+	fa2 := []*db.File{}
 	//
 	for _, item := range fa1 {
 		if _, ok := idata.DataPathsPub[item.Root]; ok {

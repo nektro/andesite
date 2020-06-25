@@ -3,39 +3,37 @@ package db
 import (
 	"strconv"
 
-	"github.com/nektro/andesite/pkg/itypes"
-
 	"github.com/nektro/go-util/util"
 
 	. "github.com/nektro/go-util/alias"
 )
 
-func QueryAccess(user *itypes.User) []string {
+func QueryAccess(user *User) []string {
 	result := []string{}
 	rows := DB.Build().Se("*").Fr("access").Wh("user", user.IDS).Exe()
 	for rows.Next() {
-		result = append(result, itypes.ScanUserAccess(rows).Path)
+		result = append(result, ScanUserAccess(rows).Path)
 	}
 	rows.Close()
 	return result
 }
 
-func QueryUserBySnowflake(provider, snowflake string) (*itypes.User, bool) {
+func QueryUserBySnowflake(provider, snowflake string) (*User, bool) {
 	rows := DB.Build().Se("*").Fr("users").Wh("provider", provider).Wh("snowflake", snowflake).Exe()
 	if !rows.Next() {
 		return nil, false
 	}
-	ur := itypes.ScanUser(rows)
+	ur := ScanUser(rows)
 	rows.Close()
 	return ur, true
 }
 
-func QueryUserByID(id int64) (*itypes.User, bool) {
+func QueryUserByID(id int64) (*User, bool) {
 	rows := DB.Build().Se("*").Fr("users").Wh("id", strconv.FormatInt(id, 10)).Exe()
 	if !rows.Next() {
 		return nil, false
 	}
-	ur := itypes.ScanUser(rows)
+	ur := ScanUser(rows)
 	rows.Close()
 	return ur, true
 }
@@ -43,9 +41,9 @@ func QueryUserByID(id int64) (*itypes.User, bool) {
 func QueryAllAccess() []map[string]interface{} {
 	var result []map[string]interface{}
 	rows := DB.Build().Se("*").Fr("access").Exe()
-	accs := []*itypes.UserAccess{}
+	accs := []*UserAccess{}
 	for rows.Next() {
-		accs = append(accs, itypes.ScanUserAccess(rows))
+		accs = append(accs, ScanUserAccess(rows))
 	}
 	rows.Close()
 	for _, uar := range accs {
@@ -91,7 +89,7 @@ func QueryAllShares() []map[string]string {
 	var result []map[string]string
 	rows := DB.Build().Se("*").Fr("shares").Exe()
 	for rows.Next() {
-		sr := itypes.ScanShare(rows)
+		sr := ScanShare(rows)
 		result = append(result, map[string]string{
 			"id":   strconv.FormatInt(sr.ID, 10),
 			"hash": sr.Hash,
@@ -102,11 +100,11 @@ func QueryAllShares() []map[string]string {
 	return result
 }
 
-func QueryAllSharesByCode(code string) []*itypes.Share {
-	shrs := []*itypes.Share{}
+func QueryAllSharesByCode(code string) []*Share {
+	shrs := []*Share{}
 	rows := DB.Build().Se("*").Fr("shares").Wh("hash", code).Exe()
 	for rows.Next() {
-		shrs = append(shrs, itypes.ScanShare(rows))
+		shrs = append(shrs, ScanShare(rows))
 	}
 	rows.Close()
 	return shrs
@@ -120,11 +118,11 @@ func QueryAccessByShare(code string) string {
 	return result
 }
 
-func QueryAllDiscordRoleAccess() []itypes.DiscordRoleAccess {
-	var result []itypes.DiscordRoleAccess
+func QueryAllDiscordRoleAccess() []DiscordRoleAccess {
+	var result []DiscordRoleAccess
 	rows := DB.Build().Se("*").Fr("shares_discord_role").Exe()
 	for rows.Next() {
-		var v itypes.DiscordRoleAccess
+		var v DiscordRoleAccess
 		rows.Scan(&v.ID, &v.GuildID, &v.RoleID, &v.Path, &v.GuildName, &v.RoleName)
 		result = append(result, v)
 	}
@@ -132,7 +130,7 @@ func QueryAllDiscordRoleAccess() []itypes.DiscordRoleAccess {
 	return result
 }
 
-func QueryDiscordRoleAccess(id int64) *itypes.DiscordRoleAccess {
+func QueryDiscordRoleAccess(id int64) *DiscordRoleAccess {
 	for _, item := range QueryAllDiscordRoleAccess() {
 		if item.ID == id {
 			return &item
@@ -141,11 +139,11 @@ func QueryDiscordRoleAccess(id int64) *itypes.DiscordRoleAccess {
 	return nil
 }
 
-func QueryAllUsers() []*itypes.User {
-	result := []*itypes.User{}
+func QueryAllUsers() []*User {
+	result := []*User{}
 	q := DB.Build().Se("*").Fr("users").Exe()
 	for q.Next() {
-		result = append(result, itypes.ScanUser(q))
+		result = append(result, ScanUser(q))
 	}
 	return result
 }

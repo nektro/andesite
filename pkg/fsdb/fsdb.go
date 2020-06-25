@@ -9,7 +9,6 @@ import (
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/itypes"
 
 	"github.com/karrick/godirwalk"
 	"github.com/nektro/go-util/util"
@@ -37,7 +36,7 @@ func Init(mp map[string]string, rt string) {
 			if s.IsDir() {
 				return nil
 			}
-			insertFile(&itypes.File{
+			insertFile(&db.File{
 				0,
 				rt,
 				upathS,
@@ -58,16 +57,16 @@ func Init(mp map[string]string, rt string) {
 	util.Log("fsdb:", rt+":", "scan complete.")
 }
 
-func NewFiles(rows *sql.Rows) []*itypes.File {
-	r := []*itypes.File{}
+func NewFiles(rows *sql.Rows) []*db.File {
+	r := []*db.File{}
 	for rows.Next() {
-		r = append(r, itypes.ScanFile(rows))
+		r = append(r, db.ScanFile(rows))
 	}
 	rows.Close()
 	return r
 }
 
-func insertFile(f *itypes.File) {
+func insertFile(f *db.File) {
 	oldF := NewFiles(db.FS.Build().Se("*").Fr(cTbl).Wh("path", f.Path).Exe())
 	if len(oldF) > 0 {
 		if oldF[0].ModTime == f.ModTime {

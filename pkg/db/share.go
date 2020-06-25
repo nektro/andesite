@@ -1,4 +1,4 @@
-package itypes
+package db
 
 import (
 	"database/sql"

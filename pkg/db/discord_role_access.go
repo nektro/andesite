@@ -1,4 +1,4 @@
-package itypes
+package db
 
 type DiscordRoleAccess struct {
 	ID        int64  `json:"id"`
