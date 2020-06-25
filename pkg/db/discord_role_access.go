@@ -49,6 +49,11 @@ func (DiscordRoleAccess) All() []*DiscordRoleAccess {
 // searchers
 //
 
+func (DiscordRoleAccess) ByID(id int64) (*DiscordRoleAccess, bool) {
+	ur, ok := dbstorage.ScanFirst(DiscordRoleAccess{}.b().Wh("id", strconv.FormatInt(id, 10)), DiscordRoleAccess{}).(*DiscordRoleAccess)
+	return ur, ok
+}
+
 //
 // modifiers
 //
