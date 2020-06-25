@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+
+	dbstorage "github.com/nektro/go.dbstorage"
 )
 
 type Share struct {
@@ -10,8 +12,8 @@ type Share struct {
 	Path string `json:"path" sqlite:"text"`
 }
 
-func ScanShare(rows *sql.Rows) *Share {
-	var v Share
+// Scan implements dbstorage.Scannable
+func (v Share) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.Hash, &v.Path)
 	return &v
 }

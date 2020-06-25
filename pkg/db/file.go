@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/nektro/go-util/util"
+	dbstorage "github.com/nektro/go.dbstorage"
 )
 
 type File struct {
@@ -23,8 +24,8 @@ type File struct {
 	BLAKE2b  string `json:"hash_blake2b" sqlite:"text"`
 }
 
-func ScanFile(rows *sql.Rows) *File {
-	var v File
+// Scan implements dbstorage.Scannable
+func (v File) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.Root, &v.Path, &v.Size, &v.ModTime, &v.MD5, &v.SHA1, &v.SHA256, &v.SHA512, &v.SHA3, &v.BLAKE2b)
 	v.SizeS = util.ByteCountIEC(v.Size)
 	v.ModTimeS = time.Unix(v.ModTime, -1).UTC().String()[:19]

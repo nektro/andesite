@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+
+	dbstorage "github.com/nektro/go.dbstorage"
 )
 
 type UserAccess struct {
@@ -10,8 +12,8 @@ type UserAccess struct {
 	Path string `json:"path" sqlite:"text"`
 }
 
-func ScanUserAccess(rows *sql.Rows) *UserAccess {
-	var v UserAccess
+// Scan implements dbstorage.Scannable
+func (v UserAccess) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.User, &v.Path)
 	return &v
 }

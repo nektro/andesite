@@ -3,6 +3,8 @@ package db
 import (
 	"database/sql"
 	"strconv"
+
+	dbstorage "github.com/nektro/go.dbstorage"
 )
 
 type User struct {
@@ -16,8 +18,8 @@ type User struct {
 	Provider  string `json:"provider" sqlite:"text"`
 }
 
-func ScanUser(rows *sql.Rows) *User {
-	var v User
+// Scan implements dbstorage.Scannable
+func (v User) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey, &v.Provider)
 	v.IDS = strconv.FormatInt(v.ID, 10)
 	return &v
