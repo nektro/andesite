@@ -14,19 +14,27 @@ var (
 	FS dbstorage.Database
 )
 
+const (
+	ctUser              = "users"
+	ctUserAccess        = "access"
+	ctShare             = "shares"
+	ctDiscordRoleAccess = "shares_discord_role"
+	ctFile              = "files"
+)
+
 var (
 	searchCache = map[string]bool{}
 )
 
 func Init() {
 	DB = etc.Database
-	DB.CreateTableStruct("users", User{})
-	DB.CreateTableStruct("access", UserAccess{})
-	DB.CreateTableStruct("shares", Share{})
-	DB.CreateTableStruct("shares_discord_role", DiscordRoleAccess{})
+	DB.CreateTableStruct(ctUser, User{})
+	DB.CreateTableStruct(ctUserAccess, UserAccess{})
+	DB.CreateTableStruct(ctShare, Share{})
+	DB.CreateTableStruct(ctDiscordRoleAccess, DiscordRoleAccess{})
 
 	FS = dbstorage.ConnectSqlite(etc.DataRoot() + "/files.db")
-	FS.CreateTableStruct("files", File{})
+	FS.CreateTableStruct(ctFile, File{})
 }
 
 func Upgrade() {
@@ -63,7 +71,7 @@ func SaveOAuth2InfoCb(w http.ResponseWriter, r *http.Request, provider string, i
 }
 
 func FolderSize(p string) (size int64, count int64) {
-	rows := FS.Build().Se("sum(size), count(*)").Fr("files").WR("path", "like", "?||'%'", true, p).Exe()
+	rows := FS.Build().Se("sum(size), count(*)").Fr(ctFile).WR("path", "like", "?||'%'", true, p).Exe()
 	defer rows.Close()
 	rows.Next()
 	rows.Scan(&size, &count)
