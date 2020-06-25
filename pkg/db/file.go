@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"strconv"
 	"time"
 
 	"github.com/nektro/go-util/util"
@@ -9,7 +10,8 @@ import (
 )
 
 type File struct {
-	ID       int64  `json:"id"`
+	ID       int64 `json:"id"`
+	IDS      string
 	Root     string `json:"root" sqlite:"text"`
 	Path     string `json:"path" sqlite:"text"`
 	Size     int64  `json:"size" sqlite:"int"`
@@ -27,6 +29,7 @@ type File struct {
 // Scan implements dbstorage.Scannable
 func (v File) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.Root, &v.Path, &v.Size, &v.ModTime, &v.MD5, &v.SHA1, &v.SHA256, &v.SHA512, &v.SHA3, &v.BLAKE2b)
+	v.IDS = strconv.FormatInt(v.ID, 10)
 	v.SizeS = util.ByteCountIEC(v.Size)
 	v.ModTimeS = time.Unix(v.ModTime, -1).UTC().String()[:19]
 	return &v
