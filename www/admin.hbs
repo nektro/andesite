@@ -45,13 +45,13 @@
                         <th class="collapsing"></th>
                     </thead>
                     <tbody>
-                        {{#each accesses}}
+                        {{#each accesses as |ac|}}
                         <tr>
                             <form method="POST">
-                                <input type="hidden" name="id" value="{{id}}">
-                                <td><select name="user">{{#each users}}<option value="{{ID}}"{{#equal ID userO.ID}} selected{{/equal}}>{{Name}}@{{Provider}}</option>{{/each}}</select></td>
-                                <td><input type="text" name="name" class="name" placeholder="{User Name}" value="{{userO.Name}}@{{userO.Provider}}" readonly></td>
-                                <td><input type="text" name="path" placeholder="Path" value="{{path}}"></td>
+                                <input type="hidden" name="id" value="{{ac.ID}}">
+                                <td><select name="user">{{#each users as |us|}}<option value="{{ID}}"{{#equal us.ID ac.User}} selected{{/equal}}>{{user_name us.ID}}</option>{{/each}}</select></td>
+                                <td><input type="text" name="name" class="name" placeholder="{User Name}" value="{{user_name ac.User}}" readonly></td>
+                                <td><input type="text" name="path" placeholder="Path" value="{{ac.Path}}"></td>
                                 <td><button class="ui button" formaction="./api/access/update">Update</button></td>
                                 <td><button class="ui button" formaction="./api/access/delete">Delete</button></td>
                             </form>
@@ -59,7 +59,7 @@
                         {{/each}}
                         <tr>
                             <form method="POST">
-                                <td><select name="user">{{#each users}}<option value="{{ID}}">{{Name}}@{{Provider}}</option>{{/each}}</select></td>
+                                <td><select name="user">{{#each users}}<option value="{{ID}}">{{user_name ID}}</option>{{/each}}</select></td>
                                 <td colspan="2"><input type="text" name="path" placeholder="Path"></td>
                                 <td colspan="2"><button class="ui button" formaction="./api/access/create">Add Access</button></td>
                             </form>

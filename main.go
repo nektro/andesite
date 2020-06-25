@@ -101,6 +101,13 @@ func main() {
 	raymond.RegisterHelper("add_i", func(a, b int) int {
 		return a + b
 	})
+	raymond.RegisterHelper("user_name", func(x int64) string {
+		u, ok := db.User{}.ByID(x)
+		if !ok {
+			return ""
+		}
+		return u.FullName()
+	})
 
 	//
 	// http server setup

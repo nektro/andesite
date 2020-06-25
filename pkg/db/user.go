@@ -77,3 +77,7 @@ func (v *User) GetAccess() []string {
 	}
 	return res
 }
+
+func (v *User) FullName() string {
+	return v.Name + "@" + v.Provider
+}
