@@ -19,7 +19,7 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 	dc := idata.Config.GetDiscordClient()
 	etc.WriteHandlebarsFile(r, w, "/admin.hbs", map[string]interface{}{
-		"version":               idata.Version,
+		"version":               etc.Version,
 		"user":                  user,
 		"base":                  idata.Config.HTTPBase,
 		"name":                  oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
@@ -39,7 +39,7 @@ func HandleAdminUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	etc.WriteHandlebarsFile(r, w, "/users.hbs", map[string]interface{}{
-		"version": idata.Version,
+		"version": etc.Version,
 		"user":    user,
 		"base":    idata.Config.HTTPBase,
 		"name":    oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,
@@ -54,7 +54,7 @@ func HandleAdminRoots(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	etc.WriteHandlebarsFile(r, w, "/admin_roots.hbs", map[string]interface{}{
-		"version":       idata.Version,
+		"version":       etc.Version,
 		"user":          user,
 		"base":          idata.Config.HTTPBase,
 		"roots_public":  iutil.MapToArray(idata.DataPathsPub),

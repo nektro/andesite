@@ -33,7 +33,7 @@ func Init() {
 	DB.CreateTableStruct(ctShare, Share{})
 	DB.CreateTableStruct(ctDiscordRoleAccess, DiscordRoleAccess{})
 
-	FS = dbstorage.ConnectSqlite(etc.DataRoot() + "/files.db")
+	FS, _ = dbstorage.ConnectSqlite(etc.DataRoot() + "/files.db")
 	FS.CreateTableStruct(ctFile, File{})
 }
 

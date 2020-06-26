@@ -12,7 +12,6 @@ const (
 )
 
 var (
-	Version        = "vMASTER"
 	Config         = new(itypes.Config)
 	HomedirPath, _ = homedir.Dir()
 	DataPathsPub   = map[string]string{}

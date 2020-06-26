@@ -19,7 +19,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	etc.WriteHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
-		"version": idata.Version,
+		"version": etc.Version,
 		"user":    user,
 		"base":    idata.Config.HTTPBase,
 		"name":    oauth2.ProviderIDMap[user.Provider].NamePrefix + user.Name,

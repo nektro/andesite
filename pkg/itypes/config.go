@@ -8,7 +8,6 @@ type Config struct {
 	Version   int               `json:"version"`
 	Root      string            `json:"root"`
 	Public    string            `json:"public"`
-	Port      int               `json:"port"`
 	Themes    []string          `json:"themes"`
 	HTTPBase  string            `json:"base"`
 	Clients   []oauth2.AppConf  `json:"clients"`

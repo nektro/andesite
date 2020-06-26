@@ -15,14 +15,14 @@ import (
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/iutil"
-	"golang.org/x/text/language"
-	"golang.org/x/text/message"
 
 	"github.com/nektro/go-util/arrays/stringsu"
 	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
 	"github.com/valyala/fastjson"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 
 	. "github.com/nektro/go-util/alias"
 )
@@ -141,7 +141,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			dsize, fcount := db.FolderSize(pth)
 
 			etc.WriteHandlebarsFile(r, w, "/listing.hbs", map[string]interface{}{
-				"version":    idata.Version,
+				"version":    etc.Version,
 				"provider":   user.Provider,
 				"user":       user,
 				"can_search": db.CanSearch(pth),

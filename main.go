@@ -28,13 +28,13 @@ var (
 )
 
 func main() {
-	idata.Version = etc.FixBareVersion(Version)
-	util.Log("Initializing Andesite " + idata.Version + "...")
 	etc.AppID = "andesite"
+	etc.Version = Version
+	etc.FixBareVersion()
+	util.Log("Initializing Andesite " + etc.Version + "...")
 
 	vflag.IntVar(&idata.Config.Version, "version", idata.RequiredConfigVersion, "Config version to use.")
 	vflag.StringVar(&idata.Config.Root, "root", "", "Path of root directory for files")
-	vflag.IntVar(&idata.Config.Port, "port", 8000, "Port to open server on")
 	vflag.StringVar(&idata.Config.HTTPBase, "base", "/", "Http Origin Path")
 	vflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
 	vflag.StringArrayVar(&idata.Config.SearchOn, "enable-search", []string{}, "Set to a root ID to enable file search for that directory.")
@@ -45,7 +45,7 @@ func main() {
 	vflag.BoolVar(&idata.Config.VerboseFS, "fsdb-verbose", false, "")
 	etc.PreInit()
 
-	etc.Init("andesite", &idata.Config, "./files/", db.SaveOAuth2InfoCb)
+	etc.Init(&idata.Config, "./files/", db.SaveOAuth2InfoCb)
 
 	//
 
@@ -107,6 +107,12 @@ func main() {
 			return ""
 		}
 		return u.FullName()
+	})
+	raymond.RegisterHelper("grab_url", func(h, p, k string) string {
+		if len(k) > 0 {
+			return strings.Replace(h, "://", "://"+k+"@", 1) + p
+		}
+		return h + p
 	})
 
 	//
@@ -192,5 +198,5 @@ func main() {
 	//
 	// start http server
 
-	etc.StartServer(idata.Config.Port)
+	etc.StartServer()
 }
