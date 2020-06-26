@@ -6,8 +6,6 @@ import (
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/iutil"
 
-	etc "github.com/nektro/go.etc"
-
 	. "github.com/nektro/go-util/alias"
 )
 
@@ -18,7 +16,7 @@ func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := etc.Database.QueryNextID("access")
+	aid := db.DB.QueryNextID("access")
 	uS, u, err := hGrabUser(r, w)
 	if err != nil {
 		return
@@ -53,8 +51,8 @@ func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	apt := r.PostForm.Get("path")
 	//
-	etc.Database.Build().Up("access", "user", uS).Wh("id", idS).Exe()
-	etc.Database.Build().Up("access", "path", apt).Wh("id", idS).Exe()
+	db.DB.Build().Up("access", "user", uS).Wh("id", idS).Exe()
+	db.DB.Build().Up("access", "path", apt).Wh("id", idS).Exe()
 	iutil.WriteAPIResponse(r, w, true, "Updated access for "+u.Name+"@"+u.Provider+".")
 }
 

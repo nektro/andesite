@@ -8,8 +8,6 @@ import (
 	"github.com/nektro/andesite/pkg/idata"
 	"github.com/nektro/andesite/pkg/iutil"
 
-	etc "github.com/nektro/go.etc"
-
 	. "github.com/nektro/go-util/alias"
 )
 
@@ -24,7 +22,7 @@ func HandleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := etc.Database.QueryNextID("shares_discord_role")
+	aid := db.DB.QueryNextID("shares_discord_role")
 	// ags := r.PostForm.Get("GuildID")
 	ags := idata.Config.GetDiscordClient().Extra1
 	agr := r.PostForm.Get("RoleID")
@@ -65,11 +63,11 @@ func HandleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 		iutil.WriteAPIResponse(r, w, false, "Unable to fetch role metadata from Discord API.")
 		return
 	}
-	etc.Database.Build().Up("shares_discord_role", "guild_snowflake", qgs).Wh("id", qid).Exe()
-	etc.Database.Build().Up("shares_discord_role", "role_snowflake", qgr).Wh("id", qid).Exe()
-	etc.Database.Build().Up("shares_discord_role", "path", qpt).Wh("id", qid).Exe()
-	etc.Database.Build().Up("shares_discord_role", "guild_name", gn).Wh("id", qid).Exe()
-	etc.Database.Build().Up("shares_discord_role", "role_name", rn).Wh("id", qid).Exe()
+	db.DB.Build().Up("shares_discord_role", "guild_snowflake", qgs).Wh("id", qid).Exe()
+	db.DB.Build().Up("shares_discord_role", "role_snowflake", qgr).Wh("id", qid).Exe()
+	db.DB.Build().Up("shares_discord_role", "path", qpt).Wh("id", qid).Exe()
+	db.DB.Build().Up("shares_discord_role", "guild_name", gn).Wh("id", qid).Exe()
+	db.DB.Build().Up("shares_discord_role", "role_name", rn).Wh("id", qid).Exe()
 	iutil.WriteAPIResponse(r, w, true, F("Successfully updated share path for %s / %s to %s.", gn, rn, qpt))
 }
 

@@ -49,6 +49,6 @@ func HandleRegenPasskey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pk := db.GenerateNewUserPasskey(user.Snowflake)
-	etc.Database.Build().Up("users", "passkey", pk).Wh("snowflake", user.Snowflake).Exe()
+	db.DB.Build().Up("users", "passkey", pk).Wh("snowflake", user.Snowflake).Exe()
 	iutil.WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+pk, "Return", "./files/")
 }

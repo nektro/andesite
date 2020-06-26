@@ -8,7 +8,6 @@ import (
 	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/nektro/go-util/util"
-	etc "github.com/nektro/go.etc"
 
 	. "github.com/nektro/go-util/alias"
 )
@@ -18,7 +17,7 @@ func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	aid := etc.Database.QueryNextID("shares")
+	aid := db.DB.QueryNextID("shares")
 	ash := util.Hash("MD5", []byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(aid, 10), T())))[:12]
 	if !iutil.ContainsAll(r.PostForm, "path") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
@@ -45,7 +44,7 @@ func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	aph := r.PostForm.Get("path")
 	//
-	etc.Database.Build().Up("shares", "path", aph).Wh("id", idS).Exe()
+	db.DB.Build().Up("shares", "path", aph).Wh("id", idS).Exe()
 	iutil.WriteAPIResponse(r, w, true, "Successfully updated share path.")
 }
 
