@@ -116,13 +116,13 @@ func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requ
 		pk := ""
 
 		if len(pk) == 0 {
-			ua := r.Header.Get("user-agent")
-			if strings.HasPrefix(ua, "AndesiteUser/") {
-				pk = strings.Split(ua, "/")[1]
-			}
+			pk = r.Header.Get("x-passkey")
 		}
 		if len(pk) == 0 {
-			pk = r.Header.Get("x-passkey")
+			u, _, o := r.BasicAuth()
+			if o && len(u) > 0 {
+				pk = u
+			}
 		}
 		if len(pk) == 0 {
 			if doOutput {

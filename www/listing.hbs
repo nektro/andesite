@@ -122,8 +122,8 @@
         </div>
         <div id="dlbox">
             {{#if user.PassKey}}<p>Download the contents of the entire folder using your passkey: <code>{{user.PassKey}}</code> (<a href="{{base}}regen_passkey">Regenerate Key</a>)</p>{{/if}}
-            <p><code>wget -m -np -c -R "index.html*"{{#if user.PassKey}} --user-agent "AndesiteUser/{{user.PassKey}}"{{/if}} "{{host}}{{path}}"</code></p>
-            <p><code>rclone copy --http-url="{{host}}{{path}}" :http: ./ -P{{#if user.PassKey}} --user-agent "AndesiteUser/{{user.PassKey}}"{{/if}}</code></p>
+            <p><code>wget -m -np -c -R "index.html*"{{#if user.PassKey}} --header="x-passkey:{{user.PassKey}}"{{/if}} "{{host}}{{path}}"</code></p>
+            <p><code>rclone copy --http-url="{{grab_url host path user.PassKey}}" :http: ./ -P</code></p>
         </div>
         <div class="ui basic modal">
             <div class="ui icon header"><i class="hashtag icon"></i> File Details</div>
