@@ -43,6 +43,7 @@ func main() {
 	flagDBT := vflag.String("discord-bot-token", "", "")
 	vflag.BoolVar(&idata.Config.Verbose, "verbose", false, "")
 	vflag.BoolVar(&idata.Config.VerboseFS, "fsdb-verbose", false, "")
+	vflag.StringArrayVar(&idata.Config.OffHashes, "disable-hash", []string{}, "")
 	etc.PreInit()
 
 	etc.Init(&idata.Config, "./files/", db.SaveOAuth2InfoCb)
@@ -72,6 +73,10 @@ func main() {
 
 	idata.Config.SearchOn = stringsu.Depupe(idata.Config.SearchOn)
 	idata.Config.SearchOff = stringsu.Depupe(idata.Config.SearchOff)
+
+	for _, item := range idata.Config.OffHashes {
+		idata.DisableHash(item)
+	}
 
 	//
 	// database initialization

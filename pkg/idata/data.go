@@ -1,9 +1,12 @@
 package idata
 
 import (
+	"strings"
+
 	"github.com/nektro/andesite/pkg/itypes"
 
 	"github.com/mitchellh/go-homedir"
+	"github.com/nektro/go-util/arrays/stringsu"
 )
 
 const (
@@ -16,4 +19,11 @@ var (
 	HomedirPath, _ = homedir.Dir()
 	DataPathsPub   = map[string]string{}
 	DataPathsPrv   = map[string]string{}
+	Hashes         = []string{"MD5", "SHA1", "SHA256", "SHA512", "SHA3_512", "BLAKE2b_512"}
 )
+
+func DisableHash(alg string) {
+	Hashes = stringsu.Filter(Hashes, func(s string) bool {
+		return !strings.HasPrefix(strings.ToLower(s), alg)
+	})
+}

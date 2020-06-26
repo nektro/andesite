@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/nektro/andesite/pkg/idata"
+
 	"github.com/nektro/go-util/util"
 	dbstorage "github.com/nektro/go.dbstorage"
 )
@@ -72,7 +74,7 @@ func (File) ByPath(path string) (*File, bool) {
 //
 
 func (v *File) PopulateHashes() {
-	for _, item := range []string{"MD5", "SHA1", "SHA256", "SHA512", "SHA3_512", "BLAKE2b_512"} {
+	for _, item := range idata.Hashes {
 		v.setHash(item, hash(item, v.PathFull))
 	}
 }
