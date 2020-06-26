@@ -130,17 +130,15 @@ func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requ
 			}
 			return nil, nil, E("not logged in and no passkey found")
 		}
-		kq := etc.Database.Build().Se("*").Fr("users").Wh("passkey", pk).Exe()
-		if !kq.Next() {
+		u, ok := db.User{}.ByPasskey(pk)
+		if !ok {
 			if doOutput {
 				WriteUserDenied(r, w, true, true)
 			}
 			return nil, nil, E("invalid passkey")
 		}
-		u := db.ScanUser(kq)
 		provID = u.Provider
 		sessID = u.Snowflake
-		kq.Close()
 	}
 	var pS, uS string
 	if provID != nil {
@@ -149,7 +147,7 @@ func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requ
 	if sessID != nil {
 		uS = sessID.(string)
 	}
-	user, ok := db.QueryUserBySnowflake(pS, uS)
+	user, ok := db.User{}.BySnowflake(pS, uS)
 
 	if requireLogin {
 		if !ok {
