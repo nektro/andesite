@@ -3,6 +3,7 @@ package main
 import (
 	"net/url"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/nektro/andesite/pkg/db"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/aymerick/raymond"
 	"github.com/nektro/go-util/arrays/stringsu"
+	"github.com/nektro/go-util/types"
 	"github.com/nektro/go-util/util"
 	"github.com/nektro/go-util/vflag"
 	etc "github.com/nektro/go.etc"
@@ -44,6 +46,7 @@ func main() {
 	vflag.BoolVar(&idata.Config.Verbose, "verbose", false, "")
 	vflag.BoolVar(&idata.Config.VerboseFS, "fsdb-verbose", false, "")
 	vflag.StringArrayVar(&idata.Config.OffHashes, "disable-hash", []string{}, "")
+	vflag.IntVar(&idata.Config.HashPllel, "hash-concurrency", runtime.NumCPU(), "")
 	etc.PreInit()
 
 	etc.Init(&idata.Config, "./files/", db.SaveOAuth2InfoCb)
@@ -77,6 +80,8 @@ func main() {
 	for _, item := range idata.Config.OffHashes {
 		idata.DisableHash(item)
 	}
+
+	idata.HashingSem = types.NewSemaphore(idata.Config.HashPllel)
 
 	//
 	// database initialization

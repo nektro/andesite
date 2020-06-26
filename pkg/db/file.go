@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/nektro/andesite/pkg/idata"
@@ -74,9 +75,19 @@ func (File) ByPath(path string) (*File, bool) {
 //
 
 func (v *File) PopulateHashes() {
+	wg := new(sync.WaitGroup)
 	for _, item := range idata.Hashes {
-		v.setHash(item, hash(item, v.PathFull))
+		wg.Add(1)
+		idata.HashingSem.Add()
+		j := item
+		go func() {
+			defer idata.HashingSem.Done()
+			defer wg.Done()
+
+			v.setHash(j, hash(j, v.PathFull))
+		}()
 	}
+	wg.Wait()
 }
 
 func (v *File) setHash(alg, hv string) {
