@@ -38,15 +38,10 @@ func Init(mp map[string]string, rt string) {
 			insertFile(&db.File{
 				0, "0",
 				rt,
-				upathS,
+				upathS, osPathname,
 				s.Size(), "",
 				s.ModTime().UTC().Unix(), "",
-				hash("MD5", osPathname),
-				hash("SHA1", osPathname),
-				hash("SHA256", osPathname),
-				hash("SHA512", osPathname),
-				hash("SHA3_512", osPathname),
-				hash("BLAKE2b_512", osPathname),
+				"", "", "", "", "", "",
 			})
 			return nil
 		},
@@ -65,6 +60,7 @@ func insertFile(f *db.File) {
 		}
 		// File exists but ModTime changed, updated
 		s := oldF.IDS
+		f.PopulateHashes()
 		db.FS.Build().Up(cTbl, "size", strconv.FormatInt(f.Size, 10)).Wh("id", s).Exe()
 		db.FS.Build().Up(cTbl, "mod_time", strconv.FormatInt(f.ModTime, 10)).Wh("id", s).Exe()
 		db.FS.Build().Up(cTbl, "hash_md5", f.MD5).Wh("id", s).Exe()
@@ -81,6 +77,7 @@ func insertFile(f *db.File) {
 	if idata.Config.VerboseFS {
 		util.Log("fsdb:", "add:", id, f.Path)
 	}
+	f.PopulateHashes()
 	db.FS.Build().Ins(cTbl, id, f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b).Exe()
 	dbstorage.InsertsLock.Unlock()
 }
@@ -92,10 +89,4 @@ func DeInit(mp map[string]string, rt string) {
 	}
 	db.FS.Build().Del("files").Wh("root", rt).Exe()
 	util.Log("fsdb:", rt+":", "removed.")
-}
-
-func hash(algo string, pathS string) string {
-	f, _ := os.Open(pathS)
-	defer f.Close()
-	return util.HashStream(algo, f)
 }

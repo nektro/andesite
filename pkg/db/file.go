@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"os"
 	"strconv"
 	"time"
 
@@ -14,6 +15,7 @@ type File struct {
 	IDS      string
 	Root     string `json:"root" sqlite:"text"`
 	Path     string `json:"path" sqlite:"text"`
+	PathFull string
 	Size     int64  `json:"size" sqlite:"int"`
 	SizeS    string `json:"html_size"`
 	ModTime  int64  `json:"mod_time" sqlite:"int"`
@@ -68,3 +70,32 @@ func (File) ByPath(path string) (*File, bool) {
 //
 // modifiers
 //
+
+func (v *File) PopulateHashes() {
+	for _, item := range []string{"MD5", "SHA1", "SHA256", "SHA512", "SHA3_512", "BLAKE2b_512"} {
+		v.setHash(item, hash(item, v.PathFull))
+	}
+}
+
+func (v *File) setHash(alg, hv string) {
+	switch alg {
+	case "MD5":
+		v.MD5 = hv
+	case "SHA1":
+		v.SHA1 = hv
+	case "SHA256":
+		v.SHA256 = hv
+	case "SHA512":
+		v.SHA512 = hv
+	case "SHA3_512":
+		v.SHA3 = hv
+	case "BLAKE2b_512":
+		v.BLAKE2b = hv
+	}
+}
+
+func hash(algo string, pathS string) string {
+	f, _ := os.Open(pathS)
+	defer f.Close()
+	return util.HashStream(algo, f)
+}
