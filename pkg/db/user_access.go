@@ -8,8 +8,7 @@ import (
 )
 
 type UserAccess struct {
-	ID   int64 `json:"id"`
-	IDS  string
+	ID   int64  `json:"id"`
 	User int64  `json:"user" sqlite:"int"`
 	Path string `json:"path" sqlite:"text"`
 }
@@ -17,7 +16,6 @@ type UserAccess struct {
 // Scan implements dbstorage.Scannable
 func (v UserAccess) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.User, &v.Path)
-	v.IDS = strconv.FormatInt(v.ID, 10)
 	return &v
 }
 
@@ -34,6 +32,10 @@ func (UserAccess) ScanAll(q dbstorage.QueryBuilder) []*UserAccess {
 	return res
 }
 
+func (v *UserAccess) i() string {
+	return strconv.FormatInt(v.ID, 10)
+}
+
 func (UserAccess) b() dbstorage.QueryBuilder {
 	return DB.Build().Se("*").Fr(ctUserAccess)
 }
@@ -47,7 +49,7 @@ func (UserAccess) All() []*UserAccess {
 //
 
 func (UserAccess) ByUser(user *User) []*UserAccess {
-	return UserAccess{}.ScanAll(UserAccess{}.b().Wh("user", user.IDS))
+	return UserAccess{}.ScanAll(UserAccess{}.b().Wh("user", user.i()))
 }
 
 //

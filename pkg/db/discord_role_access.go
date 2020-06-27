@@ -8,8 +8,7 @@ import (
 )
 
 type DiscordRoleAccess struct {
-	ID        int64 `json:"id"`
-	IDS       string
+	ID        int64  `json:"id"`
 	GuildID   string `json:"guild_snowflake" sqlite:"text"`
 	RoleID    string `json:"role_snowflake" sqlite:"text"`
 	Path      string `json:"path" sqlite:"text"`
@@ -20,7 +19,6 @@ type DiscordRoleAccess struct {
 // Scan implements dbstorage.Scannable
 func (v DiscordRoleAccess) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.GuildID, &v.RoleID, &v.Path, &v.GuildName, &v.RoleName)
-	v.IDS = strconv.FormatInt(v.ID, 10)
 	return &v
 }
 
@@ -35,6 +33,10 @@ func (DiscordRoleAccess) ScanAll(q dbstorage.QueryBuilder) []*DiscordRoleAccess 
 		res = append(res, o)
 	}
 	return res
+}
+
+func (v *DiscordRoleAccess) i() string {
+	return strconv.FormatInt(v.ID, 10)
 }
 
 func (DiscordRoleAccess) b() dbstorage.QueryBuilder {

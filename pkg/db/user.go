@@ -8,8 +8,7 @@ import (
 )
 
 type User struct {
-	ID        int64 `json:"id"`
-	IDS       string
+	ID        int64  `json:"id"`
 	Snowflake string `json:"snowflake" sqlite:"text"`
 	Admin     bool   `json:"admin" sqlite:"tinyint(1)"`
 	Name      string `json:"name" sqlite:"text"`
@@ -21,7 +20,6 @@ type User struct {
 // Scan implements dbstorage.Scannable
 func (v User) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.Snowflake, &v.Admin, &v.Name, &v.JoinedOn, &v.PassKey, &v.Provider)
-	v.IDS = strconv.FormatInt(v.ID, 10)
 	return &v
 }
 
@@ -36,6 +34,10 @@ func (User) ScanAll(q dbstorage.QueryBuilder) []*User {
 		res = append(res, o)
 	}
 	return res
+}
+
+func (v *User) i() string {
+	return strconv.FormatInt(v.ID, 10)
 }
 
 func (User) b() dbstorage.QueryBuilder {
@@ -80,4 +82,14 @@ func (v *User) GetAccess() []string {
 
 func (v *User) FullName() string {
 	return v.Name + "@" + v.Provider
+}
+
+func (v *User) SetProvider(s string) {
+	v.Provider = s
+	DB.Build().Up(ctUser, "provider", s).Wh("id", v.i()).Exe()
+}
+
+func (v *User) SetSnowflake(s string) {
+	v.Snowflake = s
+	DB.Build().Up(ctUser, "snowflake", s).Wh("id", v.i()).Exe()
 }

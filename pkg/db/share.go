@@ -8,8 +8,7 @@ import (
 )
 
 type Share struct {
-	ID   int64 `json:"id"`
-	IDS  string
+	ID   int64  `json:"id"`
 	Hash string `json:"hash" sqlite:"text"`
 	Path string `json:"path" sqlite:"text"`
 }
@@ -17,7 +16,6 @@ type Share struct {
 // Scan implements dbstorage.Scannable
 func (v Share) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.Hash, &v.Path)
-	v.IDS = strconv.FormatInt(v.ID, 10)
 	return &v
 }
 
@@ -32,6 +30,10 @@ func (Share) ScanAll(q dbstorage.QueryBuilder) []*Share {
 		res = append(res, o)
 	}
 	return res
+}
+
+func (v *Share) i() string {
+	return strconv.FormatInt(v.ID, 10)
 }
 
 func (Share) b() dbstorage.QueryBuilder {

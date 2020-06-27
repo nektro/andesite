@@ -50,8 +50,8 @@ func Upgrade() {
 			if strings.HasPrefix(item.Snowflake, v) {
 				sn := item.Snowflake[len(v):]
 				util.Log("[db-upgrade]", item.Snowflake, "is now", sn, "as", k)
-				DB.Build().Up("users", "snowflake", sn).Wh("id", item.IDS).Exe()
-				DB.Build().Up("users", "provider", k).Wh("id", item.IDS).Exe()
+				item.SetProvider(k)
+				item.SetSnowflake(sn)
 			}
 		}
 	}

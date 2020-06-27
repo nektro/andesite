@@ -4,18 +4,19 @@ import (
 	"database/sql"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/nektro/andesite/pkg/idata"
 
+	"github.com/nektro/go-util/arrays/stringsu"
 	"github.com/nektro/go-util/util"
 	dbstorage "github.com/nektro/go.dbstorage"
 )
 
 type File struct {
-	ID       int64 `json:"id"`
-	IDS      string
+	ID       int64  `json:"id"`
 	Root     string `json:"root" sqlite:"text"`
 	Path     string `json:"path" sqlite:"text"`
 	PathFull string
@@ -34,7 +35,6 @@ type File struct {
 // Scan implements dbstorage.Scannable
 func (v File) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.Root, &v.Path, &v.Size, &v.ModTime, &v.MD5, &v.SHA1, &v.SHA256, &v.SHA512, &v.SHA3, &v.BLAKE2b)
-	v.IDS = strconv.FormatInt(v.ID, 10)
 	v.SizeS = util.ByteCountIEC(v.Size)
 	v.ModTimeS = time.Unix(v.ModTime, -1).UTC().String()[:19]
 	return &v
@@ -51,6 +51,10 @@ func (File) ScanAll(q dbstorage.QueryBuilder) []*File {
 		res = append(res, o)
 	}
 	return res
+}
+
+func (v *File) i() string {
+	return strconv.FormatInt(v.ID, 10)
 }
 
 func (File) b() dbstorage.QueryBuilder {
@@ -74,7 +78,7 @@ func (File) ByPath(path string) (*File, bool) {
 // modifiers
 //
 
-func (v *File) PopulateHashes() {
+func (v *File) PopulateHashes(doUp bool) {
 	wg := new(sync.WaitGroup)
 	for _, item := range idata.Hashes {
 		wg.Add(1)
@@ -84,13 +88,13 @@ func (v *File) PopulateHashes() {
 			defer idata.HashingSem.Done()
 			defer wg.Done()
 
-			v.setHash(j, hash(j, v.PathFull))
+			v.setHash(j, hash(j, v.PathFull), doUp)
 		}()
 	}
 	wg.Wait()
 }
 
-func (v *File) setHash(alg, hv string) {
+func (v *File) setHash(alg, hv string, doUp bool) {
 	switch alg {
 	case "MD5":
 		v.MD5 = hv
@@ -105,10 +109,26 @@ func (v *File) setHash(alg, hv string) {
 	case "BLAKE2b_512":
 		v.BLAKE2b = hv
 	}
+	if doUp && stringsu.Contains(idata.Hashes, alg) {
+		hk := strings.ToLower(strings.TrimSuffix(alg, "_512"))
+		FS.Build().Up(ctFile, "hash_"+hk, hv).Wh("id", v.i()).Exe()
+	}
 }
 
 func hash(algo string, pathS string) string {
 	f, _ := os.Open(pathS)
 	defer f.Close()
 	return util.HashStream(algo, f)
+}
+
+func (v *File) SetSize(x int64) {
+	v.Size = x
+	n := strconv.FormatInt(x, 10)
+	DB.Build().Up(ctUser, "size", n).Wh("id", v.i()).Exe()
+}
+
+func (v *File) SetModTime(x int64) {
+	v.ModTime = x
+	n := strconv.FormatInt(x, 10)
+	DB.Build().Up(ctUser, "mod_time", n).Wh("id", v.i()).Exe()
 }
