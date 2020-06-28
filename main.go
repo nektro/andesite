@@ -143,7 +143,7 @@ func main() {
 	if len(idata.DataPathsPrv) > 0 {
 		for k, v := range idata.DataPathsPrv {
 			htp.Register("/"+k+"/*", "GET", handler.HandleDirectoryListing(handler.HandleFileListing))
-			util.Log("Sharing private files as", k, "from ", v)
+			util.Log("Sharing private files as", k, "from", v)
 		}
 
 		htp.Register("/regen_passkey", "GET", handler.HandleRegenPasskey)
@@ -180,7 +180,7 @@ func main() {
 	if len(idata.DataPathsPub) > 0 {
 		for k, v := range idata.DataPathsPub {
 			htp.Register("/"+k+"/*", "GET", handler.HandleDirectoryListing(handler.HandlePublicListing))
-			util.Log("Sharing public files as", k, "from ", v)
+			util.Log("Sharing public files as", k, "from", v)
 		}
 	}
 
