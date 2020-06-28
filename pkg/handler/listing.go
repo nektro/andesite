@@ -14,7 +14,6 @@ import (
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/nektro/go-util/arrays/stringsu"
 	"github.com/nektro/go-util/util"
@@ -46,7 +45,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 		// disallow exploring dotfile folders
 		if strings.Contains(qpath, "/.") {
-			iutil.WriteUserDenied(r, w, true, false)
+			WriteUserDenied(r, w, true, false)
 			return
 		}
 
@@ -54,7 +53,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 		stat, err := os.Lstat(fileRoot + qpath)
 		if os.IsNotExist(err) {
 			// 404
-			iutil.WriteUserDenied(r, w, true, false)
+			WriteUserDenied(r, w, true, false)
 			return
 		}
 
@@ -72,7 +71,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			files, _ := ioutil.ReadDir(fileRoot + qpath)
 
 			// hide dot files
-			files = iutil.Filter(files, func(x os.FileInfo) bool {
+			files = Filter(files, func(x os.FileInfo) bool {
 				return !strings.HasPrefix(x.Name(), ".")
 			})
 
@@ -80,7 +79,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			l1 := len(files)
 
 			// access check
-			files = iutil.Filter(files, func(x os.FileInfo) bool {
+			files = Filter(files, func(x os.FileInfo) bool {
 				ok := false
 				fpath := qpath + x.Name()
 				for _, item := range uAccess {
@@ -95,7 +94,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			l2 := len(files)
 
 			if l1 > 0 && l2 == 0 {
-				iutil.WriteUserDenied(r, w, true, false)
+				WriteUserDenied(r, w, true, false)
 				return
 			}
 
@@ -165,7 +164,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				}
 			}
 			if can == false {
-				iutil.WriteUserDenied(r, w, true, false)
+				WriteUserDenied(r, w, true, false)
 				return
 			}
 
@@ -179,7 +178,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 
 // handler for http://andesite/files/*
 func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *db.User, map[string]interface{}, error) {
-	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet, http.MethodHead}, true, false, true)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet, http.MethodHead}, true, false, true)
 	if err != nil {
 		return "", "", nil, nil, nil, err
 	}
@@ -224,7 +223,7 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 
 	dp, qpath, err := processListingURL(idata.DataPathsPrv, r.URL.Path)
 	if err != nil {
-		iutil.WriteResponse(r, w, "Not Found", "", "")
+		WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
 	return dp, qpath, userAccess, user, map[string]interface{}{
@@ -234,13 +233,13 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 
 // handler for http://andesite/public/*
 func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *db.User, map[string]interface{}, error) {
-	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodHead, http.MethodGet}, false, false, true)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodHead, http.MethodGet}, false, false, true)
 	if err != nil {
 		return "", "", nil, nil, nil, err
 	}
 	dp, qpath, err := processListingURL(idata.DataPathsPub, r.URL.Path)
 	if err != nil {
-		iutil.WriteResponse(r, w, "Not Found", "", "")
+		WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
 	return dp, qpath, []string{"/"}, user, map[string]interface{}{}, nil
@@ -248,7 +247,7 @@ func HandlePublicListing(w http.ResponseWriter, r *http.Request) (string, string
 
 // handler for http://andesite/open/*
 func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string, []string, *db.User, map[string]interface{}, error) {
-	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet, http.MethodHead}, false, false, true)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet, http.MethodHead}, false, false, true)
 	if err != nil {
 		return "", "", nil, nil, nil, err
 	}
@@ -259,12 +258,12 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 	}
 	s, ok := db.Share{}.ByCode(u[2])
 	if !ok {
-		iutil.WriteResponse(r, w, "Not Found", "unable to find a share by the code: "+u[2], "")
+		WriteResponse(r, w, "Not Found", "unable to find a share by the code: "+u[2], "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
 	dp, ua, err := findRootForShareAccess(s.Path)
 	if err != nil {
-		iutil.WriteResponse(r, w, "Not Found", "unable to find a file root for the share: "+s.Hash, "")
+		WriteResponse(r, w, "Not Found", "unable to find a file root for the share: "+s.Hash, "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
 	return dp, "/" + strings.Join(u[3:], "/"), []string{ua}, user, nil, nil

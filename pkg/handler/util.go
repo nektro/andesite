@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/iutil"
 )
 
 func processListingURL(pt map[string]string, upathS string) (string, string, error) {
@@ -19,7 +18,7 @@ func processListingURL(pt map[string]string, upathS string) (string, string, err
 }
 
 func findRootForShareAccess(acc string) (string, string, error) {
-	for k, v := range iutil.Combine(idata.DataPathsPrv, idata.DataPathsPub) {
+	for k, v := range Combine(idata.DataPathsPrv, idata.DataPathsPub) {
 		if strings.HasPrefix(acc, "/"+k) {
 			ap := strings.ReplaceAll(acc, "/"+k, v)
 			if strings.HasSuffix(ap, "/") {

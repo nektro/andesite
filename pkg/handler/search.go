@@ -6,14 +6,13 @@ import (
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/iutil"
 
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
 )
 
 func HandleSearch(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, false, false, true)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, false, false, true)
 	if err != nil {
 		return
 	}
@@ -27,9 +26,9 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, false, false, false)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, false, false, false)
 	if err != nil {
-		iutil.WriteJSON(w, map[string]interface{}{
+		WriteJSON(w, map[string]interface{}{
 			"response": "bad",
 			"message":  err.Error(),
 		})
@@ -66,7 +65,7 @@ func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	iutil.WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]interface{}{
 		"response": "good",
 		"count":    len(fa2),
 		"results":  fa2,

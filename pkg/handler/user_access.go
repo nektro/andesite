@@ -4,14 +4,13 @@ import (
 	"net/http"
 
 	"github.com/nektro/andesite/pkg/db"
-	"github.com/nektro/andesite/pkg/iutil"
 
 	. "github.com/nektro/go-util/alias"
 )
 
 // handler for http://andesite/api/access/create
 func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
+	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -20,19 +19,19 @@ func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	if !iutil.ContainsAll(r.PostForm, "path") {
-		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
+	if !ContainsAll(r.PostForm, "path") {
+		WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	apt := r.PostForm.Get("path")
 	//
 	db.CreateUserAccess(u, apt)
-	iutil.WriteAPIResponse(r, w, true, F("Created access for %s.", u.Name+"@"+u.Provider))
+	WriteAPIResponse(r, w, true, F("Created access for %s.", u.Name+"@"+u.Provider))
 }
 
 // handler for http://andesite/api/access/update
 func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
+	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -48,20 +47,20 @@ func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	if !iutil.ContainsAll(r.PostForm, "path") {
-		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
+	if !ContainsAll(r.PostForm, "path") {
+		WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	apt := r.PostForm.Get("path")
 	//
 	ua.SetUser(u)
 	ua.SetPath(apt)
-	iutil.WriteAPIResponse(r, w, true, "Updated access for "+u.Name+"@"+u.Provider+".")
+	WriteAPIResponse(r, w, true, "Updated access for "+u.Name+"@"+u.Provider+".")
 }
 
 // handler for http://andesite/api/access/delete
 func HandleAccessDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
+	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -76,5 +75,5 @@ func HandleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	ua.Delete()
-	iutil.WriteAPIResponse(r, w, true, "Removed access "+idS+".")
+	WriteAPIResponse(r, w, true, "Removed access "+idS+".")
 }

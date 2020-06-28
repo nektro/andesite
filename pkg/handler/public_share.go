@@ -4,28 +4,27 @@ import (
 	"net/http"
 
 	"github.com/nektro/andesite/pkg/db"
-	"github.com/nektro/andesite/pkg/iutil"
 
 	. "github.com/nektro/go-util/alias"
 )
 
 func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
+	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
-	if !iutil.ContainsAll(r.PostForm, "path") {
-		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
+	if !ContainsAll(r.PostForm, "path") {
+		WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	fpath := r.PostForm.Get("path")
 	//
 	sh := db.CreateShare(fpath)
-	iutil.WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", sh.Hash, fpath))
+	WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", sh.Hash, fpath))
 }
 
 func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
+	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -33,8 +32,8 @@ func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	if !iutil.ContainsAll(r.PostForm, "path") {
-		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
+	if !ContainsAll(r.PostForm, "path") {
+		WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	aph := r.PostForm.Get("path")
@@ -44,17 +43,17 @@ func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	sh.SetPath(aph)
-	iutil.WriteAPIResponse(r, w, true, "Successfully updated share path.")
+	WriteAPIResponse(r, w, true, "Successfully updated share path.")
 }
 
 func HandleShareDelete(w http.ResponseWriter, r *http.Request) {
-	_, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
+	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
 	//
-	if !iutil.ContainsAll(r.PostForm, "path") {
-		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
+	if !ContainsAll(r.PostForm, "path") {
+		WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	_, id, err := hGrabID(r, w)
@@ -67,5 +66,5 @@ func HandleShareDelete(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	sh.Delete()
-	iutil.WriteAPIResponse(r, w, true, "Successfully deleted share link.")
+	WriteAPIResponse(r, w, true, "Successfully deleted share link.")
 }

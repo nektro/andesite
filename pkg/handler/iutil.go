@@ -1,7 +1,8 @@
-package iutil
+package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
@@ -182,7 +183,7 @@ func ApiBootstrap(r *http.Request, w http.ResponseWriter, methods []string, requ
 func WriteJSON(w http.ResponseWriter, data map[string]interface{}) {
 	w.Header().Add("content-type", "application/json")
 	bytes, _ := json.Marshal(data)
-	w.Write(bytes)
+	fmt.Fprintln(w, string(bytes))
 }
 
 func MakeDiscordRequest(endpoint string, body url.Values) []byte {

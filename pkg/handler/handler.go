@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/nektro/andesite/pkg/iutil"
-
 	"github.com/nektro/go-util/util"
 	etc "github.com/nektro/go.etc"
 )
@@ -32,21 +30,21 @@ func HandleTest(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/logout
 func HandleLogout(w http.ResponseWriter, r *http.Request) {
-	sess, _, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, false, true)
+	sess, _, err := ApiBootstrap(r, w, []string{http.MethodGet}, true, false, true)
 	if err != nil {
 		return
 	}
 	//
 	sess.Options.MaxAge = -1
 	sess.Save(r, w)
-	iutil.WriteLinkResponse(r, w, "Success", "Successfully logged out.", "Back Home", "./../")
+	WriteLinkResponse(r, w, "Success", "Successfully logged out.", "Back Home", "./../")
 }
 
 func HandleRegenPasskey(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, false, true)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, true, false, true)
 	if err != nil {
 		return
 	}
 	user.ResetPasskey()
-	iutil.WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+user.PassKey, "Return", "./files/")
+	WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+user.PassKey, "Return", "./files/")
 }

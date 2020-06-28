@@ -5,7 +5,6 @@ import (
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
-	"github.com/nektro/andesite/pkg/iutil"
 
 	etc "github.com/nektro/go.etc"
 	oauth2 "github.com/nektro/go.oauth2"
@@ -13,7 +12,7 @@ import (
 
 // handler for http://andesite/admin
 func HandleAdmin(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, true, true)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -34,7 +33,7 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/admin/users
 func HandleAdminUsers(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, true, true)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -49,7 +48,7 @@ func HandleAdminUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleAdminRoots(w http.ResponseWriter, r *http.Request) {
-	_, user, err := iutil.ApiBootstrap(r, w, []string{http.MethodGet}, true, true, true)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, true, true, true)
 	if err != nil {
 		return
 	}
@@ -57,7 +56,7 @@ func HandleAdminRoots(w http.ResponseWriter, r *http.Request) {
 		"version":       etc.Version,
 		"user":          user,
 		"base":          idata.Config.HTTPBase,
-		"roots_public":  iutil.MapToArray(idata.DataPathsPub),
-		"roots_private": iutil.MapToArray(idata.DataPathsPrv),
+		"roots_public":  MapToArray(idata.DataPathsPub),
+		"roots_private": MapToArray(idata.DataPathsPrv),
 	})
 }
