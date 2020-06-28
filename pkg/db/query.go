@@ -17,10 +17,10 @@ func GenerateNewUserPasskey(snowflake string) string {
 }
 
 func QueryAssertUserName(provider, snowflake string, name string) {
-	_, ok := User{}.BySnowflake(provider, snowflake)
+	u, ok := User{}.BySnowflake(provider, snowflake)
 	if ok {
 		db.Build().Up(ctUser, "provider", provider).Wh("snowflake", snowflake).Exe()
-		db.Build().Up(ctUser, "name", name).Wh("snowflake", snowflake).Exe()
+		u.SetName(name)
 	} else {
 		uid := db.QueryNextID("users")
 		QueryDoAddUser(uid, provider, snowflake, false, name)

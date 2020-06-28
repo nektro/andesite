@@ -102,3 +102,8 @@ func (v *User) ResetPasskey() {
 	v.PassKey = s
 	Up(v, db, ctUser, "passkey", s)
 }
+
+func (v *User) SetName(s string) {
+	v.Name = s
+	Up(v, db, ctUser, "name", s)
+}
