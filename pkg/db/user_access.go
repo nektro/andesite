@@ -13,6 +13,16 @@ type UserAccess struct {
 	Path string `json:"path" sqlite:"text"`
 }
 
+func CreateUserAccess(us *User, pt string) *UserAccess {
+	dbstorage.InsertsLock.Lock()
+	defer dbstorage.InsertsLock.Unlock()
+	//
+	id := db.QueryNextID(ctUserAccess)
+	rv := &UserAccess{id, us.ID, pt}
+	db.Build().InsI(ctUserAccess, rv).Exe()
+	return rv
+}
+
 // Scan implements dbstorage.Scannable
 func (v UserAccess) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.User, &v.Path)
@@ -37,7 +47,7 @@ func (v *UserAccess) i() string {
 }
 
 func (UserAccess) b() dbstorage.QueryBuilder {
-	return DB.Build().Se("*").Fr(ctUserAccess)
+	return db.Build().Se("*").Fr(ctUserAccess)
 }
 
 func (UserAccess) All() []*UserAccess {
@@ -48,6 +58,11 @@ func (UserAccess) All() []*UserAccess {
 // searchers
 //
 
+func (UserAccess) ByID(id int64) (*UserAccess, bool) {
+	ur, ok := dbstorage.ScanFirst(UserAccess{}.b().Wh("id", strconv.FormatInt(id, 10)), UserAccess{}).(*UserAccess)
+	return ur, ok
+}
+
 func (UserAccess) ByUser(user *User) []*UserAccess {
 	return UserAccess{}.ScanAll(UserAccess{}.b().Wh("user", user.i()))
 }
@@ -55,3 +70,17 @@ func (UserAccess) ByUser(user *User) []*UserAccess {
 //
 // modifiers
 //
+
+func (v *UserAccess) SetUser(u *User) {
+	v.User = u.ID
+	Up(v, db, ctShare, "user", u.i())
+}
+
+func (v *UserAccess) SetPath(s string) {
+	v.Path = s
+	Up(v, db, ctShare, "path", s)
+}
+
+func (v *UserAccess) Delete() {
+	Del(v, db, ctShare)
+}

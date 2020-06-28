@@ -16,8 +16,7 @@ func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := db.DB.QueryNextID("access")
-	uS, u, err := hGrabUser(r, w)
+	_, u, err := hGrabUser(r, w)
 	if err != nil {
 		return
 	}
@@ -27,7 +26,7 @@ func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	apt := r.PostForm.Get("path")
 	//
-	db.DB.Build().Ins("access", aid, uS, apt).Exe()
+	db.CreateUserAccess(u, apt)
 	iutil.WriteAPIResponse(r, w, true, F("Created access for %s.", u.Name+"@"+u.Provider))
 }
 
@@ -37,11 +36,15 @@ func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	idS, _, err := hGrabID(r, w)
+	_, id, err := hGrabID(r, w)
 	if err != nil {
 		return
 	}
-	uS, u, err := hGrabUser(r, w)
+	ua, ok := db.UserAccess{}.ByID(id)
+	if !ok {
+		return
+	}
+	_, u, err := hGrabUser(r, w)
 	if err != nil {
 		return
 	}
@@ -51,8 +54,8 @@ func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	apt := r.PostForm.Get("path")
 	//
-	db.DB.Build().Up("access", "user", uS).Wh("id", idS).Exe()
-	db.DB.Build().Up("access", "path", apt).Wh("id", idS).Exe()
+	ua.SetUser(u)
+	ua.SetPath(apt)
 	iutil.WriteAPIResponse(r, w, true, "Updated access for "+u.Name+"@"+u.Provider+".")
 }
 
@@ -63,11 +66,15 @@ func HandleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	idS, _, err := hGrabID(r, w)
+	idS, id, err := hGrabID(r, w)
 	if err != nil {
 		return
 	}
+	ua, ok := db.UserAccess{}.ByID(id)
+	if !ok {
+		return
+	}
 	//
-	db.DB.Build().Del("access").Wh("id", idS).Exe()
+	ua.Delete()
 	iutil.WriteAPIResponse(r, w, true, "Removed access "+idS+".")
 }

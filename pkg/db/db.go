@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	DB dbstorage.Database
+	db dbstorage.Database
 	FS dbstorage.Database
 )
 
@@ -27,11 +27,11 @@ var (
 )
 
 func Init() {
-	DB = etc.Database
-	DB.CreateTableStruct(ctUser, User{})
-	DB.CreateTableStruct(ctUserAccess, UserAccess{})
-	DB.CreateTableStruct(ctShare, Share{})
-	DB.CreateTableStruct(ctDiscordRoleAccess, DiscordRoleAccess{})
+	db = etc.Database
+	db.CreateTableStruct(ctUser, User{})
+	db.CreateTableStruct(ctUserAccess, UserAccess{})
+	db.CreateTableStruct(ctShare, Share{})
+	db.CreateTableStruct(ctDiscordRoleAccess, DiscordRoleAccess{})
 
 	FS, _ = dbstorage.ConnectSqlite(etc.DataRoot() + "/files.db")
 	FS.CreateTableStruct(ctFile, File{})
@@ -55,6 +55,11 @@ func Upgrade() {
 			}
 		}
 	}
+}
+
+func Close() {
+	db.Close()
+	FS.Close()
 }
 
 func SaveOAuth2InfoCb(w http.ResponseWriter, r *http.Request, provider string, id string, name string, resp map[string]interface{}) {
@@ -87,4 +92,16 @@ func CanSearch(p string) bool {
 	b = count > 0
 	searchCache[p] = b
 	return b
+}
+
+type IDers interface {
+	i() string
+}
+
+func Up(v IDers, d dbstorage.Database, table string, col string, value string) {
+	d.Build().Up(table, col, value).Wh("id", v.i()).Exe()
+}
+
+func Del(v IDers, d dbstorage.Database, table string) {
+	d.Build().Del(table).Wh("id", v.i()).Exe()
 }

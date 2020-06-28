@@ -4,13 +4,27 @@ import (
 	"database/sql"
 	"strconv"
 
+	"github.com/nektro/go-util/util"
 	dbstorage "github.com/nektro/go.dbstorage"
+
+	. "github.com/nektro/go-util/alias"
 )
 
 type Share struct {
 	ID   int64  `json:"id"`
 	Hash string `json:"hash" sqlite:"text"`
 	Path string `json:"path" sqlite:"text"`
+}
+
+func CreateShare(pt string) *Share {
+	dbstorage.InsertsLock.Lock()
+	defer dbstorage.InsertsLock.Unlock()
+	//
+	id := db.QueryNextID(ctShare)
+	hv := util.Hash("MD5", []byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(id, 10), T())))[:12]
+	rv := &Share{id, hv, pt}
+	db.Build().InsI(ctShare, rv).Exe()
+	return rv
 }
 
 // Scan implements dbstorage.Scannable
@@ -37,7 +51,7 @@ func (v *Share) i() string {
 }
 
 func (Share) b() dbstorage.QueryBuilder {
-	return DB.Build().Se("*").Fr(ctShare)
+	return db.Build().Se("*").Fr(ctShare)
 }
 
 func (Share) All() []*Share {
@@ -48,6 +62,11 @@ func (Share) All() []*Share {
 // searchers
 //
 
+func (Share) ByID(id int64) (*Share, bool) {
+	ur, ok := dbstorage.ScanFirst(Share{}.b().Wh("id", strconv.FormatInt(id, 10)), Share{}).(*Share)
+	return ur, ok
+}
+
 func (Share) ByCode(c string) (*Share, bool) {
 	ur, ok := dbstorage.ScanFirst(Share{}.b().Wh("hash", c), Share{}).(*Share)
 	return ur, ok
@@ -56,3 +75,12 @@ func (Share) ByCode(c string) (*Share, bool) {
 //
 // modifiers
 //
+
+func (v *Share) SetPath(s string) {
+	v.Path = s
+	Up(v, db, ctShare, "path", s)
+}
+
+func (v *Share) Delete() {
+	Del(v, db, ctShare)
+}

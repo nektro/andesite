@@ -2,12 +2,9 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/iutil"
-
-	"github.com/nektro/go-util/util"
 
 	. "github.com/nektro/go-util/alias"
 )
@@ -17,16 +14,14 @@ func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	aid := db.DB.QueryNextID("shares")
-	ash := util.Hash("MD5", []byte(F("astheno.andesite.share.%s.%s", strconv.FormatInt(aid, 10), T())))[:12]
 	if !iutil.ContainsAll(r.PostForm, "path") {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
 	fpath := r.PostForm.Get("path")
 	//
-	db.DB.Build().Ins("shares", aid, ash, fpath).Exe()
-	iutil.WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", ash, fpath))
+	sh := db.CreateShare(fpath)
+	iutil.WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", sh.Hash, fpath))
 }
 
 func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +29,7 @@ func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	idS, _, err := hGrabID(r, w)
+	_, id, err := hGrabID(r, w)
 	if err != nil {
 		return
 	}
@@ -43,8 +38,12 @@ func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	aph := r.PostForm.Get("path")
+	sh, ok := db.Share{}.ByID(id)
+	if !ok {
+		return
+	}
 	//
-	db.DB.Build().Up("shares", "path", aph).Wh("id", idS).Exe()
+	sh.SetPath(aph)
 	iutil.WriteAPIResponse(r, w, true, "Successfully updated share path.")
 }
 
@@ -58,11 +57,15 @@ func HandleShareDelete(w http.ResponseWriter, r *http.Request) {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
-	idS, _, err := hGrabID(r, w)
+	_, id, err := hGrabID(r, w)
 	if err != nil {
 		return
 	}
+	sh, ok := db.Share{}.ByID(id)
+	if !ok {
+		return
+	}
 	//
-	db.DB.Build().Del("shares").Wh("id", idS).Exe()
+	sh.Delete()
 	iutil.WriteAPIResponse(r, w, true, "Successfully deleted share link.")
 }

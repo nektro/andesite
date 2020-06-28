@@ -16,6 +16,16 @@ type DiscordRoleAccess struct {
 	RoleName  string `json:"role_name" sqlite:"text"`
 }
 
+func CreateDiscordRoleAccess(gi, ri, pt, gn, rn string) *DiscordRoleAccess {
+	dbstorage.InsertsLock.Lock()
+	defer dbstorage.InsertsLock.Unlock()
+	//
+	id := db.QueryNextID(ctDiscordRoleAccess)
+	rv := &DiscordRoleAccess{id, gi, ri, pt, gn, rn}
+	db.Build().InsI(ctDiscordRoleAccess, rv).Exe()
+	return rv
+}
+
 // Scan implements dbstorage.Scannable
 func (v DiscordRoleAccess) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.GuildID, &v.RoleID, &v.Path, &v.GuildName, &v.RoleName)
@@ -40,7 +50,7 @@ func (v *DiscordRoleAccess) i() string {
 }
 
 func (DiscordRoleAccess) b() dbstorage.QueryBuilder {
-	return DB.Build().Se("*").Fr(ctDiscordRoleAccess)
+	return db.Build().Se("*").Fr(ctDiscordRoleAccess)
 }
 
 func (DiscordRoleAccess) All() []*DiscordRoleAccess {
@@ -59,3 +69,32 @@ func (DiscordRoleAccess) ByID(id int64) (*DiscordRoleAccess, bool) {
 //
 // modifiers
 //
+
+func (v *DiscordRoleAccess) SetGuildID(s string) {
+	v.GuildID = s
+	Up(v, db, ctDiscordRoleAccess, "guild_snowflake", s)
+}
+
+func (v *DiscordRoleAccess) SetRoleID(s string) {
+	v.RoleID = s
+	Up(v, db, ctDiscordRoleAccess, "role_snowflake", s)
+}
+
+func (v *DiscordRoleAccess) SetPath(s string) {
+	v.Path = s
+	Up(v, db, ctDiscordRoleAccess, "path", s)
+}
+
+func (v *DiscordRoleAccess) SetGuildName(s string) {
+	v.GuildName = s
+	Up(v, db, ctDiscordRoleAccess, "guild_name", s)
+}
+
+func (v *DiscordRoleAccess) SetRoleName(s string) {
+	v.RoleName = s
+	Up(v, db, ctDiscordRoleAccess, "role_name", s)
+}
+
+func (v *DiscordRoleAccess) Delete() {
+	Del(v, db, ctDiscordRoleAccess)
+}

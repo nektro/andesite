@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/iutil"
 
 	"github.com/nektro/go-util/util"
@@ -48,7 +47,6 @@ func HandleRegenPasskey(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	pk := db.GenerateNewUserPasskey(user.Snowflake)
-	db.DB.Build().Up("users", "passkey", pk).Wh("snowflake", user.Snowflake).Exe()
-	iutil.WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+pk, "Return", "./files/")
+	user.ResetPasskey()
+	iutil.WriteLinkResponse(r, w, "Passkey Updated", "It is now: "+user.PassKey, "Return", "./files/")
 }

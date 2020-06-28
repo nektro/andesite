@@ -32,6 +32,18 @@ type File struct {
 	BLAKE2b  string `json:"hash_blake2b" sqlite:"text"`
 }
 
+func CreateFile(rt, pt string, sz, mt int64, h1, h2, h3, h4, h5, h6 string) {
+	dbstorage.InsertsLock.Lock()
+	defer dbstorage.InsertsLock.Unlock()
+	//
+	id := FS.QueryNextID(ctFile)
+	FS.Build().Ins(ctFile, id, rt, pt, sz, mt, h1, h2, h3, h4, h5, h6).Exe()
+}
+
+func DropFilesFromRoot(rt string) {
+	FS.Build().Del(ctFile).Wh("root", rt).Exe()
+}
+
 // Scan implements dbstorage.Scannable
 func (v File) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.Root, &v.Path, &v.Size, &v.ModTime, &v.MD5, &v.SHA1, &v.SHA256, &v.SHA512, &v.SHA3, &v.BLAKE2b)
@@ -124,11 +136,11 @@ func hash(algo string, pathS string) string {
 func (v *File) SetSize(x int64) {
 	v.Size = x
 	n := strconv.FormatInt(x, 10)
-	DB.Build().Up(ctUser, "size", n).Wh("id", v.i()).Exe()
+	FS.Build().Up(ctUser, "size", n).Wh("id", v.i()).Exe()
 }
 
 func (v *File) SetModTime(x int64) {
 	v.ModTime = x
 	n := strconv.FormatInt(x, 10)
-	DB.Build().Up(ctUser, "mod_time", n).Wh("id", v.i()).Exe()
+	FS.Build().Up(ctUser, "mod_time", n).Wh("id", v.i()).Exe()
 }

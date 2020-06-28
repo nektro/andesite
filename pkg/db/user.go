@@ -4,7 +4,10 @@ import (
 	"database/sql"
 	"strconv"
 
+	"github.com/nektro/go-util/util"
 	dbstorage "github.com/nektro/go.dbstorage"
+
+	. "github.com/nektro/go-util/alias"
 )
 
 type User struct {
@@ -41,7 +44,7 @@ func (v *User) i() string {
 }
 
 func (User) b() dbstorage.QueryBuilder {
-	return DB.Build().Se("*").Fr(ctUser)
+	return db.Build().Se("*").Fr(ctUser)
 }
 
 func (User) All() []*User {
@@ -86,10 +89,16 @@ func (v *User) FullName() string {
 
 func (v *User) SetProvider(s string) {
 	v.Provider = s
-	DB.Build().Up(ctUser, "provider", s).Wh("id", v.i()).Exe()
+	Up(v, db, ctUser, "provider", s)
 }
 
 func (v *User) SetSnowflake(s string) {
 	v.Snowflake = s
-	DB.Build().Up(ctUser, "snowflake", s).Wh("id", v.i()).Exe()
+	Up(v, db, ctUser, "snowflake", s)
+}
+
+func (v *User) ResetPasskey() {
+	s := util.Hash("MD5", []byte(F("astheno.andesite.passkey.%s.%s", v.Snowflake, T())))[0:10]
+	v.PassKey = s
+	Up(v, db, ctUser, "passkey", s)
 }

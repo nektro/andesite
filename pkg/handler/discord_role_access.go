@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
@@ -22,7 +21,6 @@ func HandleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	aid := db.DB.QueryNextID("shares_discord_role")
 	// ags := r.PostForm.Get("GuildID")
 	ags := idata.Config.GetDiscordClient().Extra1
 	agr := r.PostForm.Get("RoleID")
@@ -35,7 +33,7 @@ func HandleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 		iutil.WriteAPIResponse(r, w, false, "Unable to fetch role metadata from Discord API.")
 		return
 	}
-	db.DB.Build().Ins("shares_discord_role", aid, ags, agr, apt, gn, rn).Exe()
+	db.CreateDiscordRoleAccess(ags, agr, apt, gn, rn)
 	iutil.WriteAPIResponse(r, w, true, F("Created access for %s / %s to %s.", gn, rn, apt))
 }
 
@@ -50,7 +48,10 @@ func HandleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//
-	qid := r.PostForm.Get("ID")
+	_, qid, err := hGrabID(r, w)
+	if err != nil {
+		return
+	}
 	// qgs := r.PostForm.Get("GuildID")
 	qgs := idata.Config.GetDiscordClient().Extra1
 	qgr := r.PostForm.Get("RoleID")
@@ -63,11 +64,15 @@ func HandleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 		iutil.WriteAPIResponse(r, w, false, "Unable to fetch role metadata from Discord API.")
 		return
 	}
-	db.DB.Build().Up("shares_discord_role", "guild_snowflake", qgs).Wh("id", qid).Exe()
-	db.DB.Build().Up("shares_discord_role", "role_snowflake", qgr).Wh("id", qid).Exe()
-	db.DB.Build().Up("shares_discord_role", "path", qpt).Wh("id", qid).Exe()
-	db.DB.Build().Up("shares_discord_role", "guild_name", gn).Wh("id", qid).Exe()
-	db.DB.Build().Up("shares_discord_role", "role_name", rn).Wh("id", qid).Exe()
+	dra, ok := db.DiscordRoleAccess{}.ByID(qid)
+	if !ok {
+		return
+	}
+	dra.SetGuildID(qgs)
+	dra.SetGuildName(gn)
+	dra.SetRoleID(qgr)
+	dra.SetRoleName(rn)
+	dra.SetPath(qpt)
 	iutil.WriteAPIResponse(r, w, true, F("Successfully updated share path for %s / %s to %s.", gn, rn, qpt))
 }
 
@@ -80,7 +85,7 @@ func HandleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
-	qID, err := strconv.ParseInt(r.PostForm.Get("ID"), 10, 64)
+	_, qID, err := hGrabID(r, w)
 	if err != nil {
 		return
 	}
@@ -88,6 +93,6 @@ func HandleDiscordRoleAccessDelete(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	db.DB.Build().Del("shares_discord_role").Wh("id", strconv.FormatInt(qID, 10)).Exe()
+	dra.Delete()
 	iutil.WriteAPIResponse(r, w, true, F("Successfully deleted access for %s / %s to %s.", dra.GuildName, dra.RoleName, dra.Path))
 }

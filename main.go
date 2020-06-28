@@ -97,7 +97,7 @@ func main() {
 		util.Log("Gracefully shutting down...")
 
 		util.Log("Saving database to disk")
-		db.DB.Close()
+		db.Close()
 
 		util.Log("Done!")
 	})
