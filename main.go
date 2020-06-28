@@ -128,6 +128,8 @@ func main() {
 	//
 	// http server setup
 
+	handler.Init()
+
 	htp.Register("/test", "GET", handler.HandleTest)
 
 	if len(idata.Config.Root) > 0 {

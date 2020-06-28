@@ -9,6 +9,12 @@ import (
 	etc "github.com/nektro/go.etc"
 )
 
+func Init() {
+	etc.HtpErrCb = func(r *http.Request, w http.ResponseWriter, good bool, code int, msg string) {
+		WriteAPIResponse(r, w, good, msg)
+	}
+}
+
 // handler for http://andesite/test
 func HandleTest(w http.ResponseWriter, r *http.Request) {
 	// sessions test and debug info

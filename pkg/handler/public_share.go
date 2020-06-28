@@ -5,38 +5,31 @@ import (
 
 	"github.com/nektro/andesite/pkg/db"
 
+	"github.com/nektro/go.etc/htp"
+
 	. "github.com/nektro/go-util/alias"
 )
 
 func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
+	c := htp.GetController(r)
 	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
-	if !ContainsAll(r.PostForm, "path") {
-		WriteAPIResponse(r, w, false, "Missing POST values")
-		return
-	}
-	fpath := r.PostForm.Get("path")
 	//
+	fpath := c.GetFormString("path")
 	sh := db.CreateShare(fpath)
 	WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", sh.Hash, fpath))
 }
 
 func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
+	c := htp.GetController(r)
 	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
-	_, id, err := hGrabID(r, w)
-	if err != nil {
-		return
-	}
-	if !ContainsAll(r.PostForm, "path") {
-		WriteAPIResponse(r, w, false, "Missing POST values")
-		return
-	}
-	aph := r.PostForm.Get("path")
+	_, id := c.GetFormInt("id")
+	aph := c.GetFormString("path")
 	sh, ok := db.Share{}.ByID(id)
 	if !ok {
 		return
@@ -47,19 +40,13 @@ func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleShareDelete(w http.ResponseWriter, r *http.Request) {
+	c := htp.GetController(r)
 	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
 	//
-	if !ContainsAll(r.PostForm, "path") {
-		WriteAPIResponse(r, w, false, "Missing POST values")
-		return
-	}
-	_, id, err := hGrabID(r, w)
-	if err != nil {
-		return
-	}
+	_, id := c.GetFormInt("id")
 	sh, ok := db.Share{}.ByID(id)
 	if !ok {
 		return

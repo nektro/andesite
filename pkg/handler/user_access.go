@@ -5,11 +5,14 @@ import (
 
 	"github.com/nektro/andesite/pkg/db"
 
+	"github.com/nektro/go.etc/htp"
+
 	. "github.com/nektro/go-util/alias"
 )
 
 // handler for http://andesite/api/access/create
 func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
+	c := htp.GetController(r)
 	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
@@ -19,26 +22,20 @@ func HandleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	if !ContainsAll(r.PostForm, "path") {
-		WriteAPIResponse(r, w, false, "Missing POST values")
-		return
-	}
-	apt := r.PostForm.Get("path")
 	//
+	apt := c.GetFormString("path")
 	db.CreateUserAccess(u, apt)
 	WriteAPIResponse(r, w, true, F("Created access for %s.", u.Name+"@"+u.Provider))
 }
 
 // handler for http://andesite/api/access/update
 func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
+	c := htp.GetController(r)
 	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
-	_, id, err := hGrabID(r, w)
-	if err != nil {
-		return
-	}
+	_, id := c.GetFormInt("id")
 	ua, ok := db.UserAccess{}.ByID(id)
 	if !ok {
 		return
@@ -47,12 +44,8 @@ func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	if !ContainsAll(r.PostForm, "path") {
-		WriteAPIResponse(r, w, false, "Missing POST values")
-		return
-	}
-	apt := r.PostForm.Get("path")
 	//
+	apt := c.GetFormString("path")
 	ua.SetUser(u)
 	ua.SetPath(apt)
 	WriteAPIResponse(r, w, true, "Updated access for "+u.Name+"@"+u.Provider+".")
@@ -60,15 +53,13 @@ func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 
 // handler for http://andesite/api/access/delete
 func HandleAccessDelete(w http.ResponseWriter, r *http.Request) {
+	c := htp.GetController(r)
 	_, _, err := ApiBootstrap(r, w, []string{http.MethodPost}, true, true, true)
 	if err != nil {
 		return
 	}
 	//
-	idS, id, err := hGrabID(r, w)
-	if err != nil {
-		return
-	}
+	idS, id := c.GetFormInt("id")
 	ua, ok := db.UserAccess{}.ByID(id)
 	if !ok {
 		return
