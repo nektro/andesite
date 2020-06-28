@@ -12,10 +12,6 @@ import (
 	"github.com/nektro/go-util/util"
 )
 
-const (
-	cTbl = "files"
-)
-
 func Init(mp map[string]string, rt string) {
 	bd, ok := mp[rt]
 	if !ok {
