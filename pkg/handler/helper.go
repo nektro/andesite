@@ -20,7 +20,7 @@ func hGrabQueryString(r *http.Request, w http.ResponseWriter, name string) (stri
 
 func hGrabID(r *http.Request, w http.ResponseWriter) (string, int64, error) {
 	if !iutil.ContainsAll(r.PostForm, "id") {
-		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
+		iutil.WriteAPIResponse(r, w, false, "Missing POST value: ID")
 		return "", -1, E("")
 	}
 	a := r.PostForm.Get("id")
@@ -34,7 +34,7 @@ func hGrabID(r *http.Request, w http.ResponseWriter) (string, int64, error) {
 
 func hGrabUser(r *http.Request, w http.ResponseWriter) (string, *db.User, error) {
 	if !iutil.ContainsAll(r.PostForm, "user") {
-		iutil.WriteAPIResponse(r, w, false, "Missing POST values")
+		iutil.WriteAPIResponse(r, w, false, "Missing POST value: user")
 		return "", nil, E("")
 	}
 	a := r.PostForm.Get("user")
