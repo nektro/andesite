@@ -136,11 +136,11 @@ func hash(algo string, pathS string) string {
 func (v *File) SetSize(x int64) {
 	v.Size = x
 	n := strconv.FormatInt(x, 10)
-	FS.Build().Up(ctUser, "size", n).Wh("id", v.i()).Exe()
+	Up(v, FS, ctFile, "size", n)
 }
 
 func (v *File) SetModTime(x int64) {
 	v.ModTime = x
 	n := strconv.FormatInt(x, 10)
-	FS.Build().Up(ctUser, "mod_time", n).Wh("id", v.i()).Exe()
+	Up(v, FS, ctFile, "mod_time", n)
 }
