@@ -25,6 +25,8 @@ Use these to configure your Andesite instance. All are optional. "Name" refers t
 | `--config` | n/a. | `string` | `~/.config/andesite/config.json` | The path to the `config.json` file used for app configuration. |
 | `--enable-search` | `"search_on"` | `string[]` | none. | Names of roots to scan and add to the file database. |
 | `--disable-search` | `"search_off"` | `string[]` | none. | Names of roots to remove from the file database. |
+| | `"roots_public"` | `string[][]` | none. | Enabled roots that don't lie on `/public/` by adding entries `[url_path,fs_path]`. |
+| | `"roots_private"` | `string[][]` | none. | Enabled roots that don't lie on `/filess/` by adding entries `[url_path,fs_path]`. |
 | `--verbose` | `"verbose"` | `boolean` | `false` | Set to true to enable verbose logging. |
 | `--fsdb-verobose` | `"verbose_fsdb"` | `boolean` | `false` | Set to true to enable verbose fsdb logging. |
 | `--disable-hash` | | `string[]` | none. | Any of `md5`, `sha1`, `sha256`, `sha512`, `sha3`, `blake2b`. |
