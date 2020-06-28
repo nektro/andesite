@@ -11,10 +11,10 @@ require (
 	github.com/karrick/godirwalk v1.15.6
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/nektro/go-util v0.0.0-20200615042406-06c402ab8b8d
+	github.com/nektro/go-util v0.0.0-20200628005533-4f8d3b6caf28
 	github.com/nektro/go.dbstorage v0.0.0-20200615041125-215d5945fccf
 	github.com/nektro/go.discord v0.0.0-20190906060420-58630ff220dd
-	github.com/nektro/go.etc v0.0.0-20200626184820-7af4d0e889e2
+	github.com/nektro/go.etc v0.0.0-20200628010535-d1a90c61ce13
 	github.com/nektro/go.oauth2 v0.0.0-20200413024519-33aeafe6ee91
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/pflag v1.0.5
