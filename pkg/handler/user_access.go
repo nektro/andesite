@@ -48,7 +48,7 @@ func HandleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	apt := c.GetFormString("path")
 	ua.SetUser(u)
 	ua.SetPath(apt)
-	WriteAPIResponse(r, w, true, "Updated access for "+u.Name+"@"+u.Provider+".")
+	WriteAPIResponse(r, w, true, "Updated access for "+u.FullName()+".")
 }
 
 // handler for http://andesite/api/access/delete
