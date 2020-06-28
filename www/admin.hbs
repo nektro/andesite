@@ -74,9 +74,9 @@
                         {{#each shares}}
                         <tr>
                             <form method="POST">
-                                <input type="hidden" name="id" value="{{id}}">
-                                <td><input type="text" name="hash" class="hash" value="{{hash}}" readonly></td>
-                                <td><input type="text" name="path" placeholder="Path" value="{{path}}"></td>
+                                <input type="hidden" name="id" value="{{ID}}">
+                                <td><input type="text" name="hash" class="hash" value="{{Hash}}" readonly></td>
+                                <td><input type="text" name="path" placeholder="Path" value="{{Path}}"></td>
                                 <td><button class="ui button" formaction="./api/share/update">Update</button></td>
                                 <td><button class="ui button" formaction="./api/share/delete">Delete</button></td>
                                 <td><a href="./open/{{hash}}/">Open</a></td>
@@ -109,7 +109,7 @@
                         {{#each discord_shares}}
                         <tr>
                             <form method="POST">
-                                <input type="hidden" name="ID" value="{{ID}}">
+                                <input type="hidden" name="id" value="{{ID}}">
                                 {{!-- <td><input type="text" name="GuildID" class="snowflake" value="{{GuildID}}"></td> --}}
                                 {{!-- <td><input type="text" name="GuildName" class="name" value="{{GuildName}}" readonly></td> --}}
                                 <td><input type="text" name="RoleID" class="snowflake" value="{{RoleID}}"></td>
