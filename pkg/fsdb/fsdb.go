@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
@@ -18,6 +19,7 @@ func Init(mp map[string]string, rt string) {
 		return
 	}
 	util.Log("fsdb:", rt+":", "scan begin...")
+	start := time.Now()
 	godirwalk.Walk(bd, &godirwalk.Options{
 		Callback: func(osPathname string, de *godirwalk.Dirent) error {
 			fpathS, _ := filepath.Abs(osPathname)
@@ -42,7 +44,8 @@ func Init(mp map[string]string, rt string) {
 		Unsorted:            true,
 		FollowSymbolicLinks: true,
 	})
-	util.Log("fsdb:", rt+":", "scan complete.")
+	dur := time.Since(start)
+	util.Log("fsdb:", rt+":", "scan completed in "+dur.String())
 }
 
 func insertFile(f *db.File) {
