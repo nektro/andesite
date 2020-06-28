@@ -262,7 +262,7 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
-	dp, ua, err := findRootForShareAccess(s.Hash)
+	dp, ua, err := findRootForShareAccess(s.Path)
 	if err != nil {
 		iutil.WriteResponse(r, w, "Not Found", "", "")
 		return "", "", nil, nil, nil, errors.New("")
