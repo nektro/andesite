@@ -40,7 +40,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 		}
 
 		// disallow path tricks
-		if strings.Contains(r.URL.Path, "..") {
+		if strings.Contains(r.URL.Path, "/.") {
 			return
 		}
 
