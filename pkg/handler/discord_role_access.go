@@ -17,16 +17,12 @@ func HandleDiscordRoleAccessCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	//
-	//
 	// ags := c.GetFormString("GuildID")
 	ags := idata.Config.GetDiscordClient().Extra1
-	//
 	agr := c.GetFormString("RoleID")
 	apt := c.GetFormString("Path")
 	gn := FetchDiscordGuild(ags).Name
 	rn := FetchDiscordRole(ags, agr).Name
-	//
 	if len(gn) == 0 && len(rn) == 0 {
 		WriteAPIResponse(r, w, false, "Unable to fetch role metadata from Discord API.")
 		return
@@ -41,21 +37,17 @@ func HandleDiscordRoleAccessUpdate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	//
 	if !ContainsAll(r.PostForm, "ID", "RoleID", "Path") {
 		WriteAPIResponse(r, w, false, "Missing POST values")
 		return
 	}
-	//
 	_, qid := c.GetFormInt("id")
 	// qgs := c.GetFormString("GuildID")
 	qgs := idata.Config.GetDiscordClient().Extra1
-	//
 	qgr := c.GetFormString("RoleID")
 	qpt := c.GetFormString("Path")
 	gn := FetchDiscordGuild(qgs).Name
 	rn := FetchDiscordRole(qgs, qgr).Name
-	//
 	if len(gn) == 0 && len(rn) == 0 {
 		WriteAPIResponse(r, w, false, "Unable to fetch role metadata from Discord API.")
 		return

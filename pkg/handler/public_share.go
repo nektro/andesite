@@ -16,7 +16,6 @@ func HandleShareCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	//
 	fpath := c.GetFormString("path")
 	sh := db.CreateShare(fpath)
 	WriteAPIResponse(r, w, true, F("Created share with code %s for folder %s.", sh.Hash, fpath))
@@ -34,7 +33,6 @@ func HandleShareUpdate(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	//
 	sh.SetPath(aph)
 	WriteAPIResponse(r, w, true, "Successfully updated share path.")
 }
@@ -45,13 +43,11 @@ func HandleShareDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	//
 	_, id := c.GetFormInt("id")
 	sh, ok := db.Share{}.ByID(id)
 	if !ok {
 		return
 	}
-	//
 	sh.Delete()
 	WriteAPIResponse(r, w, true, "Successfully deleted share link.")
 }
