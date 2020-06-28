@@ -22,8 +22,8 @@ github.com/nektro/go.dbstorage v0.0.0-20200615041125-215d5945fccf h1:TUCRZleTIW+
 github.com/nektro/go.dbstorage v0.0.0-20200615041125-215d5945fccf/go.mod h1:8PkaJBrkNn1TsHpOjDLDxOsKXv7QviBBjncs0WgPyO0=
 github.com/nektro/go.discord v0.0.0-20190906060420-58630ff220dd h1:e8RgnXPoDTc+Q340LAuZ+OdOe7XPYOXTF5k5CI5daqM=
 github.com/nektro/go.discord v0.0.0-20190906060420-58630ff220dd/go.mod h1:5l5KIfJE6AHZkxaYglzzqaR/P4tSIv+UzzR1mrXWQX8=
-github.com/nektro/go.etc v0.0.0-20200628010535-d1a90c61ce13 h1:o+CLYbTnd+lsn+7BV+Mt5b6VK0lAWOh20384Rp0YG9M=
-github.com/nektro/go.etc v0.0.0-20200628010535-d1a90c61ce13/go.mod h1:lZDMgzeJ6eYj8GNcQXfVs2s1KERw00pE2IMVs9XlO+w=
+github.com/nektro/go.etc v0.0.0-20200628024318-d471af580762 h1:hpOWkFhuPcUDsZ+KG8EGbKcGQqvEIU28PmuXBVhat6c=
+github.com/nektro/go.etc v0.0.0-20200628024318-d471af580762/go.mod h1:lZDMgzeJ6eYj8GNcQXfVs2s1KERw00pE2IMVs9XlO+w=
 github.com/nektro/go.oauth2 v0.0.0-20200413024519-33aeafe6ee91 h1:RguHpv3kTNGR87GpXT+V86xZVBsWyOTKLl1Fukr5R68=
 github.com/nektro/go.oauth2 v0.0.0-20200413024519-33aeafe6ee91/go.mod h1:ywuQRMEuUHKL59OHssh4c0taBA2APYnun7humThPn9o=
 github.com/rakyll/statik v0.1.7 h1:OF3QCZUuyPxuGEP7B4ypUa7sB/iHtqOTDYZXGM8KOdQ=
