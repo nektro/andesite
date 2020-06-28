@@ -59,11 +59,15 @@ func insertFile(f *db.File) {
 		return
 	}
 	// File does not exist, add
+	idata.HashingSem.Add()
 	if idata.Config.VerboseFS {
 		util.Log("fsdb:", "add:", f.Path)
 	}
-	f.PopulateHashes(false)
-	db.CreateFile(f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
+	go func() {
+		defer idata.HashingSem.Done()
+		f.PopulateHashes(false)
+		db.CreateFile(f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
+	}()
 }
 
 func DeInit(mp map[string]string, rt string) {
