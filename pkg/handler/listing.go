@@ -259,12 +259,12 @@ func HandleShareListing(w http.ResponseWriter, r *http.Request) (string, string,
 	}
 	s, ok := db.Share{}.ByCode(u[2])
 	if !ok {
-		iutil.WriteResponse(r, w, "Not Found", "", "")
+		iutil.WriteResponse(r, w, "Not Found", "unable to find a share by the code: "+u[2], "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
 	dp, ua, err := findRootForShareAccess(s.Path)
 	if err != nil {
-		iutil.WriteResponse(r, w, "Not Found", "", "")
+		iutil.WriteResponse(r, w, "Not Found", "unable to find a file root for the share: "+s.Hash, "")
 		return "", "", nil, nil, nil, errors.New("")
 	}
 	return dp, "/" + strings.Join(u[3:], "/"), []string{ua}, user, nil, nil
