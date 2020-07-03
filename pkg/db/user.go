@@ -12,12 +12,12 @@ import (
 
 type User struct {
 	ID        int64  `json:"id"`
-	Snowflake string `json:"snowflake" sqlite:"text"`
-	Admin     bool   `json:"admin" sqlite:"tinyint(1)"`
-	Name      string `json:"name" sqlite:"text"`
-	JoinedOn  string `json:"joined_on" sqlite:"text"`
-	PassKey   string `json:"passkey" sqlite:"text"`
-	Provider  string `json:"provider" sqlite:"text"`
+	Snowflake string `json:"snowflake" dbsorm:"1"`
+	Admin     bool   `json:"admin" dbsorm:"1"`
+	Name      string `json:"name" dbsorm:"1"`
+	JoinedOn  string `json:"joined_on" dbsorm:"1"`
+	PassKey   string `json:"passkey" dbsorm:"1"`
+	Provider  string `json:"provider" dbsorm:"1"`
 }
 
 // Scan implements dbstorage.Scannable

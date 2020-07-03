@@ -9,11 +9,11 @@ import (
 
 type DiscordRoleAccess struct {
 	ID        int64  `json:"id"`
-	GuildID   string `json:"guild_snowflake" sqlite:"text"`
-	RoleID    string `json:"role_snowflake" sqlite:"text"`
-	Path      string `json:"path" sqlite:"text"`
-	GuildName string `json:"guild_name" sqlite:"text"`
-	RoleName  string `json:"role_name" sqlite:"text"`
+	GuildID   string `json:"guild_snowflake" dbsorm:"1"`
+	RoleID    string `json:"role_snowflake" dbsorm:"1"`
+	Path      string `json:"path" dbsorm:"1"`
+	GuildName string `json:"guild_name" dbsorm:"1"`
+	RoleName  string `json:"role_name" dbsorm:"1"`
 }
 
 func CreateDiscordRoleAccess(gi, ri, pt, gn, rn string) *DiscordRoleAccess {

@@ -16,19 +16,19 @@ import (
 
 type File struct {
 	ID       int64  `json:"id"`
-	Root     string `json:"root" sqlite:"text"`
-	Path     string `json:"path" sqlite:"text"`
+	Root     string `json:"root" dbsorm:"1"`
+	Path     string `json:"path" dbsorm:"1"`
 	PathFull string
-	Size     int64  `json:"size" sqlite:"int"`
+	Size     int64  `json:"size" dbsorm:"1"`
 	SizeS    string `json:"html_size"`
-	ModTime  int64  `json:"mod_time" sqlite:"int"`
+	ModTime  int64  `json:"mod_time" dbsorm:"1"`
 	ModTimeS string `json:"html_modtime"`
-	MD5      string `json:"hash_md5" sqlite:"text"`
-	SHA1     string `json:"hash_sha1" sqlite:"text"`
-	SHA256   string `json:"hash_sha256" sqlite:"text"`
-	SHA512   string `json:"hash_sha512" sqlite:"text"`
-	SHA3     string `json:"hash_sha3" sqlite:"text"`
-	BLAKE2b  string `json:"hash_blake2b" sqlite:"text"`
+	MD5      string `json:"hash_md5" dbsorm:"1"`
+	SHA1     string `json:"hash_sha1" dbsorm:"1"`
+	SHA256   string `json:"hash_sha256" dbsorm:"1"`
+	SHA512   string `json:"hash_sha512" dbsorm:"1"`
+	SHA3     string `json:"hash_sha3" dbsorm:"1"`
+	BLAKE2b  string `json:"hash_blake2b" dbsorm:"1"`
 }
 
 func CreateFile(rt, pt string, sz, mt int64, h1, h2, h3, h4, h5, h6 string) {

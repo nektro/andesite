@@ -9,8 +9,8 @@ import (
 
 type UserAccess struct {
 	ID   int64  `json:"id"`
-	User int64  `json:"user" sqlite:"int"`
-	Path string `json:"path" sqlite:"text"`
+	User int64  `json:"user" dbsorm:"1"`
+	Path string `json:"path" dbsorm:"1"`
 }
 
 func CreateUserAccess(us *User, pt string) *UserAccess {

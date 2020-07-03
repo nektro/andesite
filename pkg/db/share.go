@@ -12,8 +12,8 @@ import (
 
 type Share struct {
 	ID   int64  `json:"id"`
-	Hash string `json:"hash" sqlite:"text"`
-	Path string `json:"path" sqlite:"text"`
+	Hash string `json:"hash" dbsorm:"1"`
+	Path string `json:"path" dbsorm:"1"`
 }
 
 func CreateShare(pt string) *Share {
