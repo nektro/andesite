@@ -31,6 +31,7 @@ Use these to configure your Andesite instance. All are optional. "Name" refers t
 | `--fsdb-verbose` | `"verbose_fsdb"` | `boolean` | `false` | Set to true to enable verbose fsdb logging. |
 | `--disable-hash` | | `string[]` | none. | Any of `md5`, `sha1`, `sha256`, `sha512`, `sha3`, `blake2b`. |
 | `--hash-concurrency` | | `int` | cpu count | Number of hashes to run concurrently. |
+| `--custom-root-public` | | `string[]` | none | Similar to `"roots_public"`, passed in the form `name=path`. |
 
 > Note: for `--enable-search` and `--disable-search`, sending values to these flags will trigger a background scan of the root directory you point it at (whether that be `public`, `files`, etc). As such, unless content is changed or updated, it is not necessary to pass these flags across multiple runs of the app.
 

@@ -20,6 +20,7 @@ type Config struct {
 	RootsPrv  [][]string        `json:"roots_private"`
 	OffHashes []string
 	HashPllel int
+	CRootsPub []string
 }
 
 func (c *Config) GetDiscordClient() *oauth2.AppConf {

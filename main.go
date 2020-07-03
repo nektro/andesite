@@ -47,6 +47,7 @@ func main() {
 	vflag.BoolVar(&idata.Config.VerboseFS, "fsdb-verbose", false, "")
 	vflag.StringArrayVar(&idata.Config.OffHashes, "disable-hash", []string{}, "")
 	vflag.IntVar(&idata.Config.HashPllel, "hash-concurrency", runtime.NumCPU(), "")
+	vflag.StringArrayVar(&idata.Config.CRootsPub, "custom-root-public", []string{}, "")
 	etc.PreInit()
 
 	etc.Init(&idata.Config, "./files/", db.SaveOAuth2InfoCb)
@@ -82,6 +83,10 @@ func main() {
 	}
 
 	idata.HashingSem = types.NewSemaphore(idata.Config.HashPllel)
+
+	for _, item := range idata.Config.CRootsPub {
+		idata.Config.RootsPub = append(idata.Config.RootsPub, strings.SplitN(item, "=", 2))
+	}
 
 	//
 	// database initialization
