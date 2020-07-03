@@ -7,6 +7,10 @@
 [![release](https://img.shields.io/github/v/release/nektro/andesite)](https://github.com/nektro/andesite/releases/latest)
 [![goreportcard](https://goreportcard.com/badge/github.com/nektro/andesite)](https://goreportcard.com/report/github.com/nektro/andesite)
 [![codefactor](https://www.codefactor.io/repository/github/nektro/andesite/badge)](https://www.codefactor.io/repository/github/nektro/andesite)
+[![downloads](https://img.shields.io/github/downloads/nektro/andesite/total.svg)](https://github.com/nektro/andesite/releases)
+[![issuehunt](https://img.shields.io/badge/issuehunt-andesite-38d39f)](https://issuehunt.io/r/nektro/andesite)
+[![docker_pulls](https://img.shields.io/docker/pulls/nektro/andesite)](https://hub.docker.com/r/nektro/andesite)
+[![docker_stars](https://img.shields.io/docker/stars/nektro/andesite)](https://hub.docker.com/r/nektro/andesite)
 
 Share folders in an Open Directory without making your entire server public. Manages users with OAuth2.
 
