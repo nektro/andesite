@@ -28,7 +28,7 @@ Use these to configure your Andesite instance. All are optional. "Name" refers t
 | | `"roots_public"` | `string[][]` | none. | Enabled roots that don't lie on `/public/` by adding entries `[url_path,fs_path]`. |
 | | `"roots_private"` | `string[][]` | none. | Enabled roots that don't lie on `/filess/` by adding entries `[url_path,fs_path]`. |
 | `--verbose` | `"verbose"` | `boolean` | `false` | Set to true to enable verbose logging. |
-| `--fsdb-verobose` | `"verbose_fsdb"` | `boolean` | `false` | Set to true to enable verbose fsdb logging. |
+| `--fsdb-verbose` | `"verbose_fsdb"` | `boolean` | `false` | Set to true to enable verbose fsdb logging. |
 | `--disable-hash` | | `string[]` | none. | Any of `md5`, `sha1`, `sha256`, `sha512`, `sha3`, `blake2b`. |
 | `--hash-concurrency` | | `int` | cpu count | Number of hashes to run concurrently. |
 
