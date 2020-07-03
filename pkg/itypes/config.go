@@ -21,6 +21,7 @@ type Config struct {
 	OffHashes []string
 	HashPllel int
 	CRootsPub []string
+	CRootsPrv []string
 }
 
 func (c *Config) GetDiscordClient() *oauth2.AppConf {

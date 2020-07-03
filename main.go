@@ -48,6 +48,7 @@ func main() {
 	vflag.StringArrayVar(&idata.Config.OffHashes, "disable-hash", []string{}, "")
 	vflag.IntVar(&idata.Config.HashPllel, "hash-concurrency", runtime.NumCPU(), "")
 	vflag.StringArrayVar(&idata.Config.CRootsPub, "custom-root-public", []string{}, "")
+	vflag.StringArrayVar(&idata.Config.CRootsPrv, "custom-root-private", []string{}, "")
 	etc.PreInit()
 
 	etc.Init(&idata.Config, "./files/", db.SaveOAuth2InfoCb)
@@ -86,6 +87,9 @@ func main() {
 
 	for _, item := range idata.Config.CRootsPub {
 		idata.Config.RootsPub = append(idata.Config.RootsPub, strings.SplitN(item, "=", 2))
+	}
+	for _, item := range idata.Config.CRootsPrv {
+		idata.Config.RootsPrv = append(idata.Config.RootsPrv, strings.SplitN(item, "=", 2))
 	}
 
 	//
