@@ -27,9 +27,16 @@ func Init(mp map[string]string, rt string) {
 				return nil
 			}
 			upathS := "/" + rt + strings.TrimPrefix(fpathS, bd)
-			s, _ := os.Stat(osPathname)
+			s, _ := os.Lstat(osPathname)
 			if s.IsDir() {
 				return nil
+			}
+			if s.Mode()&os.ModeSymlink != 0 {
+				realpath, _ := os.Readlink(osPathname)
+				s, _ = os.Lstat(filepath.Dir(osPathname) + "/" + realpath)
+				if s.IsDir() {
+					return nil
+				}
 			}
 			insertFile(&db.File{
 				0,
