@@ -16,7 +16,6 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	//
 	etc.WriteHandlebarsFile(r, w, "/search.hbs", map[string]interface{}{
 		"version": etc.Version,
 		"user":    user,

@@ -19,9 +19,8 @@ import (
 	etc "github.com/nektro/go.etc"
 	"github.com/nektro/go.etc/htp"
 
-	. "github.com/nektro/go-util/alias"
-
 	_ "github.com/nektro/andesite/statik"
+	. "github.com/nektro/go-util/alias"
 )
 
 // version var overwritten by build_all.sh
