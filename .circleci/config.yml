@@ -2,7 +2,7 @@
 # See https://circleci.com/docs/2.0/language-go/
 version: 2.1
 orbs:
-  docker: circleci/docker@1.0.1
+  docker: circleci/docker@1.4.0
 jobs:
   build:
     working_directory: /home/circleci/andesite
@@ -23,5 +23,7 @@ jobs:
       - docker/check
       - docker/build:
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+          tag: latest
       - docker/push:
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+          tag: latest
