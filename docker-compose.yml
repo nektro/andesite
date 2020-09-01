@@ -1,0 +1,22 @@
+version: "3"
+services:
+    app:
+        image: golang
+        volumes:
+            - .:/app/
+            - .:/files/secret:ro
+            - ./../go.etc/:/go.etc/
+        working_dir: /app/
+        command: go run main.go --port 8000 --config './data/config.json'
+        ports:
+            - "8000"
+        environment:
+            BASE: /app/
+            THEME: :sky
+            ROOT: /files/secret
+    nginx:
+        image: nginx
+        volumes:
+            - ./docker-compose.nginx.conf:/etc/nginx/nginx.conf:ro
+        ports:
+            - "80:80"
