@@ -15,10 +15,9 @@ require (
 	github.com/nektro/go-util v0.0.0-20200831224928-5ee14cded1af
 	github.com/nektro/go.dbstorage v0.0.0-20200802192712-7245913dba7b
 	github.com/nektro/go.discord v0.0.0-20190906060420-58630ff220dd
-	github.com/nektro/go.etc v0.0.0-20200825215452-23036b4f075b
-	github.com/nektro/go.oauth2 v0.0.0-20200802231242-8d0850da0ee7
+	github.com/nektro/go.etc v0.0.0-20200901033255-aefb1b33a137
+	github.com/nektro/go.oauth2 v0.0.0-20200901032914-5d8c9a2371d2
 	github.com/rakyll/statik v0.1.7
-	github.com/spf13/pflag v1.0.5
 	github.com/valyala/fastjson v1.5.4
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a // indirect

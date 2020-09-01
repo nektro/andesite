@@ -36,7 +36,6 @@ func main() {
 
 	vflag.IntVar(&idata.Config.Version, "version", idata.RequiredConfigVersion, "Config version to use.")
 	vflag.StringVar(&idata.Config.Root, "root", "", "Path of root directory for files")
-	vflag.StringVar(&idata.Config.HTTPBase, "base", "/", "Http Origin Path")
 	vflag.StringVar(&idata.Config.Public, "public", "", "Public root of files to serve")
 	vflag.StringArrayVar(&idata.Config.SearchOn, "enable-search", []string{}, "Set to a root ID to enable file search for that directory.")
 	vflag.StringArrayVar(&idata.Config.SearchOff, "disable-search", []string{}, "Set to a root ID to disable file search for that directory.")
@@ -137,6 +136,7 @@ func main() {
 	// http server setup
 
 	handler.Init()
+	idata.Config.HTTPBase = htp.Base()
 
 	htp.Register("/test", "GET", handler.HandleTest)
 
