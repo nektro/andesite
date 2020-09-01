@@ -69,6 +69,8 @@ Alternatively, you may have a `"clients"` field in your `config.json` similar to
 ## Deployment
 Pre-compiled binaries can be obtained from https://github.com/nektro/andesite/releases/latest.
 
+Or from Docker `docker run nektro/andesite`
+
 ## Development
 
 ### Prerequisites
