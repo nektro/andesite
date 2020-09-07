@@ -43,7 +43,7 @@ func HandleLogout(w http.ResponseWriter, r *http.Request) {
 	//
 	sess.Options.MaxAge = -1
 	sess.Save(r, w)
-	WriteLinkResponse(r, w, "Success", "Successfully logged out.", "Back Home", "./../")
+	WriteLinkResponse(r, w, "Success", "Successfully logged out.", "Back Home", "./")
 }
 
 func HandleRegenPasskey(w http.ResponseWriter, r *http.Request) {
