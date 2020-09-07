@@ -125,9 +125,14 @@ func main() {
 		}
 		return u.FullName()
 	})
-	raymond.RegisterHelper("grab_url", func(h, p, k string) string {
+	raymond.RegisterHelper("dl_url", func(h, b, p string) string {
+		b = strings.TrimSuffix(b, "/")
+		return h + b + p
+	})
+	raymond.RegisterHelper("grab_url", func(h, b, p, k string) string {
+		b = strings.TrimSuffix(b, "/")
 		if len(k) > 0 {
-			return strings.Replace(h, "://", "://"+k+"@", 1) + p
+			return strings.Replace(h, "://", "://"+k+"@", 1) + b + p
 		}
 		return h + p
 	})
