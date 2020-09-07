@@ -13,6 +13,7 @@ services:
         environment:
             BASE: /app/
             ROOT: /files/secret
+            ENABLE_SEARCH: :files
     nginx:
         image: nginx
         volumes:
