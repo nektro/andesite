@@ -172,6 +172,9 @@ func main() {
 		for _, item := range idata.Config.SearchOn {
 			go fsdb.Init(idata.DataPathsPub, item)
 			go fsdb.Init(idata.DataPathsPrv, item)
+
+			htp.Register("/"+item+"/search", "GET", handler.HandleSearch)
+			htp.Register("/"+item+"/api/search", "GET", handler.HandleSearchRootAPI(item))
 		}
 	}
 	if len(idata.Config.SearchOff) > 0 {
