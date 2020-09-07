@@ -29,3 +29,17 @@ func DisableHash(alg string) {
 		return !strings.HasPrefix(strings.ToLower(s), alg)
 	})
 }
+
+func RootForData(pathS string) string {
+	for k, v := range DataPathsPub {
+		if pathS == v {
+			return k
+		}
+	}
+	for k, v := range DataPathsPrv {
+		if pathS == v {
+			return k
+		}
+	}
+	return ""
+}

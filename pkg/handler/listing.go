@@ -154,6 +154,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				"file_count": printer.Sprintf("%d", len(files)),
 				"dir_size":   util.ByteCountIEC(dsize),
 				"file_total": printer.Sprintf("%d", fcount),
+				"root":       idata.RootForData(fileRoot),
 			})
 		} else {
 			// access check
