@@ -12,7 +12,6 @@ services:
             - "8000"
         environment:
             BASE: /app/
-            THEME: :sky
             ROOT: /files/secret
     nginx:
         image: nginx
