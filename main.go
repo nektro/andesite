@@ -138,12 +138,7 @@ func main() {
 	})
 
 	//
-	// http server setup
-
-	handler.Init()
-	idata.Config.HTTPBase = htp.Base()
-
-	htp.Register("/test", "GET", handler.HandleTest)
+	// init roots
 
 	if len(idata.Config.Root) > 0 {
 		idata.Config.Root, _ = filepath.Abs(filepath.Clean(strings.ReplaceAll(idata.Config.Root, "~", idata.HomedirPath)))
@@ -155,6 +150,45 @@ func main() {
 		util.DieOnError(err)
 		idata.DataPathsPrv[item[0]] = ab
 	}
+
+	if len(idata.Config.Public) > 0 {
+		idata.Config.Public, _ = filepath.Abs(filepath.Clean(strings.ReplaceAll(idata.Config.Public, "~", idata.HomedirPath)))
+		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
+		idata.DataPathsPub["public"] = idata.Config.Public
+	}
+	for _, item := range idata.Config.RootsPub {
+		ab, err := filepath.Abs(item[1])
+		util.DieOnError(err)
+		idata.DataPathsPub[item[0]] = ab
+	}
+
+	//
+	// initialize file database in background
+
+	if len(idata.Config.SearchOn) > 0 {
+		htp.Register("/search", "GET", handler.HandleSearch)
+		htp.Register("/api/search", "GET", handler.HandleSearchAPI)
+
+		for _, item := range idata.Config.SearchOn {
+			go fsdb.Init(idata.DataPathsPub, item)
+			go fsdb.Init(idata.DataPathsPrv, item)
+		}
+	}
+	if len(idata.Config.SearchOff) > 0 {
+		for _, item := range idata.Config.SearchOff {
+			fsdb.DeInit(idata.DataPathsPub, item)
+			fsdb.DeInit(idata.DataPathsPrv, item)
+		}
+	}
+
+	//
+	// http server setup
+
+	handler.Init()
+	idata.Config.HTTPBase = htp.Base()
+
+	htp.Register("/test", "GET", handler.HandleTest)
+
 	if len(idata.DataPathsPrv) > 0 {
 		for k, v := range idata.DataPathsPrv {
 			htp.Register("/"+k+"/*", "GET", handler.HandleDirectoryListing(handler.HandleFileListing))
@@ -182,39 +216,10 @@ func main() {
 		htp.Register("/api/access_discord_role/delete", "POST", handler.HandleDiscordRoleAccessDelete)
 	}
 
-	if len(idata.Config.Public) > 0 {
-		idata.Config.Public, _ = filepath.Abs(filepath.Clean(strings.ReplaceAll(idata.Config.Public, "~", idata.HomedirPath)))
-		util.DieOnError(util.Assert(util.DoesDirectoryExist(idata.Config.Public), "Public root directory does not exist. Aborting!"))
-		idata.DataPathsPub["public"] = idata.Config.Public
-	}
-	for _, item := range idata.Config.RootsPub {
-		ab, err := filepath.Abs(item[1])
-		util.DieOnError(err)
-		idata.DataPathsPub[item[0]] = ab
-	}
 	if len(idata.DataPathsPub) > 0 {
 		for k, v := range idata.DataPathsPub {
 			htp.Register("/"+k+"/*", "GET", handler.HandleDirectoryListing(handler.HandlePublicListing))
 			util.Log("Sharing public files as", k, "from", v)
-		}
-	}
-
-	//
-	// initialize file database in background
-
-	if len(idata.Config.SearchOn) > 0 {
-		htp.Register("/search", "GET", handler.HandleSearch)
-		htp.Register("/api/search", "GET", handler.HandleSearchAPI)
-
-		for _, item := range idata.Config.SearchOn {
-			go fsdb.Init(idata.DataPathsPub, item)
-			go fsdb.Init(idata.DataPathsPrv, item)
-		}
-	}
-	if len(idata.Config.SearchOff) > 0 {
-		for _, item := range idata.Config.SearchOff {
-			fsdb.DeInit(idata.DataPathsPub, item)
-			fsdb.DeInit(idata.DataPathsPrv, item)
 		}
 	}
 
