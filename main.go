@@ -202,17 +202,15 @@ func main() {
 	//
 	// initialize file database in background
 
-	htp.Register("/search", "GET", handler.HandleSearch)
-	htp.Register("/api/search", "GET", handler.HandleSearchAPI)
+	if len(idata.Config.SearchOn) > 0 {
+		htp.Register("/search", "GET", handler.HandleSearch)
+		htp.Register("/api/search", "GET", handler.HandleSearchAPI)
 
-	go func() {
-		if len(idata.Config.SearchOn) > 0 {
-			for _, item := range idata.Config.SearchOn {
-				fsdb.Init(idata.DataPathsPub, item)
-				fsdb.Init(idata.DataPathsPrv, item)
-			}
+		for _, item := range idata.Config.SearchOn {
+			go fsdb.Init(idata.DataPathsPub, item)
+			go fsdb.Init(idata.DataPathsPrv, item)
 		}
-	}()
+	}
 	if len(idata.Config.SearchOff) > 0 {
 		for _, item := range idata.Config.SearchOff {
 			fsdb.DeInit(idata.DataPathsPub, item)
