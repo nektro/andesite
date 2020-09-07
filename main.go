@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/nektro/andesite/pkg/config"
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/fsdb"
 	"github.com/nektro/andesite/pkg/handler"
@@ -47,6 +48,7 @@ func main() {
 	vflag.IntVar(&idata.Config.HashPllel, "hash-concurrency", runtime.NumCPU(), "")
 	vflag.StringArrayVar(&idata.Config.CRootsPub, "custom-root-public", []string{}, "")
 	vflag.StringArrayVar(&idata.Config.CRootsPrv, "custom-root-private", []string{}, "")
+	vflag.BoolVar(&config.GlobalSearchOff, "disable-global-search", false, "")
 	etc.PreInit()
 
 	etc.Init(&idata.Config, "./files/", db.SaveOAuth2InfoCb)

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/nektro/andesite/pkg/config"
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
 
@@ -12,7 +13,7 @@ import (
 )
 
 func HandleSearch(w http.ResponseWriter, r *http.Request) {
-	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, false, false, true)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, config.GlobalSearchOff, config.GlobalSearchOff, true)
 	if err != nil {
 		return
 	}
@@ -25,7 +26,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSearchAPI(w http.ResponseWriter, r *http.Request) {
-	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, false, false, false)
+	_, user, err := ApiBootstrap(r, w, []string{http.MethodGet}, config.GlobalSearchOff, config.GlobalSearchOff, false)
 	if err != nil {
 		WriteJSON(w, map[string]interface{}{
 			"response": "bad",
