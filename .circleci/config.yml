@@ -20,6 +20,7 @@ jobs:
           destination: /artifacts/
       - run: ./scripts/make_release.sh
       - setup_remote_docker
+          version: 18.09.3
       - docker/check
       - docker/build:
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
