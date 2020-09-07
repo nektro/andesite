@@ -4,7 +4,7 @@ COPY . .
 RUN apk add --no-cache git gcc musl-dev \
     && export VCS_REF=$(git tag --points-at HEAD) \
     && echo $VCS_REF \
-    && go get -u github.com/rakyll/statik \
+    && go install -v github.com/rakyll/statik \
     && $GOPATH/bin/statik -src="./www/" \
     && go get -u . \
     && CGO_ENABLED=1 go build -ldflags "-s -w -X main.Version=$VCS_REF" .
