@@ -47,7 +47,7 @@ func DropFilesFromRoot(rt string) {
 func (v File) Scan(rows *sql.Rows) dbstorage.Scannable {
 	rows.Scan(&v.ID, &v.Root, &v.Path, &v.Size, &v.ModTime, &v.MD5, &v.SHA1, &v.SHA256, &v.SHA512, &v.SHA3, &v.BLAKE2b)
 	v.SizeS = util.ByteCountIEC(v.Size)
-	v.ModTimeS = time.Unix(v.ModTime, -1).UTC().String()[:19]
+	v.ModTimeS = time.Unix(v.ModTime, -1).UTC().Format(time.RFC822)
 	return &v
 }
 
