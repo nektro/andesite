@@ -15,6 +15,7 @@
         <!---->
         <script>
             $(document).ready(function() {
+                const base = "{{base}}".slice(0, -1);
                 $(".ui.search").search({
                     apiSettings: {
                         url: "./api/search?q={query}",
@@ -24,7 +25,7 @@
                                     return {
                                         title: v.path,
                                         description: v.html_modtime + " || " + v.html_size,
-                                        url: v.path,
+                                        url: base + v.path,
                                     };
                                 }),
                             }
