@@ -111,6 +111,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 					symfile, err := os.Lstat(realpath)
 
 					if err != nil {
+						util.LogError(err)
 						continue
 					}
 					if symfile.IsDir() {
