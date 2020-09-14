@@ -24,7 +24,7 @@ jobs:
       - docker/check
       - docker/build:
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-          tag: latest
+          tag: latest,v$CIRCLE_BUILD_NUM
       - docker/push:
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-          tag: latest
+          tag: latest,v$CIRCLE_BUILD_NUM
