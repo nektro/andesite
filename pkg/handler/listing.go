@@ -108,8 +108,11 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 				} else if files[i].Mode()&os.ModeSymlink != 0 {
 					// resolve link, then do this again
 					realpath, _ := os.Readlink(fileRoot + qpath + files[i].Name())
-					symfile, _ := os.Lstat(realpath)
+					symfile, err := os.Lstat(realpath)
 
+					if err != nil {
+						continue
+					}
 					if symfile.IsDir() {
 						a = name + "/"
 					} else {
