@@ -192,8 +192,6 @@ func main() {
 	handler.Init()
 	idata.Config.HTTPBase = htp.Base()
 
-	htp.Register("/test", "GET", handler.HandleTest)
-
 	if len(idata.DataPathsPrv) > 0 {
 		for k, v := range idata.DataPathsPrv {
 			htp.Register("/"+k+"/*", "GET", handler.HandleDirectoryListing(handler.HandleFileListing))
