@@ -38,14 +38,18 @@ func Init(mp map[string]string, rt string) {
 					return nil
 				}
 			}
-			insertFile(&db.File{
-				0,
-				rt,
-				upathS, osPathname,
-				s.Size(), "",
-				s.ModTime().UTC().Unix(), "",
-				"", "", "", "", "", "",
-			})
+			idata.HashingSem.Add()
+			defer func() {
+				defer idata.HashingSem.Done()
+				insertFile(&db.File{
+					0,
+					rt,
+					upathS, osPathname,
+					s.Size(), "",
+					s.ModTime().UTC().Unix(), "",
+					"", "", "", "", "", "",
+				})
+			}()
 			return nil
 		},
 		Unsorted:            true,
@@ -75,15 +79,11 @@ func insertFile(f *db.File) {
 		return
 	}
 	// File does not exist, add
-	idata.HashingSem.Add()
 	if idata.Config.Verbose {
 		util.Log("fsdb:", "add:", f.Path)
 	}
-	go func() {
-		defer idata.HashingSem.Done()
-		f.PopulateHashes(false)
-		db.CreateFile(f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
-	}()
+	f.PopulateHashes(false)
+	db.CreateFile(f.Root, f.Path, f.Size, f.ModTime, f.MD5, f.SHA1, f.SHA256, f.SHA512, f.SHA3, f.BLAKE2b)
 }
 
 func DeInit(mp map[string]string, rt string) {
