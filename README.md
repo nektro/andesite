@@ -52,20 +52,7 @@ The Identity Provider IDs used below can be found in the table in the [nektro/go
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
-| `--auth-{IDP-ID}-id` | `string` | none. | Client ID. |
-| `--auth-{IDP-ID}-secret` | `string` | none. | Client Secret. |
-
-Alternatively, you may have a `"clients"` field in your `config.json` similar to the one below that specifies your different IDP app configurations. 
-
-```json
-"clients": [
-    {
-        "for": "{IDP-ID}",
-        "id": "{App-ID}",
-        "secret": "{App-Secret}"
-    }
-]
-```
+| `--oauth2-client` | `string[]` | none. | `idp_id|id|secret` |
 
 ## Deployment
 Pre-compiled binaries can be obtained from https://github.com/nektro/andesite/releases/latest.
