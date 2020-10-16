@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -194,17 +193,13 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 
 	if user.Provider == "discord" && dc.Extra1 != "" && dc.Extra2 != "" {
 		dra := db.DiscordRoleAccess{}.All()
-		var p fastjson.Parser
 
 		rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, dc.Extra1, user.Snowflake)
 		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
-		req.Header.Set("User-Agent", "nektro/andesite")
+		req.Header.Set("User-Agent", "nektro/andesite/"+etc.Version)
 		req.Header.Set("Authorization", "Bot "+dc.Extra2)
 		bys := util.DoHttpRequest(req)
-		v, err := p.Parse(string(bys))
-		if err != nil {
-			fmt.Println(2, "err", err.Error())
-		}
+		v, _ := fastjson.ParseBytes(bys)
 		if v != nil {
 			for _, item := range dra {
 				for _, i := range v.GetArray("roles") {
