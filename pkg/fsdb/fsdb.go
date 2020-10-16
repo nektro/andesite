@@ -60,17 +60,23 @@ func insertFile(f *db.File) {
 	if ok {
 		if oldF.ModTime == f.ModTime {
 			// File exists and ModTime has not changed, skip
+			if idata.Config.VerboseFS {
+				util.Log("fsdb:", "skp:", f.Path)
+			}
 			return
 		}
 		// File exists but ModTime changed, updated
 		f.PopulateHashes(true)
 		f.SetSize(f.Size)
 		f.SetModTime(f.ModTime)
+		if idata.Config.VerboseFS {
+			util.Log("fsdb:", "upd:", f.Path)
+		}
 		return
 	}
 	// File does not exist, add
 	idata.HashingSem.Add()
-	if idata.Config.VerboseFS {
+	if idata.Config.Verbose {
 		util.Log("fsdb:", "add:", f.Path)
 	}
 	go func() {
