@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/nektro/andesite/pkg/db"
 	"github.com/nektro/andesite/pkg/idata"
@@ -193,20 +194,31 @@ func HandleFileListing(w http.ResponseWriter, r *http.Request) (string, string, 
 
 	if user.Provider == "discord" && dc.Extra1 != "" && dc.Extra2 != "" {
 		dra := db.DiscordRoleAccess{}.All()
+		key := "discord_roles_" + dc.Extra1 + "_" + user.Snowflake
+		arr := []string{}
 
-		rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, dc.Extra1, user.Snowflake)
-		req, _ := http.NewRequest(http.MethodGet, rurl, strings.NewReader(""))
-		req.Header.Set("User-Agent", "nektro/andesite/"+etc.Version)
-		req.Header.Set("Authorization", "Bot "+dc.Extra2)
-		bys := util.DoHttpRequest(req)
-		v, _ := fastjson.ParseBytes(bys)
-		if v != nil {
-			for _, item := range dra {
-				for _, i := range v.GetArray("roles") {
-					s, _ := i.StringBytes()
-					if string(s) == item.RoleID {
-						userAccess = append(userAccess, item.Path)
-					}
+		if idata.TempStore.Has(key) {
+			sv := idata.TempStore.Get(key).(string)
+			arr = strings.Split(sv, ",")
+		} else {
+			rurl := F("%s/guilds/%s/members/%s", idata.DiscordAPI, dc.Extra1, user.Snowflake)
+			req, _ := http.NewRequest(http.MethodGet, rurl, nil)
+			req.Header.Set("User-Agent", "nektro/andesite/"+etc.Version)
+			req.Header.Set("Authorization", "Bot "+dc.Extra2)
+			bys := util.DoHttpRequest(req)
+			v, _ := fastjson.ParseBytes(bys)
+			if v != nil {
+				for _, item := range v.GetArray("roles") {
+					arr = append(arr, string(item.GetStringBytes("")))
+					nsv := strings.Join(arr, ",")
+					idata.TempStore.Set(key, nsv, time.Minute)
+				}
+			}
+		}
+		for _, item := range dra {
+			for _, jtem := range arr {
+				if jtem == item.RoleID {
+					userAccess = append(userAccess, item.Path)
 				}
 			}
 		}
