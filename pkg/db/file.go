@@ -36,7 +36,8 @@ func CreateFile(rt, pt string, sz, mt int64, h1, h2, h3, h4, h5, h6 string) {
 	defer dbstorage.InsertsLock.Unlock()
 	//
 	id := FS.QueryNextID(ctFile)
-	FS.Build().Ins(ctFile, id, rt, pt, sz, mt, h1, h2, h3, h4, h5, h6).Exe()
+	rv := &File{id, rt, pt, "", sz, "", mt, "", h1, h2, h3, h4, h5, h6}
+	FS.Build().InsI(ctFile, rv).Exe()
 }
 
 func DropFilesFromRoot(rt string) {
