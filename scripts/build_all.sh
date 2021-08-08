@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 init() {
-    go get -v -u github.com/rakyll/statik
-    $GOPATH/bin/statik -src="./www/" -f
+    go install github.com/rakyll/statik
+    ~/go/bin/statik -src="./www/" -f
 }
 build_template() {
     export CGO_ENABLED=1
