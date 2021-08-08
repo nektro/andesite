@@ -13,7 +13,6 @@ jobs:
       - run: go version
       - run: go env
       - run: go get -v .
-      - run: go test -v .
       - run: ./scripts/build_all.sh
       - store_artifacts:
           path: ./bin/
@@ -25,6 +24,7 @@ jobs:
       - docker/build:
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
           tag: latest,v$CIRCLE_BUILD_NUM
+          extra_build_args: --build-arg VERSION=v$CIRCLE_BUILD_NUM
       - docker/push:
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
           tag: latest,v$CIRCLE_BUILD_NUM
