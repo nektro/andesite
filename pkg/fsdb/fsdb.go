@@ -33,6 +33,10 @@ func Init(mp map[string]string, rt string) {
 			}
 			if s.Mode()&os.ModeSymlink != 0 {
 				realpath, _ := filepath.EvalSymlinks(osPathname)
+				if realpath == "" {
+					util.LogError("fsdb:", rt+":", "symlink", osPathname, "is pointing to a non-existing file")
+					return nil
+				}
 				s, err := os.Lstat(realpath)
 				if err != nil {
 					util.LogError("fsdb:", rt+":", err)
