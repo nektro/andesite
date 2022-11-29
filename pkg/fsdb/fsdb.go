@@ -32,8 +32,8 @@ func Init(mp map[string]string, rt string) {
 				return nil
 			}
 			if s.Mode()&os.ModeSymlink != 0 {
-				realpath, _ := os.Readlink(osPathname)
-				s, _ = os.Lstat(filepath.Dir(osPathname) + "/" + realpath)
+				realpath, _ := filepath.EvalSymlinks(osPathname)
+				s, _ = os.Lstat(realpath)
 				if s.IsDir() {
 					return nil
 				}
