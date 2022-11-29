@@ -102,9 +102,9 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 			for i := 0; i < len(files); i++ {
 				name := files[i].Name()
 				a := ""
-				if files[i].IsDir() {
-					a = name + "/"
-				} else if files[i].Mode()&os.ModeSymlink != 0 {
+				ext := ""
+				isFile := true
+				if files[i].Mode()&os.ModeSymlink != 0 {
 					// resolve link, then do this again
 					realpath, _ := filepath.EvalSymlinks(fileRoot + qpath + files[i].Name())
 					if realpath == "" {
@@ -119,15 +119,21 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 					}
 					if symfile.IsDir() {
 						a = name + "/"
+						ext = ".folder"
+						isFile = false
 					} else {
 						a = name
+						ext = filepath.Ext(a)
 					}
 				} else {
-					a = name
-				}
-				ext := filepath.Ext(a)
-				if files[i].IsDir() {
-					ext = ".folder"
+					if files[i].IsDir() {
+						a = name
+						ext = ".folder"
+						isFile = false
+					} else {
+						a = name
+						ext = filepath.Ext(a)
+					}
 				}
 				if len(ext) == 0 {
 					ext = ".asc"
@@ -138,7 +144,7 @@ func HandleDirectoryListing(getAccess func(http.ResponseWriter, *http.Request) (
 					"mod":     files[i].ModTime().UTC().String()[:19],
 					"ext":     ext[1:],
 					"mod_raw": strconv.FormatInt(files[i].ModTime().UTC().Unix(), 10),
-					"is_file": !files[i].IsDir(),
+					"is_file": isFile,
 				})
 			}
 			pth := r.URL.Path[len(idata.Config.HTTPBase)-1:]
