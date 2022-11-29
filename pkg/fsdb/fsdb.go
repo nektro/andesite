@@ -33,7 +33,11 @@ func Init(mp map[string]string, rt string) {
 			}
 			if s.Mode()&os.ModeSymlink != 0 {
 				realpath, _ := filepath.EvalSymlinks(osPathname)
-				s, _ = os.Lstat(realpath)
+				s, err := os.Lstat(realpath)
+				if err != nil {
+					util.LogError("fsdb:", rt+":", err)
+					return nil
+				}
 				if s.IsDir() {
 					return nil
 				}
