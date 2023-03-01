@@ -1,0 +1,9 @@
+with import <nixpkgs> {};
+
+pkgs.mkShell {
+  nativeBuildInputs = with pkgs; [
+    go
+  ];
+
+  hardeningDisable = [ "all" ];
+}
