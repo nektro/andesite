@@ -63,7 +63,7 @@ Or from Docker `docker run nektro/andesite`
 ### Prerequisites
 
 - A directory you wish to proxy through Andesite
-- The Go Language 1.12+ (https://golang.org/dl/)
+- The Go Language 1.16+ (https://golang.org/dl/)
 - GCC on your PATH (for the https://github.com/mattn/go-sqlite3 installation)
 
 ### Installing
