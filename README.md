@@ -1,4 +1,5 @@
 # Andesite
+
 ![loc](https://sloc.xyz/github/nektro/andesite)
 [![license](https://img.shields.io/github/license/nektro/andesite.svg)](https://github.com/nektro/andesite/blob/master/LICENSE)
 [![discord](https://img.shields.io/discord/551971034593755159.svg?logo=discord)](https://discord.gg/P6Y4zQC)
@@ -15,9 +16,11 @@
 Share folders in an Open Directory without making your entire server public. Manages users with OAuth2.
 
 ## Getting Started
+
 These instructions will help you get the project up and running. To obtain the binary you will use to run the app, follow the [Development](#development) or [Deployment](#deployment) sections for futher direction. Below, are general directions for all builds.
 
 ### Options
+
 Use these to configure your Andesite instance. All are optional. "Name" refers to the name of the CLI flag that may be used. "Config Name" refers to the key name inside of your `config.json`. More on that later.
 
 | Name | Config Name | Type | Default | Description |
@@ -42,6 +45,7 @@ Use these to configure your Andesite instance. All are optional. "Name" refers t
 > Note: for `--enable-search` and `--disable-search`, sending values to these flags will trigger a background scan of the root directory you point it at (whether that be `public`, `files`, etc). As such, unless content is changed or updated, it is not necessary to pass these flags across multiple runs of the app.
 
 ### Creating Credentials
+
 In order to create a "closed directory" with Andesite, you will need to create an app on your Identity Provider(s) of choice. See the [nektro/go.oauth2](https://github.com/nektro/go.oauth2#readme) docs for more detailed info on this process on where to go and what data you'll need.
 
 Here you can also fill out a picture and description that will be displayed during the authorization of users on your chosen Identity Provider. When prompted for the "Redirect URI" during the app setup process, the URL to use will be `http://andesite/callback`, replacing `andesite` with any origins you wish Andesite to be usable from, such as `example.com` or `localhost:800`.
@@ -55,6 +59,7 @@ The Identity Provider IDs used below can be found in the table in the [nektro/go
 | `--oauth2-client` | `string[]` | none. | `idp_id|id|secret` |
 
 ## Deployment
+
 Pre-compiled binaries can be obtained from https://github.com/nektro/andesite/releases/latest.
 
 Or from Docker `docker run nektro/andesite`
@@ -62,11 +67,13 @@ Or from Docker `docker run nektro/andesite`
 ## Development
 
 ### Prerequisites
+
 - A directory you wish to proxy through Andesite
 - The Go Language 1.12+ (https://golang.org/dl/)
 - GCC on your PATH (for the https://github.com/mattn/go-sqlite3 installation)
 
 ### Installing
+
 Run
 ```
 $ go get -v -u github.com/nektro/andesite
@@ -82,6 +89,7 @@ $ ./andesite
 ## Extras
 
 ### Discord Guild/Role Access Grant
+
 Due to a limitation in the Discord API, in order to determine if a user has a role on a specific server, you must use a bot. To get started, go to https://discordapp.com/developers/applications/ and add a Bot user to your app and copy down the Bot Token. Now, to be able to give file/folder access to entire roles, we are going to be using more flags:
 
 | Name | Config Name | Type | Default | Description |
@@ -92,6 +100,7 @@ Due to a limitation in the Discord API, in order to determine if a user has a ro
 Enabling these values will add a section to `http://andesite/admin` that you can input the role snowflakes and the path you are granting.
 
 ### Themes
+
 Andesite supports making custom themes for the splash page and the various HTML templates throughout the program. Those are:
 - `index.html` - [Default Source](./www/index.html)
     - The main page shown to all users at the root of the server.
@@ -111,6 +120,7 @@ Andesite supports making custom themes for the splash page and the various HTML 
 All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `--theme` was `example`. Doing this will tell Andesite to serve files from `.andesite/themes/example/`.
 
 ## Built With
+
 - http://github.com/aymerick/raymond
 - http://github.com/fsnotify/fsnotify
 - http://github.com/nektro/go-util
@@ -122,11 +132,13 @@ All or none of the files may be replaced when using a theme. To enable use of a 
 - http://github.com/valyala/fastjson
 
 ## Contributing
+
 [![issues](https://img.shields.io/github/issues/nektro/andesite.svg)](https://github.com/nektro/andesite/issues)
 
 We listen to issues all the time right here on GitHub. Labels are extensively to show the progress through the fixing process. Question issues are okay but make sure to close the issue when it has been answered! Off-topic and '+1' comments will be deleted. Please use post/comment reactions for this purpose.
 
 ## Contact
+
 - hello@nektro.net
 - https://twitter.com/nektro
 
