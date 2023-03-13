@@ -2,14 +2,8 @@
 
 ![loc](https://sloc.xyz/github/nektro/andesite)
 [![license](https://img.shields.io/github/license/nektro/andesite.svg)](https://github.com/nektro/andesite/blob/master/LICENSE)
-[![discord](https://img.shields.io/discord/551971034593755159.svg?logo=discord)](https://discord.gg/P6Y4zQC)
-[![paypal](https://img.shields.io/badge/donate-paypal-009cdf?logo=paypal)](https://paypal.me/nektro)
-[![circleci](https://circleci.com/gh/nektro/andesite.svg?style=svg)](https://circleci.com/gh/nektro/andesite)
 [![release](https://img.shields.io/github/v/release/nektro/andesite)](https://github.com/nektro/andesite/releases/latest)
-[![goreportcard](https://goreportcard.com/badge/github.com/nektro/andesite)](https://goreportcard.com/report/github.com/nektro/andesite)
-[![codefactor](https://www.codefactor.io/repository/github/nektro/andesite/badge)](https://www.codefactor.io/repository/github/nektro/andesite)
 [![downloads](https://img.shields.io/github/downloads/nektro/andesite/total.svg)](https://github.com/nektro/andesite/releases)
-[![issuehunt](https://img.shields.io/badge/issuehunt-andesite-38d39f)](https://issuehunt.io/r/nektro/andesite)
 [![docker_pulls](https://img.shields.io/docker/pulls/nektro/andesite)](https://hub.docker.com/r/nektro/andesite)
 [![docker_stars](https://img.shields.io/docker/stars/nektro/andesite)](https://hub.docker.com/r/nektro/andesite)
 
