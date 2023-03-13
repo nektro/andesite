@@ -1,0 +1,10 @@
+2
+git https://github.com/kivikakk/htmlentities.zig commit-311c844c1d1d1cb968eedfeb76ce911038b1043a
+git https://github.com/nektro/mango_pie commit-6a3a9b8f7efcaaa8a6ef3a0e09d6a939093a2815
+git https://github.com/nektro/zig-extras commit-d34ac633f0a0af8d348b66a38e7497d031f027b1
+git https://github.com/nektro/zig-flag commit-05a5b3ad0037289b8338807dcf2963e5b3e4b753
+git https://github.com/nektro/zig-mime commit-b0dbc36aa97d59a036fbaefbe16858043492146d
+git https://github.com/nektro/zig-pek commit-ca41fc8f0a6abf964e99089777fc7b6953c09e14
+git https://github.com/nektro/zig-range commit-4b2f12808aa09be4b27a163efc424dd4e0415992
+git https://github.com/nektro/zig-signal commit-a5a9f52a0c2c6c687b158c7c50bd962141923f59
+git https://github.com/nektro/zig-time commit-bfb7da7b8ee92b6c07f90a14b044a9b8f4df182c

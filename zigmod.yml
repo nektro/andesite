@@ -1,0 +1,14 @@
+id: m80ujped5ccgka3poxf6ulqb92vn4245is5ivlzvs9r5mliw
+name: andesite
+license: Apache-2.0
+description: Share folders in an Open Directory without making your entire server public. Manages users with OAuth2.
+root_files:
+  - www
+root_dependencies:
+  - src: git https://github.com/nektro/mango_pie
+  - src: git https://github.com/nektro/zig-signal
+  - src: git https://github.com/nektro/zig-flag
+  - src: git https://github.com/nektro/zig-pek
+  - src: git https://github.com/nektro/zig-time
+  - src: git https://github.com/nektro/zig-mime
+  - src: git https://github.com/nektro/zig-extras

@@ -1,3 +1,6 @@
 /andesite*
 /bin/
 /data/
+zig-*
+.zigmod
+deps.zig
