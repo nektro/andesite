@@ -54,30 +54,23 @@ The Identity Provider IDs used below can be found in the table in the [nektro/go
 
 ## Deployment
 
-Pre-compiled binaries can be obtained from https://github.com/nektro/andesite/releases/latest.
-
-Or from Docker `docker run nektro/andesite`
+Or from Docker `docker run nektro/andesite:2`
 
 ## Development
 
 ### Prerequisites
 
 - A directory you wish to proxy through Andesite
-- The Go Language 1.16+ (https://golang.org/dl/)
-- GCC on your PATH (for the https://github.com/mattn/go-sqlite3 installation)
+- The Zig Language master (https://ziglang.org/download/)
 
 ### Installing
 
-Run
 ```
-$ go get -v -u github.com/nektro/andesite
-```
-and then make your way to `$GOPATH/src/github.com/nektro/andesite/`.
-
-Once there, run:
-```
-$ go build
-$ ./andesite
+$ git clone https://github.com/nektro/andesite
+$ cd checkout 2
+$ zigmod fetch
+$ zig build
+$ ./zig-out/andesite
 ```
 
 ## Extras
@@ -93,37 +86,10 @@ Due to a limitation in the Discord API, in order to determine if a user has a ro
 
 Enabling these values will add a section to `http://andesite/admin` that you can input the role snowflakes and the path you are granting.
 
-### Themes
-
-Andesite supports making custom themes for the splash page and the various HTML templates throughout the program. Those are:
-- `index.html` - [Default Source](./www/index.html)
-    - The main page shown to all users at the root of the server.
-- `response.hbs` - [Default Source](./www/response.hbs)
-    - A generic page used to show errors and message to the user.
-- `listing.hbs` - [Default Source](./www/listing.hbs)
-    - The main directory listing page.
-- `admin.hbs` - [Default Source](./www/admin.hbs)
-    - The admin dashboard that allows editing the access of users.
-- `style.css` - [Default Source](./www/style.css)
-    - Empty CSS file you can use to easily make style-only themes.
-- `users.hbs` - [Default Source](./www/users.hbs)
-    - The admin dashboard that allows viewing of the list of users.
-- `admin_roots.hbs` - [Default Source](./www/admin_roots.hbs)
-    - The admin dashboard that allows viewing of all the data paths.
-
-All or none of the files may be replaced when using a theme. To enable use of a theme, suppose the value passed to `--theme` was `example`. Doing this will tell Andesite to serve files from `.andesite/themes/example/`.
-
 ## Built With
 
-- http://github.com/aymerick/raymond
-- http://github.com/fsnotify/fsnotify
-- http://github.com/nektro/go-util
-- http://github.com/nektro/go.etc
-- http://github.com/nektro/go.oauth2
-- http://github.com/mitchellh/go-homedir
-- http://github.com/rakyll/statik
-- http://github.com/spf13/pflag
-- http://github.com/valyala/fastjson
+- Zig master
+- See [`zigmod.yml`](./zigmod.yml) and [`zigmod.lock`](./zigmod.lock)
 
 ## Contributing
 
